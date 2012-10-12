@@ -16,7 +16,8 @@ changePrior=function(location){
 ChangePriorVec=function(locVec){
   sapply(locVec,changePrior)
 }
-
+####################
+##Functions for calculating proportions
 sum_calc=function(bart.obj){apply(bart.obj$varcount,2,sum)}
 
 ##calculate variable proportions 
@@ -41,23 +42,65 @@ prop_calc_prior=function(bart.obj,prior.vec){
   return(round(props,3))
 }
 
-bart.obj=bart.mod
-prior.vec=reps
-length(temp)
-length(reps)
-t=rep(reps,reps)
-t=rep(names(reps),times=as.integer(reps))
-names(reps)
-length(t)
+####################################
+#Bootstrap functions
 
-nonpar_boot=function(gene.vec,strung.rep.vec,nboot=100){
-  n=length(gene.vec)
-  maxVec=numeric(nboot)
-  for(j in 1:nboot){ ##this procedure adjusts for simult.
-  perm.sample=gene.vec[sample(1:n,n,F)]
-  bart.boot=bart(x.train=tf.train.prior,y.train=perm.sample,...)
-  props=prop_calc_prior(bart.boot,strung.rep.vec)
-  maxVec[j]=max(props) ##need max to adjust for simult.
-  }
-  return(maxVec)
+
+
+################
+#BART Loop Functions
+
+getGeneResponse=function(gene){
+  idx=which(colnames(gene.train)==gene)
+  gv=as.numeric(gene.train[,idx])
+  names(gv)=rownames(gene.train)
+  return(gv)
+}
+
+getReps=function(gene){
+  return(priorWeights[gene,])
+}
+
+############################
+##Setup function
+##This function creates:
+#PriorWeights: rows are genes, cols are TFs
+##gene.train and gene.test rows are obs and cols are genes
+##TF train and TF test: rows are obs and cols are TFs
+setup=function(){
+  ##remove first two columns
+  prior_nums=priors[,3:ncol(priors)]
+  geneNames=as.character(gene.exp[,2])
+  
+  ##get weights- rownames are genes. colnames are TFs
+  priorWeights=apply(prior_nums,2,ChangePriorVec)
+  rownames(priorWeights)=geneNames
+  
+  ##prior col 1 goes with gene col 2 and vice versa
+  priorWeights[,1]==gene.exp[,2]
+  
+  
+  ##need transpose of tf mat
+  tf.names=tf.exp[,1]
+  temp.tf=tf.exp[,5:ncol(tf.exp)]
+  tf.full=t(temp.tf) ##This is training matrix
+  colnames(tf.full)=tf.names
+  rownames(tf.full)=colnames(tf.exp)[5:ncol(tf.exp)]
+  dim(tf.full) #check 314 conditions and 39 TFs
+  hold=ceiling(.2*nrow(tf.full))
+  
+  #get training and test
+  train.end=314-hold
+  tf.train=tf.full[1:train.end,]
+  tf.test=tf.full[(train.end+1):nrow(tf.full),]
+  
+  ##Clean gene matrix
+  geneMatClean=t(gene.exp[,5:ncol(gene.exp)])
+  rownames(geneMatClean)=rownames(tf.full)
+  colnames(geneMatClean)=geneNames
+  
+  ##Get gene test and train
+  gene.train=geneMatClean[1:train.end,]
+  gene.test=geneMatClean[(1+train.end):nrow(geneMatClean),]
+  return(list(priorWeights,tf.train,tf.test,gene.train,gene.test))
 }
