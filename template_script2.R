@@ -14,11 +14,12 @@ gene.train=out[[4]];gene.test=out[[5]]##gene.train and gene.test rows are obs an
 tf.train=out[[2]];tf.test=out[[3]]##TF train and TF test: rows are obs and cols are TFs
 geneNames=as.character(gene.exp[,2]) ##gene names
 
-
-
+##run barts
 out5=run_BART(geneList=geneNames[1:100],tf.train,runBoot=T,ntree=5,nskip=1000,ndpost=2000,verbose=F)
-out5=run_BART(geneList=geneNames[1:100],tf.train,runBoot=T,ntree=10,nskip=1000,ndpost=2000,verbose=F)
-  
+out10=run_BART(geneList=geneNames[1:100],tf.train,runBoot=T,ntree=10,nskip=1000,ndpost=2000,verbose=F)
+
+
+##Consider FDR?
 run_BART=function(geneList,tf.mat,runBoot=F,...){
   t0=Sys.time()
   out=list()
@@ -73,14 +74,14 @@ run_BART=function(geneList,tf.mat,runBoot=F,...){
   return(out)
 }
 
+
+##junk
 bisectK(.01,.95,boot_mat,1,20,100)
 
-apply(out[[gene]][["boot_mat"]],2,mean)+10.91*apply(out[[gene]][["boot_mat"]],2,sd)
 boot_mat=out[[gene]][["boot_mat"]]
 out[[gene]][["trueTF"]]
 out[[gene]][["tvar"]]
 
-var_prop
 
 
 getBootMat=function(gene.vec,tf.train,...,nboot=100){ ##needs original training matrix for simult. inference
@@ -89,10 +90,10 @@ getBootMat=function(gene.vec,tf.train,...,nboot=100){ ##needs original training 
   for(j in 1:nboot){ 
     perm.sample=gene.vec[sample(1:n,n,F)] ##permute y vector
     print(perm.sample[1])
-    tf.mat.break=priorBreak(tf.train,length(strung.rep.vec))
+    tf.mat.break=priorBreak(tf.train,length(strung.rep.vec)) ##CHECK
     #bart.boot=bart(x.train=tf.mat.break,y.train=perm.sample,ntree=20,nskip=2000,ndpost=2000,verbose=F)
     bart.boot=bart(x.train=tf.mat.break,y.train=perm.sample,...)
-    props=prop_calc_prior(bart.boot,colnames(tf.mat.break)) ##THIS LINE IS WRONG- ITS NOT STRUNG REP VEC
+    props=prop_calc_prior(bart.boot,colnames(tf.mat.break)) ##CHECK! THIS COULD BE WRONG
     boot_mat[j,]=props ##need max to adjust for simult.
     if(j%%25==0) print(j)
   }
