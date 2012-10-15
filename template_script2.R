@@ -14,9 +14,13 @@ gene.train=out[[4]];gene.test=out[[5]]##gene.train and gene.test rows are obs an
 tf.train=out[[2]];tf.test=out[[3]]##TF train and TF test: rows are obs and cols are TFs
 geneNames=as.character(gene.exp[,2]) ##gene names
 
-run_BART(geneList=gene,tf.train,runBoot=T,ntree=10,nskip=1000,ndpost=2000)
 
+
+out5=run_BART(geneList=geneNames[1:100],tf.train,runBoot=T,ntree=5,nskip=1000,ndpost=2000,verbose=F)
+out5=run_BART(geneList=geneNames[1:100],tf.train,runBoot=T,ntree=10,nskip=1000,ndpost=2000,verbose=F)
+  
 run_BART=function(geneList,tf.mat,runBoot=F,...){
+  t0=Sys.time()
   out=list()
   count=0
   for(gene in geneList){
@@ -38,31 +42,48 @@ run_BART=function(geneList,tf.mat,runBoot=F,...){
     out[[gene]][["yhat"]]=(bart.mod$yhat.train.mean) ##in sample yhat
     out[[gene]][["sig"]]=mean(bart.mod$sigma) ##estimate of sigma
     count=count+1
-    if(runBoot==T) nonpar_boot(gene.vec=gene.response,strung.rep.vec=strung.reps,tf.train=tf.mat,count=count,,...) #runs non-par boot
-    ##Lets unwrap the function for the most part
-    # part 1- return boot matrix
-    ##part 2 do computations
-    ##leave everything else in this call
+    if(runBoot==T) {#runs non-par boot
+      
+      # part 1- return boot matrix
+      boot_mat=getBootMat(gene.vec=gene.response,tf.train=tf.train,...)
+      ##part 2 do computations
+      if(count<=10) out[[gene]][["boot_mat"]]=boot_mat
+  
+      ##Simult. Coverage Part
+      boot.se=apply(boot_mat,2,sd)
+      mean_boot=apply(boot_mat,2,mean)
+      coverConst=bisectK(tol=.01,coverage=.95,boot_mat=boot_mat,x_left=1,x_right=20,limit=100)
+      out[[gene]][["const"]]=coverConst
+      print(coverConst)
+      mean(sapply(1:nboot, function(s) all(boot_mat[s,]-mean_boot<=coverConst*boot.se)))
+      simul_trueTFs=which(var_prop>=mean_boot+coverConst*boot.se)
+      out[[gene]][["s_trueTF"]]=simul_trueTFs
+      
+      ##pointwise coverage
+      q95_point=apply(boot_mat,2,quantile, probs=.95)
+      point_trueTFs=which(var_prop>=q95_point)
+      out[[gene]][["p_trueTF"]]=point_trueTFs
+      ##leave everything else in this call
+    }
     
-    
-    
-    if(count%%10==0) print(count)
+      if(count%%10==0) print(count)
   }
+  t1=Sys.time()
+  print(t1-t0)
   return(out)
 }
 
-gene=geneNames[3]
-tf.mat=tf.train
-plot(bart.mod)
+bisectK(.01,.95,boot_mat,1,20,100)
+
+apply(out[[gene]][["boot_mat"]],2,mean)+10.91*apply(out[[gene]][["boot_mat"]],2,sd)
+boot_mat=out[[gene]][["boot_mat"]]
+out[[gene]][["trueTF"]]
+out[[gene]][["tvar"]]
+
 var_prop
-nboot=100
-gene.vec=gene.response
-strung.rep.vec=strung.reps
 
 
-nonpar_boot=function(gene.vec,strung.rep.vec,tf.train,nboot=10,count,...){ ##this procedure adjusts for simult.
-  ##needs original training matrix
-  print(count)
+getBootMat=function(gene.vec,tf.train,...,nboot=100){ ##needs original training matrix for simult. inference
   n=length(gene.vec) ##for permutation
   boot_mat=matrix(0,nrow=nboot,ncol=ncol(priorWeights)) ##ncol is fixed
   for(j in 1:nboot){ 
@@ -71,17 +92,11 @@ nonpar_boot=function(gene.vec,strung.rep.vec,tf.train,nboot=10,count,...){ ##thi
     tf.mat.break=priorBreak(tf.train,length(strung.rep.vec))
     #bart.boot=bart(x.train=tf.mat.break,y.train=perm.sample,ntree=20,nskip=2000,ndpost=2000,verbose=F)
     bart.boot=bart(x.train=tf.mat.break,y.train=perm.sample,...)
-    props=prop_calc_prior(bart.boot,strung.rep.vec)
+    props=prop_calc_prior(bart.boot,colnames(tf.mat.break)) ##THIS LINE IS WRONG- ITS NOT STRUNG REP VEC
     boot_mat[j,]=props ##need max to adjust for simult.
     if(j%%25==0) print(j)
   }
-  if(count<=10) out[[gene]][["boot_mat"]]=boot_mat 
-  boot.se=apply(boot_mat,2,sd)
-  mean_boot=apply(boot_mat,2,mean)
-  coverConst=bisectK(tol=.01,coverage=.95,boot_mat=boot_mat,x_left=1,x_right=20,limit=100)
-  mean(sapply(1:nboot, function(s) all(boot_mat[s,]-mean_boot<=coverConst*boot.se)))
-  trueTFs=which(var_prop>=mean_boot+coverConst*boot.se)
-  return(trueTFs)
+  return(boot_mat)
 }
 
 
@@ -96,34 +111,25 @@ priorBreak=function(tf.mat,lengthPrior,numTFs=39){
 
 ##bisection method for finding simult. coverage 
 bisectK=function(tol,coverage,boot_mat,x_left,x_right,limit){
-  count=0
-  x_left=2
-  x_right=15
+  x_left=x_left
+  x_right=x_right
   guess=(x_left+x_right)/2
   while(.5*(x_right-x_left)>=tol & count<countLimit){
     mean_boot=apply(boot_mat,2,mean)
+    boot.se=apply(boot_mat,2,sd)
     empCoverage=mean(sapply(1:nboot, function(s) all(boot_mat[s,]-mean_boot<=guess*boot.se)))
     if(empCoverage-coverage==0) break
     else if((empCoverage-coverage)<0) x_left=guess
     else x_right=guess
     guess=(x_left+x_right)/2
-    count=count+1
   }
   return(guess)
 }
 
 
-
-
-
-
 #####################OTHER STUFF FOR NOW####################
 
 ##Run some models
-bart5=run_BART(geneNameVec[1:1000],ntree=5,ndpost=3000,nskip=2000,verbose=F)
-bart10=run_BART(geneNameVec[1:1000],ntree=10,ndpost=3000,nskip=2000,verbose=F)
-bart20=run_BART(geneNameVec[1:1000],ntree=20,ndpost=3000,nskip=2000,verbose=F)
-
 
 cor5=sapply(1:1000, function(x) cor(bart5[[x]][[2]],priorWeights[x,]))
 cor10=sapply(1:1000, function(x) cor(bart10[[x]][[2]],priorWeights[x,]))
@@ -155,14 +161,7 @@ getMaxes=function(bartList,idx){
   names(mx)=names(nameMx)[1]
   return(mx)
 }
-names()
-cor(x[[2]][[2]],priorWeights[2,])
-which(x[[3]][[2]]==max(x[[3]][[2]]))
-x[[3]][[2]]
-reps
-  ##Need to get prior function stuff from computer 
-prioy=getReps(gene)
-priorWeights[gene,]
+
 train.exp=train.exp.temp[,rep(1:ncol(train.exp.temp),reps)]
 
 
