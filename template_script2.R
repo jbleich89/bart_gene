@@ -1,12 +1,16 @@
 setwd("~/Research_Genomics/bart_gene") ##work
+setwd("~/Documents/Research/Genomics/bart_gene/") ##home
 source("real_functions.R")
 library(BayesTree)
 
-
+##work
 priors=read.table("~/Research_Genomics/CHIP.priorprobs.39.txt",header=T) ##work
 gene.exp=read.table("~/Research_Genomics/expression.genes.txt",header=T) ##work
 tf.exp=read.table("~/Research_Genomics/expression.tfs.39.txt",header=T) ##work
-
+##Home
+priors=read.table("~/Documents/Research/Genomics/Real_Data/CHIP.priorprobs.39.txt",header=T) ##home
+gene.exp=read.table("~/Documents/Research/Genomics/Real_Data/expression.genes.txt",header=T) ##home
+tf.exp=read.table("~/Documents/Research/Genomics/Real_Data/expression.tfs.39.txt",header=T) ##home
 
 ##put in setup
 priorMat=as.matrix(priors[,3:ncol(priors)])
@@ -19,9 +23,11 @@ geneNames=as.character(gene.exp[,2]) ##gene names
 
 ##run barts
 out5=run_BART(geneList=geneNames[1:100],tf.train,runBoot=T,ntree=5,nskip=1000,ndpost=2000,verbose=F)
+save(out5,file="out5_1.rdata")
 out10=run_BART(geneList=geneNames[1:100],tf.train,runBoot=T,ntree=10,nskip=1000,ndpost=2000,verbose=F)
-
-
+save(out5,file="out10_1.rdata")
+out20=run_BART(geneList=geneNames[1:100],tf.train,runBoot=T,ntree=20,nskip=1000,ndpost=2000,verbose=F)
+save(out5,file="out20_1.rdata")
 ##Consider FDR?
 run_BART=function(geneList,tf.mat,runBoot=F,...){
   t0=Sys.time()
@@ -49,7 +55,7 @@ run_BART=function(geneList,tf.mat,runBoot=F,...){
     if(runBoot==T) {#runs non-par boot
       
       # part 1- return boot matrix
-      boot_mat=getBootMat(gene.vec=gene.response,tf.train=tf.train,...)
+      boot_mat=getBootMat(gene.vec=gene.response,tf.train=tf.train,strung.rep.vec=strung.reps,...)
       ##part 2 do computations
       if(count<=10) out[[gene]][["boot_mat"]]=boot_mat
   
@@ -87,7 +93,7 @@ out[[gene]][["tvar"]]
 
 
 
-getBootMat=function(gene.vec,tf.train,...,nboot=100){ ##needs original training matrix for simult. inference
+getBootMat=function(gene.vec,tf.train,strung.rep.vec,...,nboot=100){ ##needs original training matrix for simult. inference
   n=length(gene.vec) ##for permutation
   boot_mat=matrix(0,nrow=nboot,ncol=ncol(priorWeights)) ##ncol is fixed
   for(j in 1:nboot){ 
