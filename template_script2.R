@@ -28,6 +28,8 @@ out10=run_BART(geneList=geneNames[1:100],tf.train,runBoot=T,ntree=10,nskip=1000,
 save(out5,file="out10_1.rdata")
 out20=run_BART(geneList=geneNames[1:100],tf.train,runBoot=T,ntree=20,nskip=1000,ndpost=2000,verbose=F)
 save(out5,file="out20_1.rdata")
+
+
 ##Consider FDR?
 run_BART=function(geneList,tf.mat,runBoot=F,...){
   t0=Sys.time()
@@ -62,10 +64,10 @@ run_BART=function(geneList,tf.mat,runBoot=F,...){
       ##Simult. Coverage Part
       boot.se=apply(boot_mat,2,sd)
       mean_boot=apply(boot_mat,2,mean)
-      coverConst=bisectK(tol=.01,coverage=.95,boot_mat=boot_mat,x_left=1,x_right=20,limit=100)
+      coverConst=bisectK(tol=.01,coverage=.95,boot_mat=boot_mat,x_left=1,x_right=20,countLimit=100)
       out[[gene]][["const"]]=coverConst
       print(coverConst)
-      mean(sapply(1:nboot, function(s) all(boot_mat[s,]-mean_boot<=coverConst*boot.se)))
+      mean(sapply(1:nrow(boot_mat), function(s) all(boot_mat[s,]-mean_boot<=coverConst*boot.se)))
       simul_trueTFs=which(var_prop>=mean_boot+coverConst*boot.se)
       out[[gene]][["s_trueTF"]]=simul_trueTFs
       
@@ -84,15 +86,9 @@ run_BART=function(geneList,tf.mat,runBoot=F,...){
 }
 
 
-##junk
-bisectK(.01,.95,boot_mat,1,20,100)
-
-boot_mat=out[[gene]][["boot_mat"]]
-out[[gene]][["trueTF"]]
-out[[gene]][["tvar"]]
 
 
-
+###
 getBootMat=function(gene.vec,tf.train,strung.rep.vec,...,nboot=100){ ##needs original training matrix for simult. inference
   n=length(gene.vec) ##for permutation
   boot_mat=matrix(0,nrow=nboot,ncol=ncol(priorWeights)) ##ncol is fixed
@@ -120,18 +116,20 @@ priorBreak=function(tf.mat,lengthPrior,numTFs=39){
 
 
 ##bisection method for finding simult. coverage 
-bisectK=function(tol,coverage,boot_mat,x_left,x_right,limit){
+bisectK=function(tol,coverage,boot_mat,x_left,x_right,countLimit){
+  count=0
   x_left=x_left
   x_right=x_right
   guess=(x_left+x_right)/2
   while(.5*(x_right-x_left)>=tol & count<countLimit){
     mean_boot=apply(boot_mat,2,mean)
     boot.se=apply(boot_mat,2,sd)
-    empCoverage=mean(sapply(1:nboot, function(s) all(boot_mat[s,]-mean_boot<=guess*boot.se)))
+    empCoverage=mean(sapply(1:nrow(boot_mat), function(s) all(boot_mat[s,]-mean_boot<=guess*boot.se)))
     if(empCoverage-coverage==0) break
     else if((empCoverage-coverage)<0) x_left=guess
     else x_right=guess
     guess=(x_left+x_right)/2
+    count=count+1
   }
   return(guess)
 }
