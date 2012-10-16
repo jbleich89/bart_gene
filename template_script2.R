@@ -8,6 +8,9 @@ gene.exp=read.table("~/Research_Genomics/expression.genes.txt",header=T) ##work
 tf.exp=read.table("~/Research_Genomics/expression.tfs.39.txt",header=T) ##work
 
 
+##put in setup
+priorMat=as.matrix(priors[,3:ncol(priors)])
+rownames(priorMat)=priors[,1] ; colnames(priorMat)=colnames(priors)[3:ncol(priors)]
 out=setup() ##5 objects
 priorWeights=out[[1]]#PriorWeights: rows are genes, cols are TFs
 gene.train=out[[4]];gene.test=out[[5]]##gene.train and gene.test rows are obs and cols are genes
