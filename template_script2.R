@@ -23,7 +23,7 @@ geneNames=as.character(gene.exp[,2]) ##gene names
 
 ##run barts
 out5=run_BART(geneList=geneNames[1:100],tf.train,runBoot=T,ntree=5,nskip=1000,ndpost=2000,verbose=F)
-save(out5,file="out5_1.rdata")
+ save(out5,file="out5_1.rdata")
 out10=run_BART(geneList=geneNames[1:100],tf.train,runBoot=T,ntree=10,nskip=1000,ndpost=2000,verbose=F)
 save(out5,file="out10_1.rdata")
 out20=run_BART(geneList=geneNames[1:100],tf.train,runBoot=T,ntree=20,nskip=1000,ndpost=2000,verbose=F)
@@ -58,6 +58,7 @@ run_BART=function(geneList,tf.mat,runBoot=F,...){
       
       # part 1- return boot matrix
       boot_mat=getBootMat(gene.vec=gene.response,tf.train=tf.train,strung.rep.vec=strung.reps,...)
+      #boot_mat=getBootMat(gene.vec=gene.response,tf.train=tf.train,strung.rep.vec=strung.reps,ntree=5)
       ##part 2 do computations
       if(count<=10) out[[gene]][["boot_mat"]]=boot_mat
   
@@ -86,19 +87,18 @@ run_BART=function(geneList,tf.mat,runBoot=F,...){
 }
 
 
-
-
 ###
 getBootMat=function(gene.vec,tf.train,strung.rep.vec,...,nboot=100){ ##needs original training matrix for simult. inference
   n=length(gene.vec) ##for permutation
   boot_mat=matrix(0,nrow=nboot,ncol=ncol(priorWeights)) ##ncol is fixed
   for(j in 1:nboot){ 
     perm.sample=gene.vec[sample(1:n,n,F)] ##permute y vector
-    print(perm.sample[1])
+    #print(perm.sample[1])
     tf.mat.break=priorBreak(tf.train,length(strung.rep.vec)) ##CHECK
-    #bart.boot=bart(x.train=tf.mat.break,y.train=perm.sample,ntree=20,nskip=2000,ndpost=2000,verbose=F)
+    #bart.boot=bart(x.train=tf.mat.break,y.train=perm.sample,ntree=5,nskip=2000,ndpost=2000,verbose=F)
     bart.boot=bart(x.train=tf.mat.break,y.train=perm.sample,...)
     props=prop_calc_prior(bart.boot,colnames(tf.mat.break)) ##CHECK! THIS COULD BE WRONG
+   print(length(props))
     boot_mat[j,]=props ##need max to adjust for simult.
     if(j%%25==0) print(j)
   }
@@ -111,7 +111,9 @@ priorBreak=function(tf.mat,lengthPrior,numTFs=39){
   extraTFs=lengthPrior-numTFs
   samp=sample(1:numTFs,extraTFs,replace=T) ##uniform sample with replacement from other TFs 
   extraCols=tf.mat[,samp]
-  return(cbind(tf.mat,extraCols))
+  temp=(cbind(tf.mat,extraCols))
+  colnames(temp)=c(colnames(tf.mat),colnames(tf.mat)[samp])
+  return(temp)
 }
 
 
