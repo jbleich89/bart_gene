@@ -23,41 +23,55 @@ geneNames=as.character(gene.exp[,2]) ##gene names
 
 ##run barts
 out5=run_BART(geneList=geneNames[1:100],tf.train,runBoot=T,ntree=5,nskip=1000,ndpost=2000,verbose=F)
- save(out5,file="out5_1.rdata")
-out10=run_BART(geneList=geneNames[1:100],tf.train,runBoot=T,ntree=10,nskip=1000,ndpost=2000,verbose=F)
-save(out5,file="out10_1.rdata")
-out20=run_BART(geneList=geneNames[1:100],tf.train,runBoot=T,ntree=20,nskip=1000,ndpost=2000,verbose=F)
-save(out5,file="out20_1.rdata")
+#save(out5,file="out5_1.rdata")
+out10=run_BART(geneList=geneNames[1:100],tf.train,runBoot=F,ntree=10,nskip=1000,ndpost=2000,verbose=F)
+#save(out5,file="out10_1.rdata")
+out20=run_BART(geneList=geneNames[1:100],tf.train,runBoot=F,ntree=20,nskip=1000,ndpost=2000,verbose=F)
+#save(out5,file="out20_1.rdata")
+
+
+genelist=geneNames[3]
+genelist
+tf.mat=tf.train
+gene=geneNames[3]
+v100
+v1
+v200
+v500
 
 
 ##Consider FDR?
 run_BART=function(geneList,tf.mat,runBoot=F,...){
-  t0=Sys.time()
-  out=list()
+  t0=Sys.time() ##timer
+  out=list() ##set up list
   count=0
-  for(gene in geneList){
-    out[[gene]]=list()
+  for(gene in geneList){ ##for each gene you're considering
+    out[[gene]]=list() ##make a list
     out[[gene]][["name"]]=gene #store name
     
     ##Setup train
-    reps=getReps(gene) ##get reps
-    tf.mat.prior=tf.train[,rep(1:ncol(tf.mat),reps)] ##make longer matrix
-    print(dim(tf.mat.prior))
+    reps=getReps(gene) ##get reps. gets the right prior weights 
+    tf.mat.prior=tf.train[,rep(1:ncol(tf.mat),reps)] ##make longer matrix with row reps
+    print(dim(tf.mat.prior)) ##check for right dimension
     
-    gene.response=getGeneResponse(gene) ##get response
+    gene.response=getGeneResponse(gene) ##get response- returns it from big matrix of response
     length(gene.response) ##should be 251
-    #bart.mod=bart(tf.mat.prior,gene.response,ntree=10,nskip=2500,ndpost=2500)
-    bart.mod=bart(x.train=tf.mat.prior,y.train=gene.response,,...) ## run BART
+    bart.mod=bart(tf.mat.prior,gene.response,ntree=20,nskip=2500,ndpost=10000,keepevery=100)
+    #bart.mod=bart(x.train=tf.mat.prior,y.train=gene.response,,...) ## run BART
     strung.reps=rep(names(reps),times=as.integer(reps)) ##get names of TFs by number of reps
     var_prop=prop_calc_prior(bart.mod,strung.reps) ##calculate var counts using prior
+    sumVars=sum(sum_calc_prior(bart.mod,strung.reps)) ##total sum of variables
     out[[gene]][["var"]]=var_prop ##var props
     out[[gene]][["yhat"]]=(bart.mod$yhat.train.mean) ##in sample yhat
     out[[gene]][["sig"]]=mean(bart.mod$sigma) ##estimate of sigma
+    out[[gene]][["numSplits"]]=sumVars ##total number of splits used in whole model
     count=count+1
     if(runBoot==T) {#runs non-par boot
       
       # part 1- return boot matrix
-      boot_mat=getBootMat(gene.vec=gene.response,tf.train=tf.train,strung.rep.vec=strung.reps,...)
+      boot_mat_list=getBootMat(gene.vec=gene.response,tf.train=tf.train,strung.rep.vec=strung.reps,...) ##generate boot matrix
+      boot_mat=boot_mat_list[["boot"]] ##gets
+      out[[gene]][["numSplitsNull"]]=boot_mat_list[["nullSum"]]
       #boot_mat=getBootMat(gene.vec=gene.response,tf.train=tf.train,strung.rep.vec=strung.reps,ntree=5)
       ##part 2 do computations
       if(count<=10) out[[gene]][["boot_mat"]]=boot_mat
@@ -86,55 +100,70 @@ run_BART=function(geneList,tf.mat,runBoot=F,...){
   return(out)
 }
 
-
+var_prop
+prop_calc_prior(bart.mod,strung.reps)
+gene.vec=gene.response
+nboot=1
+prop_calc(bart.boot)
+max(prop_calc(bart.boot))
+which.max(prop_calc(bart.boot))
+bart.boot$varcount[,which.max(prop_calc(bart.boot))]
+perm.sample=gene.vec
 ###
-getBootMat=function(gene.vec,tf.train,strung.rep.vec,...,nboot=100){ ##needs original training matrix for simult. inference
+getBootMat=function(gene.vec,tf.train,strung.rep.vec,...,nboot=10){ ##needs original training matrix for simult. inference
+  out=list()
   n=length(gene.vec) ##for permutation
-  boot_mat=matrix(0,nrow=nboot,ncol=ncol(priorWeights)) ##ncol is fixed
+  boot_mat=matrix(0,nrow=nboot,ncol=ncol(tf.train)) ##ncol is fixed-at 39  
+  nullSum=numeric(nboot) ##vector of total vars used
   for(j in 1:nboot){ 
     perm.sample=gene.vec[sample(1:n,n,F)] ##permute y vector
     #print(perm.sample[1])
-    tf.mat.break=priorBreak(tf.train,length(strung.rep.vec)) ##CHECK
-    #bart.boot=bart(x.train=tf.mat.break,y.train=perm.sample,ntree=5,nskip=2000,ndpost=2000,verbose=F)
-    bart.boot=bart(x.train=tf.mat.break,y.train=perm.sample,...)
-    props=prop_calc_prior(bart.boot,colnames(tf.mat.break)) ##CHECK! THIS COULD BE WRONG
-   print(length(props))
+    tf.mat.null=tf.train  ##use training matrix with no priors
+    bart.boot=bart(x.train=tf.mat.null,y.train=perm.sample,ntree=10,nskip=10000,ndpost=10000,keepevery=200)
+    bart.boot=bart(x.train=tf.mat.null,y.train=perm.sample,...)
+    props=prop_calc(bart.obj=bart.boot) ##CHECK! THIS COULD BE WRONG. Think its ok 11/4
+    nullSum[j]=sum(sum_calc(bart.obj=bart.boot)) ##total number of splits. 
+    #print(length(props))
     boot_mat[j,]=props ##need max to adjust for simult.
     if(j%%25==0) print(j)
   }
-  return(boot_mat)
+  out[["boot"]]=boot_mat
+  out[["nullSum"]]=nullSum
+  return(out)
 }
 
 
 ##function for breaking prior
-priorBreak=function(tf.mat,lengthPrior,numTFs=39){
-  extraTFs=lengthPrior-numTFs
-  samp=sample(1:numTFs,extraTFs,replace=T) ##uniform sample with replacement from other TFs 
-  extraCols=tf.mat[,samp]
-  temp=(cbind(tf.mat,extraCols))
-  colnames(temp)=c(colnames(tf.mat),colnames(tf.mat)[samp])
-  return(temp)
-}
+##Now Defunct
+# priorBreak=function(tf.mat,lengthPrior,numTFs=39){
+#   extraTFs=lengthPrior-numTFs
+#   samp=sample(1:numTFs,extraTFs,replace=T) ##uniform sample with replacement from other TFs 
+#   extraCols=tf.mat[,samp]
+#   temp=(cbind(tf.mat,extraCols))
+#   colnames(temp)=c(colnames(tf.mat),colnames(tf.mat)[samp])
+#   return(temp)
+# }
 
 
-##bisection method for finding simult. coverage 
-bisectK=function(tol,coverage,boot_mat,x_left,x_right,countLimit){
-  count=0
-  x_left=x_left
-  x_right=x_right
-  guess=(x_left+x_right)/2
-  while(.5*(x_right-x_left)>=tol & count<countLimit){
-    mean_boot=apply(boot_mat,2,mean)
-    boot.se=apply(boot_mat,2,sd)
-    empCoverage=mean(sapply(1:nrow(boot_mat), function(s) all(boot_mat[s,]-mean_boot<=guess*boot.se)))
-    if(empCoverage-coverage==0) break
-    else if((empCoverage-coverage)<0) x_left=guess
-    else x_right=guess
-    guess=(x_left+x_right)/2
-    count=count+1
-  }
-  return(guess)
-}
+# ##bisection method for finding simult. coverage 
+# ##now defunct
+# bisectK=function(tol,coverage,boot_mat,x_left,x_right,countLimit){
+#   count=0
+#   x_left=x_left
+#   x_right=x_right
+#   guess=(x_left+x_right)/2
+#   while(.5*(x_right-x_left)>=tol & count<countLimit){
+#     mean_boot=apply(boot_mat,2,mean)
+#     boot.se=apply(boot_mat,2,sd)
+#     empCoverage=mean(sapply(1:nrow(boot_mat), function(s) all(boot_mat[s,]-mean_boot<=guess*boot.se)))
+#     if(empCoverage-coverage==0) break
+#     else if((empCoverage-coverage)<0) x_left=guess
+#     else x_right=guess
+#     guess=(x_left+x_right)/2
+#     count=count+1
+#   }
+#   return(guess)
+# }
 
 
 #####################OTHER STUFF FOR NOW####################

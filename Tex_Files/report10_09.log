@@ -1,0 +1,175 @@
+This is pdfTeX, Version 3.1415926-1.40.10 (MiKTeX 2.8) (preloaded format=pdflatex 2011.12.5)  15 OCT 2012 22:25
+entering extended mode
+**report10_09.tex
+
+(C:\Users\jbleich\Documents\Research_Genomics\bart_gene\Tex_Files\report10_09.t
+ex
+LaTeX2e <2009/09/24>
+Babel <v3.8l> and hyphenation patterns for english, dumylang, nohyphenation, ge
+rman, ngerman, german-x-2009-06-19, ngerman-x-2009-06-19, french, loaded.
+("C:\Program Files (x86)\MikTek2.8\tex\latex\base\article.cls"
+Document Class: article 2007/10/19 v1.4h Standard LaTeX document class
+("C:\Program Files (x86)\MikTek2.8\tex\latex\base\size12.clo"
+File: size12.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\c@figure=\count85
+\c@table=\count86
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+)
+("C:\Program Files (x86)\MikTek2.8\tex\latex\graphics\graphicx.sty"
+Package: graphicx 1999/02/16 v1.0f Enhanced LaTeX Graphics (DPC,SPQR)
+
+("C:\Program Files (x86)\MikTek2.8\tex\latex\graphics\keyval.sty"
+Package: keyval 1999/03/16 v1.13 key=value parser (DPC)
+\KV@toks@=\toks14
+)
+("C:\Program Files (x86)\MikTek2.8\tex\latex\graphics\graphics.sty"
+Package: graphics 2009/02/05 v1.0o Standard LaTeX Graphics (DPC,SPQR)
+
+("C:\Program Files (x86)\MikTek2.8\tex\latex\graphics\trig.sty"
+Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
+)
+("C:\Program Files (x86)\MikTek2.8\tex\latex\00miktex\graphics.cfg"
+File: graphics.cfg 2007/01/18 v1.5 graphics configuration of teTeX/TeXLive
+)
+Package graphics Info: Driver file: pdftex.def on input line 91.
+
+("C:\Program Files (x86)\MikTek2.8\tex\latex\pdftex-def\pdftex.def"
+File: pdftex.def 2010/02/14 v0.04n Graphics/color for pdfTeX
+\Gread@gobject=\count87
+))
+\Gin@req@height=\dimen103
+\Gin@req@width=\dimen104
+)
+("C:\Program Files (x86)\MikTek2.8\tex\latex\float\float.sty"
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count88
+\float@exts=\toks15
+\float@box=\box26
+\@float@everytoks=\toks16
+\@floatcapt=\box27
+)
+(C:\Users\jbleich\Documents\Research_Genomics\bart_gene\Tex_Files\report10_09.a
+ux
+
+LaTeX Warning: Label `fig:version1' multiply defined.
+
+
+LaTeX Warning: Label `fig:version1' multiply defined.
+
+
+LaTeX Warning: Label `fig:version2' multiply defined.
+
+
+LaTeX Warning: Label `fig:version2' multiply defined.
+
+)
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 6.
+LaTeX Font Info:    ... okay on input line 6.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 6.
+LaTeX Font Info:    ... okay on input line 6.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 6.
+LaTeX Font Info:    ... okay on input line 6.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 6.
+LaTeX Font Info:    ... okay on input line 6.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 6.
+LaTeX Font Info:    ... okay on input line 6.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 6.
+LaTeX Font Info:    ... okay on input line 6.
+ ("C:\Program Files (x86)\MikTek2.8\tex\context\base\supp-pdf.tex"
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count89
+\scratchdimen=\dimen105
+\scratchbox=\box28
+\nofMPsegments=\count90
+\nofMParguments=\count91
+\everyMPshowfont=\toks17
+\MPscratchCnt=\count92
+\MPscratchDim=\dimen106
+\MPnumerator=\count93
+\everyMPtoPDFconversion=\toks18
+)
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <14.4> on input line 7.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 7.
+
+
+LaTeX Warning: No \author given.
+
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <12> on input line 14.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 14.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 14.
+[1
+
+{C:/Users/jbleich/AppData/Local/MiKTeX/2.8/pdftex/config/pdftex.map}]
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 22.
+
+("C:\Program Files (x86)\MikTek2.8\tex\latex\base\omscmr.fd"
+File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <12> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 22.
+
+<corList.pdf, id=9, 505.89pt x 504.88625pt>
+File: corList.pdf Graphic file (type pdf)
+ <use corList.pdf> [2]
+<inclTFcor.pdf, id=14, 884.30376pt x 504.88625pt>
+File: inclTFcor.pdf Graphic file (type pdf)
+ <use inclTFcor.pdf> [3 <C:/Users/jbleich/Documents/Research_Genomics/bart_gene
+/Tex_Files/corList.pdf>]
+<shanePrior.pdf, id=25, 819.06pt x 451.6875pt>
+File: shanePrior.pdf Graphic file (type pdf)
+ <use shanePrior.pdf> [4 <C:/Users/jbleich/Documents/Research_Genomics/bart_gen
+e/Tex_Files/inclTFcor.pdf>]
+<shaneWeights.pdf, id=36, 819.06pt x 451.6875pt>
+File: shaneWeights.pdf Graphic file (type pdf)
+ <use shaneWeights.pdf>
+[5 <C:/Users/jbleich/Documents/Research_Genomics/bart_gene/Tex_Files/shanePrior
+.pdf>] <null5.pdf, id=47, 670.505pt x 611.28375pt>
+File: null5.pdf Graphic file (type pdf)
+ <use null5.pdf> [6 <C:/Users/jbleich/Documents/Research_Genomics/bart_gene/Tex
+_Files/shaneWeights.pdf>]
+<null10.pdf, id=58, 670.505pt x 611.28375pt>
+File: null10.pdf Graphic file (type pdf)
+ <use null10.pdf> [7 <C:/Users/jbleich/Documents/Research_Genomics/bart_gene/Te
+x_Files/null5.pdf>] [8 <C:/Users/jbleich/Documents/Research_Genomics/bart_gene/
+Tex_Files/null10.pdf>]
+(C:\Users\jbleich\Documents\Research_Genomics\bart_gene\Tex_Files\report10_09.a
+ux)
+
+LaTeX Warning: There were multiply-defined labels.
+
+ ) 
+Here is how much of TeX's memory you used:
+ 1028 strings out of 495285
+ 13572 string characters out of 3179958
+ 61681 words of memory out of 3000000
+ 4261 multiletter control sequences out of 15000+200000
+ 9945 words of font info for 35 fonts, out of 3000000 for 9000
+ 14 hyphenation exceptions out of 8191
+ 25i,7n,19p,271b,199s stack positions out of 5000i,500n,10000p,200000b,50000s
+<C:/Program Files (x86)/MikTek2.8/fonts/type1/public/amsfonts/cm/cmbx12.pfb><
+C:/Program Files (x86)/MikTek2.8/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/P
+rogram Files (x86)/MikTek2.8/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Progr
+am Files (x86)/MikTek2.8/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Program F
+iles (x86)/MikTek2.8/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Program File
+s (x86)/MikTek2.8/fonts/type1/public/amsfonts/cm/cmti12.pfb><C:/Program Files (
+x86)/MikTek2.8/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
+Output written on report10_09.pdf (8 pages, 236202 bytes).
+PDF statistics:
+ 101 PDF objects out of 1000 (max. 8388607)
+ 0 named destinations out of 1000 (max. 500000)
+ 31 words of extra memory for PDF output out of 10000 (max. 10000000)
+
