@@ -30,14 +30,11 @@ out20=run_BART(geneList=geneNames[1:100],tf.train,runBoot=F,ntree=20,nskip=1000,
 #save(out5,file="out20_1.rdata")
 
 
-genelist=geneNames[3]
+genelist=geneNames[10]
 genelist
 tf.mat=tf.train
-gene=geneNames[3]
-v100
-v1
-v200
-v500
+gene=geneNames[10]
+plot(1:ncol(tf.mat),var_prop,pch=16)
 
 
 ##Consider FDR?
@@ -56,7 +53,7 @@ run_BART=function(geneList,tf.mat,runBoot=F,...){
     
     gene.response=getGeneResponse(gene) ##get response- returns it from big matrix of response
     length(gene.response) ##should be 251
-    bart.mod=bart(tf.mat.prior,gene.response,ntree=20,nskip=2500,ndpost=10000,keepevery=100)
+    bart.mod=bart(tf.mat.prior,gene.response,ntree=10,nskip=2000,ndpost=5000,keepevery=25)
     #bart.mod=bart(x.train=tf.mat.prior,y.train=gene.response,,...) ## run BART
     strung.reps=rep(names(reps),times=as.integer(reps)) ##get names of TFs by number of reps
     var_prop=prop_calc_prior(bart.mod,strung.reps) ##calculate var counts using prior
@@ -101,14 +98,25 @@ run_BART=function(geneList,tf.mat,runBoot=F,...){
 }
 
 var_prop
-prop_calc_prior(bart.mod,strung.reps)
-gene.vec=gene.response
-nboot=1
-prop_calc(bart.boot)
-max(prop_calc(bart.boot))
-which.max(prop_calc(bart.boot))
-bart.boot$varcount[,which.max(prop_calc(bart.boot))]
-perm.sample=gene.vec
+maxid=apply(boot_mat,1,which.max)
+maxs=apply(boot_mat,1,max)
+maxcut=quantile(maxs,.95)
+table(maxid)
+hist(maxs)
+maxcut
+mean_boot=apply(boot_mat,2,mean); boot.se=apply(boot_mat,2,sd)
+coverConst=bisectK(tol=.1,coverage=.95,boot_mat=boot_mat,x_left=1,x_right=20,countLimit=100)
+coverConst
+
+mean(sapply(1:nrow(boot_mat), function(s) all(boot_mat[s,]-mean_boot<=coverConst*boot.se)))
+simul_trueTFs=which(var_prop>=mean_boot+coverConst*boot.se)
+simul_trueTFs
+plot(1:ncol(tf.mat),var_prop,pch=16,xlab="TF",main=paste("Variable Inclusion Plot for",gene,"\n Simultaneous"))
+abline(h=maxcut,col="red")
+sapply(1:ncol(tf.mat),function(s) segments(s,0,x1=s,mean_boot[s]+coverConst*boot.se[s],col="blue"))
+sapply(1:ncol(tf.mat),function(s) segments(s,0,x1=s,quantile(boot_mat[,s],.95),col="red"))
+par(mgp=c(1.8,.5,0))
+
 ###
 getBootMat=function(gene.vec,tf.train,strung.rep.vec,...,nboot=10){ ##needs original training matrix for simult. inference
   out=list()
@@ -119,8 +127,8 @@ getBootMat=function(gene.vec,tf.train,strung.rep.vec,...,nboot=10){ ##needs orig
     perm.sample=gene.vec[sample(1:n,n,F)] ##permute y vector
     #print(perm.sample[1])
     tf.mat.null=tf.train  ##use training matrix with no priors
-    bart.boot=bart(x.train=tf.mat.null,y.train=perm.sample,ntree=10,nskip=10000,ndpost=10000,keepevery=200)
-    bart.boot=bart(x.train=tf.mat.null,y.train=perm.sample,...)
+    bart.boot=bart(x.train=tf.mat.null,y.train=perm.sample,ntree=10,nskip=2000,ndpost=5000,keepevery=25)
+    #bart.boot=bart(x.train=tf.mat.null,y.train=perm.sample,...)
     props=prop_calc(bart.obj=bart.boot) ##CHECK! THIS COULD BE WRONG. Think its ok 11/4
     nullSum[j]=sum(sum_calc(bart.obj=bart.boot)) ##total number of splits. 
     #print(length(props))
@@ -145,25 +153,25 @@ getBootMat=function(gene.vec,tf.train,strung.rep.vec,...,nboot=10){ ##needs orig
 # }
 
 
-# ##bisection method for finding simult. coverage 
-# ##now defunct
-# bisectK=function(tol,coverage,boot_mat,x_left,x_right,countLimit){
-#   count=0
-#   x_left=x_left
-#   x_right=x_right
-#   guess=(x_left+x_right)/2
-#   while(.5*(x_right-x_left)>=tol & count<countLimit){
-#     mean_boot=apply(boot_mat,2,mean)
-#     boot.se=apply(boot_mat,2,sd)
-#     empCoverage=mean(sapply(1:nrow(boot_mat), function(s) all(boot_mat[s,]-mean_boot<=guess*boot.se)))
-#     if(empCoverage-coverage==0) break
-#     else if((empCoverage-coverage)<0) x_left=guess
-#     else x_right=guess
-#     guess=(x_left+x_right)/2
-#     count=count+1
-#   }
-#   return(guess)
-# }
+##bisection method for finding simult. coverage 
+##now defunct
+bisectK=function(tol,coverage,boot_mat,x_left,x_right,countLimit){
+  count=0
+  x_left=x_left
+  x_right=x_right
+  guess=(x_left+x_right)/2
+  while(.5*(x_right-x_left)>=tol & count<countLimit){
+    mean_boot=apply(boot_mat,2,mean)
+    boot.se=apply(boot_mat,2,sd)
+    empCoverage=mean(sapply(1:nrow(boot_mat), function(s) all(boot_mat[s,]-mean_boot<=guess*boot.se)))
+    if(empCoverage-coverage==0) break
+    else if((empCoverage-coverage)<0) x_left=guess
+    else x_right=guess
+    guess=(x_left+x_right)/2
+    count=count+1
+  }
+  return(guess)
+}
 
 
 #####################OTHER STUFF FOR NOW####################

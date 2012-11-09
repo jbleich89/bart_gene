@@ -2,11 +2,11 @@
 numTFs=39
 pTF=1/numTFs
 probVec=rep(pTF,times=numTFs)
-N=24
+N=1216
 
 rmultinom
 
-res=rmultinom(10000,N,prob=probVec)
+res=rmultinom(10000,N,prob=probVec)/N
 res[,1]
 sum(bart.boot$varcount[,ncol(bart.boot$varcount)])
 1+2+2+2+3+2+2+3+3+4
