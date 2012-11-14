@@ -6,7 +6,7 @@ source("bart_mc_fns.R")
 
 library(BayesTree)
 library(multicore)
-
+library(parallel)
 ##work
 #priors=read.table("~/Research_Genomics/CHIP.priorprobs.39.txt",header=T) ##work
 #gene.exp=read.table("~/Research_Genomics/expression.genes.txt",header=T) ##work
@@ -31,7 +31,7 @@ tf.train=out[[2]];tf.test=out[[3]]##TF train and TF test: rows are obs and cols 
 geneNames=as.character(gene.exp[,2]) ##gene names
 
 
-run_BART=function(geneList,tf.mat,runBoot=F,nboot=100,num_cores,...){
+run_BART=function(geneList,tf.mat,runBoot=F,nboot=100,num_cores=(detectCores()-1),...){
   t0=Sys.time() ##timer
   out=list() ##set up list
   count=0
@@ -64,7 +64,7 @@ run_BART=function(geneList,tf.mat,runBoot=F,nboot=100,num_cores,...){
       boot_mat=t(do.call(cbind,boot_list))
       colnames(boot_mat)=colnames(tf.mat)
       
-      out[[gene]][["numSplitsNull"]]=boot_mat_list[["nullSum"]]
+      #out[[gene]][["numSplitsNull"]]=boot_mat_list[["nullSum"]]
       #boot_mat=getBootMat(gene.vec=gene.response,tf.train=tf.train,strung.rep.vec=strung.reps,ntree=5)
       ##part 2 do computations
       if(count<=10) out[[gene]][["boot_mat"]]=boot_mat
