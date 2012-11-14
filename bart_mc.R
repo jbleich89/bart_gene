@@ -47,6 +47,7 @@ run_BART=function(geneList,tf.mat,runBoot=F,nboot=100,num_cores=(detectCores()-1
     gene.response=getGeneResponse(gene) ##get response- returns it from big matrix of response
     length(gene.response) ##should be 251
     #bart.mod=bart(tf.mat.prior,gene.response,ntree=10,nskip=2000,ndpost=5000,keepevery=25)
+    print("start bart")
     bart.mod=bart(x.train=tf.mat.prior,y.train=gene.response,,...) ## run BART
     strung.reps=rep(names(reps),times=as.integer(reps)) ##get names of TFs by number of reps
     var_prop=prop_calc_prior(bart.mod,strung.reps) ##calculate var counts using prior
@@ -82,7 +83,7 @@ run_BART=function(geneList,tf.mat,runBoot=F,nboot=100,num_cores=(detectCores()-1
       out[[gene]][["s_trueTF"]]=simul_trueTFs
       ##Simult. Coverage-Max
       maxcut=quantile(apply(boot_mat,1,max),.95)
-      maxtrue_TFs=var_prop[which(var_prop>=maxcut)]
+      max_trueTFs=var_prop[which(var_prop>=maxcut)]
       out[[gene]][["max_trueTF"]]=max_trueTFs
       ##pointwise coverage
       q95_point=apply(boot_mat,2,quantile, probs=.95)
