@@ -75,18 +75,18 @@ run_BART=function(geneList,tf.mat,runBoot=F,nboot=100,num_cores=(detectCores()-1
       boot.se=apply(boot_mat,2,sd)
       mean_boot=apply(boot_mat,2,mean)
       coverConst=bisectK(tol=.01,coverage=.95,boot_mat=boot_mat,x_left=1,x_right=20,countLimit=100)
-      out[[gene]][["const"]]=coverConst
+      out[[gene]][["const"]]=cov erConst
       print(coverConst)
       mean(sapply(1:nrow(boot_mat), function(s) all(boot_mat[s,]-mean_boot<=coverConst*boot.se)))
-      simul_trueTFs=which(var_prop>=mean_boot+coverConst*boot.se)
+      simul_trueTFs=var_prop(which(var_prop>=mean_boot+coverConst*boot.se))
       out[[gene]][["s_trueTF"]]=simul_trueTFs
       ##Simult. Coverage-Max
       maxcut=quantile(apply(boot_mat,1,max),.95)
-      max_trueTFs=which(var_prop>=maxcut)
+      maxtrue_TFs=var_prop(which(var_prop>=maxcut))
       out[[gene]][["max_trueTF"]]=max_trueTFs
       ##pointwise coverage
       q95_point=apply(boot_mat,2,quantile, probs=.95)
-      point_trueTFs=which(var_prop>=q95_point)
+      point_trueTFs=var_prop(which(var_prop>=q95_point))
       out[[gene]][["p_trueTF"]]=point_trueTFs
       ##leave everything else in this call
       print("choosing TFs done")
