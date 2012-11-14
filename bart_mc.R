@@ -75,7 +75,7 @@ run_BART=function(geneList,tf.mat,runBoot=F,nboot=100,num_cores=(detectCores()-1
       boot.se=apply(boot_mat,2,sd)
       mean_boot=apply(boot_mat,2,mean)
       coverConst=bisectK(tol=.01,coverage=.95,boot_mat=boot_mat,x_left=1,x_right=20,countLimit=100)
-      out[[gene]][["const"]]=cov erConst
+      out[[gene]][["const"]]=coverConst
       print(coverConst)
       mean(sapply(1:nrow(boot_mat), function(s) all(boot_mat[s,]-mean_boot<=coverConst*boot.se)))
       simul_trueTFs=var_prop(which(var_prop>=mean_boot+coverConst*boot.se))
