@@ -56,14 +56,16 @@ run_BART=function(geneList,tf.mat,runBoot=F,nboot=100,num_cores=(detectCores()-1
     out[[gene]][["sig"]]=mean(bart.mod$sigma) ##estimate of sigma
     out[[gene]][["numSplits"]]=sumVars ##total number of splits used in whole model
     count=count+1
+    print("bart done")
     if(runBoot==T) {#runs non-par boot
       
       # part 1- return boot matrix
       ##use multiple cores here
+      print("getting boot")
       boot_list=mclapply(1:nboot,getBootIter,gene.vec=gene.response,tf.train=tf.mat,mc.cores=num_cores,...)
       boot_mat=t(do.call(cbind,boot_list))
       colnames(boot_mat)=colnames(tf.mat)
-      
+      print("boot done")
       #out[[gene]][["numSplitsNull"]]=boot_mat_list[["nullSum"]]
       #boot_mat=getBootMat(gene.vec=gene.response,tf.train=tf.train,strung.rep.vec=strung.reps,ntree=5)
       ##part 2 do computations
@@ -87,6 +89,7 @@ run_BART=function(geneList,tf.mat,runBoot=F,nboot=100,num_cores=(detectCores()-1
       point_trueTFs=which(var_prop>=q95_point)
       out[[gene]][["p_trueTF"]]=point_trueTFs
       ##leave everything else in this call
+      print("choosing TFs done")
     }
     
     if(count%%10==0) print(count)
