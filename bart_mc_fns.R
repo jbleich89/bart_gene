@@ -84,6 +84,7 @@ bisectK=function(tol,coverage,boot_mat,x_left,x_right,countLimit){
   return(guess)
 }
 
+
 ###
 getBootMat=function(gene.vec,tf.train,strung.rep.vec,...,nboot=10){ ##needs original training matrix for simult. inference
   out=list()
@@ -109,15 +110,26 @@ getBootMat=function(gene.vec,tf.train,strung.rep.vec,...,nboot=10){ ##needs orig
 
 
 ##bootstrap for multicore
-getbootIter=function(iter,gene.vec,tf.train,...)
+getBootIter=function(iter,gene.vec,tf.train,...){
   iter ##hack just to make sure mc works
   n=length(gene.vec)
   perm.sample=gene.vec[sample(1:n,n,F)] ##permute y vector
   tf.mat.null=tf.train
   bart.boot=bart(x.train=tf.mat.null,y.train=perm.sample,...)
   props=prop_calc(bart.obj=bart.boot)
-  return(props )
+  return(props)
+}
 ##regular bootstrap function
+
+getBootIterTest=function(iter,gene.vec,tf.train){
+  iter ##hack just to make sure mc works
+  n=length(gene.vec)
+  perm.sample=gene.vec[sample(1:n,n,F)] ##permute y vector
+  tf.mat.null=tf.train
+  bart.boot=bart(x.train=tf.mat.null,y.train=perm.sample,ntree=10,nskip=2000,ndpost=3000)
+  props=prop_calc(bart.obj=bart.boot)
+  return(props)
+}
 
 
 ############################

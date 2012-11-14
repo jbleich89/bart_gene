@@ -1,8 +1,9 @@
 ##bart multicore main
 
-setwd("~/Research_Genomics/bart_gene") ##work
-setwd("~/Documents/Research/Genomics/bart_gene/") ##home
-source("real_functions.R")
+# setwd("~/Research_Genomics/bart_gene") ##work
+# setwd("~/Documents/Research/Genomics/bart_gene/") ##home
+source("bart_mc_fns.R")
+
 library(BayesTree)
 library(multicore)
 
@@ -15,9 +16,10 @@ library(multicore)
 #gene.exp=read.table("~/Documents/Research/Genomics/Real_Data/expression.genes.txt",header=T) ##home
 #tf.exp=read.table("~/Documents/Research/Genomics/Real_Data/expression.tfs.39.txt",header=T) ##home
 ##variance
-priors=read.table("CHIP.priorprobs.39.txt",header=T) ##home
-gene.exp=read.table("expression.genes.txt",header=T) ##home
-tf.exp=read.table("expression.tfs.39.txt",header=T) ##home
+priors=read.table("CHIP.priorprobs.39.txt",header=T) ##MC
+gene.exp=read.table("expression.genes.txt",header=T) ##MC
+tf.exp=read.table("expression.tfs.39.txt",header=T) ##MC
+
 
 ##objects-priorWeights (cols), priorMat (probs), gene.train, tf.train, geneNames
 
@@ -27,14 +29,6 @@ priorWeights=out[[1]]#PriorWeights: rows are genes, cols are TFs
 gene.train=out[[4]];gene.test=out[[5]]##gene.train and gene.test rows are obs and cols are genes
 tf.train=out[[2]];tf.test=out[[3]]##TF train and TF test: rows are obs and cols are TFs
 geneNames=as.character(gene.exp[,2]) ##gene names
-
-##run barts
-out5=run_BART(geneList=geneNames[1:100],tf.train,runBoot=T,ntree=5,nskip=1000,ndpost=2000,verbose=F)
-#save(out5,file="out5_1.rdata")
-out10=run_BART(geneList=geneNames[1:100],tf.train,runBoot=F,ntree=10,nskip=1000,ndpost=2000,verbose=F)
-#save(out5,file="out10_1.rdata")
-out20=run_BART(geneList=geneNames[1:100],tf.train,runBoot=F,ntree=20,nskip=1000,ndpost=2000,verbose=F)
-#save(out5,file="out20_1.rdata")
 
 
 run_BART=function(geneList,tf.mat,runBoot=F,nboot=100,num_cores,...){
@@ -52,8 +46,8 @@ run_BART=function(geneList,tf.mat,runBoot=F,nboot=100,num_cores,...){
     
     gene.response=getGeneResponse(gene) ##get response- returns it from big matrix of response
     length(gene.response) ##should be 251
-    bart.mod=bart(tf.mat.prior,gene.response,ntree=10,nskip=2000,ndpost=5000,keepevery=25)
-    #bart.mod=bart(x.train=tf.mat.prior,y.train=gene.response,,...) ## run BART
+    #bart.mod=bart(tf.mat.prior,gene.response,ntree=10,nskip=2000,ndpost=5000,keepevery=25)
+    bart.mod=bart(x.train=tf.mat.prior,y.train=gene.response,,...) ## run BART
     strung.reps=rep(names(reps),times=as.integer(reps)) ##get names of TFs by number of reps
     var_prop=prop_calc_prior(bart.mod,strung.reps) ##calculate var counts using prior
     sumVars=sum(sum_calc_prior(bart.mod,strung.reps)) ##total sum of variables
@@ -66,7 +60,9 @@ run_BART=function(geneList,tf.mat,runBoot=F,nboot=100,num_cores,...){
       
       # part 1- return boot matrix
       ##use multiple cores here
-      boot_mat=mclapply(1:nboot,getbootIter,gene.vec=gene.response,tf.train=tf.mat,mc.cores=num_cores)
+      boot_list=mclapply(1:nboot,getBootIter,gene.vec=gene.response,tf.train=tf.mat,mc.cores=num_cores,...)
+      boot_mat=t(do.call(cbind,boot_list))
+      colnames(boot_mat)=colnames(tf.mat)
       
       out[[gene]][["numSplitsNull"]]=boot_mat_list[["nullSum"]]
       #boot_mat=getBootMat(gene.vec=gene.response,tf.train=tf.train,strung.rep.vec=strung.reps,ntree=5)
@@ -103,7 +99,7 @@ run_BART=function(geneList,tf.mat,runBoot=F,nboot=100,num_cores,...){
 ##run barts
 #out5=run_BART(geneList=geneNames[1:100],tf.train,runBoot=T,ntree=5,nskip=1000,ndpost=2000,verbose=F)
 #save(out5,file="out5_1.rdata")
-out10=run_BART(geneList=geneNames[1:100],tf.train,runBoot=F,ntree=10,nskip=1000,ndpost=2000,verbose=F)
+out10=run_BART(geneList=geneNames[1],tf.train,runBoot=T,num_cores=10,ntree=10,nskip=1000,ndpost=2000,verbose=F)
 #save(out5,file="out10_1.rdata")
 #out20=run_BART(geneList=geneNames[1:100],tf.train,runBoot=F,ntree=20,nskip=1000,ndpost=2000,verbose=F)
 #save(out5,file="out20_1.rdata")
