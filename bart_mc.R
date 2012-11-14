@@ -20,7 +20,7 @@ priors=read.table("~/bart_genome/CHIP.priorprobs.39.txt",header=T) ##MC
 gene.exp=read.table("~/bart_genome/expression.genes.txt",header=T) ##MC
 tf.exp=read.table("~/bart_genome/expression.tfs.39.txt",header=T) ##MC
 
-
+num_cores=22
 ##objects-priorWeights (cols), priorMat (probs), gene.train, tf.train, geneNames
 
 priorMat=as.matrix(priors[,3:ncol(priors)]) ; rownames(priorMat)=priors[,1] ; colnames(priorMat)=colnames(priors)[3:ncol(priors)]
@@ -78,15 +78,15 @@ run_BART=function(geneList,tf.mat,runBoot=F,nboot=100,num_cores=(detectCores()-1
       out[[gene]][["const"]]=coverConst
       print(coverConst)
       mean(sapply(1:nrow(boot_mat), function(s) all(boot_mat[s,]-mean_boot<=coverConst*boot.se)))
-      simul_trueTFs=var_prop(which(var_prop>=mean_boot+coverConst*boot.se))
+      simul_trueTFs=var_prop[which(var_prop>=mean_boot+coverConst*boot.se)]
       out[[gene]][["s_trueTF"]]=simul_trueTFs
       ##Simult. Coverage-Max
       maxcut=quantile(apply(boot_mat,1,max),.95)
-      maxtrue_TFs=var_prop(which(var_prop>=maxcut))
+      maxtrue_TFs=var_prop[which(var_prop>=maxcut)]
       out[[gene]][["max_trueTF"]]=max_trueTFs
       ##pointwise coverage
       q95_point=apply(boot_mat,2,quantile, probs=.95)
-      point_trueTFs=var_prop(which(var_prop>=q95_point))
+      point_trueTFs=var_prop[which(var_prop>=q95_point)]
       out[[gene]][["p_trueTF"]]=point_trueTFs
       ##leave everything else in this call
       print("choosing TFs done")
