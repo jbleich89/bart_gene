@@ -18,7 +18,7 @@ library(multicore)
 ##variance
 priors=read.table("~/bart_genome/CHIP.priorprobs.39.txt",header=T) ##MC
 gene.exp=read.table("~/bart_genome/expression.genes.txt",header=T) ##MC
-tf.exp=read.table("expression.tfs.39.txt",header=T) ##MC
+tf.exp=read.table("~/bart_genome/expression.tfs.39.txt",header=T) ##MC
 
 
 ##objects-priorWeights (cols), priorMat (probs), gene.train, tf.train, geneNames
