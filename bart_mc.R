@@ -16,8 +16,8 @@ library(multicore)
 #gene.exp=read.table("~/Documents/Research/Genomics/Real_Data/expression.genes.txt",header=T) ##home
 #tf.exp=read.table("~/Documents/Research/Genomics/Real_Data/expression.tfs.39.txt",header=T) ##home
 ##variance
-priors=read.table("CHIP.priorprobs.39.txt",header=T) ##MC
-gene.exp=read.table("expression.genes.txt",header=T) ##MC
+priors=read.table("~/bart_genome/CHIP.priorprobs.39.txt",header=T) ##MC
+gene.exp=read.table("~/bart_genome/expression.genes.txt",header=T) ##MC
 tf.exp=read.table("expression.tfs.39.txt",header=T) ##MC
 
 
