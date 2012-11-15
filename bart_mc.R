@@ -103,7 +103,7 @@ run_BART=function(geneList,tf.mat,runBoot=F,nboot=100,num_cores=(detectCores()-1
 ##run barts
 #out5=run_BART(geneList=geneNames[1:100],tf.train,runBoot=T,ntree=5,nskip=1000,ndpost=2000,verbose=F)
 #save(out5,file="out5_1.rdata")
-out10=run_BART(geneList=geneNames[1:500],tf.train,runBoot=T,num_cores=num_cores,ntree=10,nskip=1000,ndpost=2000,verbose=F)
+out10=run_BART(geneList=geneNames[3],tf.train,runBoot=T,num_cores=num_cores,ntree=10,nskip=1000,ndpost=2000,verbose=F)
 #save(out5,file="out10_1.rdata")
 #out20=run_BART(geneList=geneNames[1:100],tf.train,runBoot=F,ntree=20,nskip=1000,ndpost=2000,verbose=F)
 #save(out5,file="out20_1.rdata")
