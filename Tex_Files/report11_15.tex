@@ -1,0 +1,113 @@
+\documentclass[12pt]{article}
+\usepackage{graphicx}
+\usepackage{float}
+\include{preamble}
+\usepackage[margin=1in]{geometry}
+\title{Inclusion Frequencies in Null Setting and Preliminary TF Discovery Results}
+
+\begin{document}
+\maketitle
+For the following simulations, $y_{i}\iid\normnot{0}{\sigma^2}$ and $\X$ consists of entries that are all $x_{ij}\iid\normnot{0}{1}$. Shown below are the cumulative inclusion probabilities. The burn-in is purposely excluded to see the behavior of an entire Gibbs chain. 12000 Gibbs samples were generated with no thinning. \\
+
+A number of different settings for $\sigma$ and $n$ will be included. The number of covariates is $39$, which is the same as the number of TFs in the real data. Hence, the expectation might be that inclusion frequencies would converge to .0256. 
+\newpage
+\section{$\sigma$=.1}
+\subsection*{N=250}
+\begin{figure}[H]
+\centerline{\includegraphics[scale=.52]{sqpt1_n250}}
+\end{figure}
+
+\subsection*{N=1000}
+\begin{figure}[H]
+\centerline{\includegraphics[scale=.52]{sqpt1_n1000}}
+\end{figure}
+
+\section{$\sigma$=1}
+\subsection*{N=250}
+\begin{figure}[H]
+\centerline{\includegraphics[scale=.52]{sq1_n250}}
+\end{figure}
+
+\subsection*{N=1000}
+\begin{figure}[H]
+\centerline{\includegraphics[scale=.52]{sq1_n1000}}
+
+\end{figure}
+
+\section{$\sigma$=2}
+\subsection*{N=250}
+\begin{figure}[H]
+\centerline{\includegraphics[scale=.52]{sq2_n250}}
+\end{figure}
+
+\subsection*{N=1000}
+\begin{figure}[H]
+\centerline{\includegraphics[scale=.52]{sq2_n1000}}
+
+\end{figure}
+
+
+\section{$\sigma$=8}
+\subsection*{N=250}
+\begin{figure}[H]
+\centerline{\includegraphics[scale=.52]{sq8_n250}}
+\end{figure}
+
+\subsection*{N=1000}
+\begin{figure}[H]
+\centerline{\includegraphics[scale=.52]{sq8_n1000}}
+
+\end{figure}
+
+\section{4 Aggregated Chains-Multiple Starting Points}
+\begin{figure}[H]
+\centerline{\includegraphics[scale=.52]{mult_chain_sq1_n250}}
+\end{figure}
+
+\textbf{Hypothesis:}From the above plots as well as the attempt to use multiple chains, it seems that autocorrelation is not necessarily the root of the problem. The issue seems to be more linked to the existence of posterior modes that BART is discovering. These modes tend to move around from dataset to dataset, but nonetheless, the posterior probability surface doesn't seem to be flat enough to allow the algorithm to wander randomly and create a uniform distribution on the splitting rules. 
+\newpage
+\section{Maximum Inclusion Frequencies Across Datasets (N=100)}
+2000 Burn-in and 5000 posterior samples. 10 Trees. Different $\bv y$ vector for each of 100 iterations. Thinning is by 25. 
+\subsection*{$\sigma=1$}
+\begin{figure}[H]
+\centerline{\includegraphics[scale=.47]{maxs_sq1}}
+\end{figure}
+
+\subsection*{$\sigma=8$}
+\begin{figure}[H]
+\centerline{\includegraphics[scale=.47]{maxs_sq8}}
+\end{figure}
+
+\section{TF Discoveries-500 Genes}{
+1000 Burn-in and 2000 posterior samples at 10 trees with no thinning. 100 bootstrap iterations for null setting. Algorithm ran in 2 hours on 20 cores. \\
+
+Shown below are the various proportions of times a TF was ``discovered'' in the 500 genes examined. 
+
+\subsection*{No Simultaneous Coverage}
+\begin{verbatim}
+ABF1  ACE2  BAS1  CAD1  CBF1  FKH1  FKH2  GAL4  GCN4  GCR1  GCR2 
+0.148 0.072 0.250 0.260 0.176 0.150 0.180 0.102 0.316 0.122 0.158 
+ HAP2  HAP3  HAP4  HSF1  INO2  LEU3  MBP1  MCM1 MET31  MSN4  NDD1 
+0.074 0.222 0.118 0.308 0.176 0.152 0.184 0.136 0.158 0.298 0.098 
+ PDR1  PHO4  PUT3  RAP1  RCS1  REB1  RLM1  RME1  ROX1  SKN7  SMP1 
+0.146 0.104 0.076 0.284 0.056 0.174 0.074 0.178 0.070 0.262 0.108 
+ STB1 STE12  SWI4  SWI5  SWI6  YAP1 
+0.148 0.166 0.130 0.162 0.170 0.286 
+\end{verbatim}
+
+\subsection*{Simultaneous Coverage Bands}
+\begin{verbatim}
+ ABF1  ACE2  BAS1  CAD1  CBF1  FKH1  FKH2  GAL4  GCN4  GCR1  GCR2 
+0.038 0.006 0.072 0.056 0.026 0.024 0.014 0.008 0.116 0.008 0.022 
+ HAP2  HAP3  HAP4  HSF1  INO2  LEU3  MBP1  MCM1 MET31  MSN4  NDD1 
+0.008 0.054 0.014 0.070 0.022 0.016 0.046 0.008 0.008 0.060 0.006 
+ PDR1  PHO4  PUT3  RAP1  RCS1  REB1  RLM1  RME1  ROX1  SKN7  SMP1 
+0.010 0.010 0.006 0.066 0.004 0.022 0.002 0.028 0.006 0.058 0.004 
+ STB1 STE12  SWI4  SWI5  SWI6  YAP1 
+0.024 0.024 0.020 0.044 0.030 0.064 
+\end{verbatim}
+
+The maximum cut-off method is omitted, but similar to the simultaneous coverage scenario, which is clearly too restrictive. There is some inherent Type I error control build into this model as their is a constraint on the total budget on inclusion frequencies.
+
+
+\end{document}
