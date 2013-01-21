@@ -5,7 +5,7 @@
 source("bart_mc_fns.R")
 
 library(BayesTree)
-library(multicore)
+#library(multicore)
 library(parallel)
 ##work
 #priors=read.table("~/Research_Genomics/CHIP.priorprobs.39.txt",header=T) ##work

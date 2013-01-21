@@ -21,6 +21,7 @@ gene.train=out[[4]];gene.test=out[[5]]##gene.train and gene.test rows are obs an
 tf.train=out[[2]];tf.test=out[[3]]##TF train and TF test: rows are obs and cols are TFs
 geneNames=as.character(gene.exp[,2]) ##gene names
 
+
 ##run barts
 out5=run_BART(geneList=geneNames[1:100],tf.train,runBoot=T,ntree=5,nskip=1000,ndpost=2000,verbose=F)
 #save(out5,file="out5_1.rdata")
@@ -30,7 +31,10 @@ out20=run_BART(geneList=geneNames[1:100],tf.train,runBoot=F,ntree=20,nskip=1000,
 #save(out5,file="out20_1.rdata")
 
 
-genelist=geneNames[10]
+out20=run_BART(geneList=geneNames[3],tf.train,runBoot=F,ntree=20,nskip=1000,ndpost=2000,verbose=F)
+
+
+genelist=geneNames[3]
 genelist
 tf.mat=tf.train
 gene=geneNames[10]
