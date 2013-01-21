@@ -72,12 +72,12 @@ setup=function(){
   prior_nums=priors[,3:ncol(priors)]
   geneNames=as.character(gene.exp[,2])
   
-  ##get weights- rownames are genes. colnames are TFs
-  priorWeights=apply(prior_nums,2,ChangePriorVec)
-  rownames(priorWeights)=geneNames
-  
-  ##prior col 1 goes with gene col 2 and vice versa
-  priorWeights[,1]==gene.exp[,2]
+#  ##get weights- rownames are genes. colnames are TFs
+#  priorWeights=apply(prior_nums,2,ChangePriorVec)
+#  rownames(priorWeights)=geneNames
+#  
+#  ##prior col 1 goes with gene col 2 and vice versa
+#  priorWeights[,1]==gene.exp[,2]
   
   
   ##need transpose of tf mat
@@ -87,12 +87,16 @@ setup=function(){
   colnames(tf.full)=tf.names
   rownames(tf.full)=colnames(tf.exp)[5:ncol(tf.exp)]
   dim(tf.full) #check 314 conditions and 39 TFs
-  hold=ceiling(.2*nrow(tf.full))
   
+  ##randomize later
+  cv_hold=ceiling(.1*nrow(tf.full))
+  test_hold=ceiling(.1*nrow(tf.full))
+		  
   #get training and test
-  train.end=314-hold
+  train.end=nrow(tf.full)-(cv_hold + test_hold)
   tf.train=tf.full[1:train.end,]
-  tf.test=tf.full[(train.end+1):nrow(tf.full),]
+  tf.cv=tf.full[(train.end+1):(train.end+cv_hold),]
+  tf.test=tf.full[(train.end+cv_hold+1):nrow(tf.full),]
   
   ##Clean gene matrix
   geneMatClean=t(gene.exp[,5:ncol(gene.exp)])
@@ -101,6 +105,14 @@ setup=function(){
   
   ##Get gene test and train
   gene.train=geneMatClean[1:train.end,]
-  gene.test=geneMatClean[(1+train.end):nrow(geneMatClean),]
-  return(list(priorWeights,tf.train,tf.test,gene.train,gene.test))
+  gene.cv=geneMatClean[(train.end+1):(train.end+cv_hold),]
+  gene.test=geneMatClean[(train.end+cv_hold+1):nrow(geneMatClean),]
+  list(
+	  tf.train=tf.train,
+	  tf.cv=tf.cv, 
+	  tf.test=tf.test,
+	  gene.train=gene.train, 
+	  gene.cv=gene.cv, 
+	  gene.test=gene.test
+  )
 }
