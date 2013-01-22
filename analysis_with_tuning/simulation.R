@@ -16,7 +16,7 @@ ms = c(
 	20
 )
 
-NUM_PERMUTE_SAMPLES = 50
+NUM_PERMUTE_SAMPLES = 100
 NUM_BURN_IN = 2000
 NUM_ITER_AFTER = 2000
 NUM_REP_FOR_TRAIN = 10
@@ -27,11 +27,12 @@ NUM_TREES_FOR_EVAL = 200
 
 #get necessary functions and data
 
-setwd("C:/Users/Kapelner/workspace/bart_gene")
-#source("real_functions.R")
+#setwd("C:/Users/Kapelner/workspace/bart_gene")
+setwd("~/workspace/bart_gene")
 source("helper_functions.R")
 
-setwd("C:/Users/Kapelner/Desktop/Dropbox/BART_gene")
+#setwd("C:/Users/Kapelner/Desktop/Dropbox/BART_gene")
+setwd("~/Desktop/shane_data")
 
 priors = read.table("CHIP.priorprobs.39.txt", header = TRUE)
 gene.exp = read.table("expression.genes.txt", header = TRUE)
@@ -51,7 +52,8 @@ tf_test = result[["tf.test"]]##TF train and TF test: rows are obs and cols are T
 gene_names = as.character(gene.exp[, 2]) ##gene names
 
 #now load up the BART stuff
-setwd("C:/Users/Kapelner/workspace/CGMBART_GPL/")
+#setwd("C:/Users/Kapelner/workspace/CGMBART_GPL/")
+setwd("~/workspace/CGMBART_GPL/")
 source("r_scripts/bart_package.R")
 
 
@@ -140,7 +142,7 @@ run_simulation_for_all_genes_cs_and_ms = function(){
 		results[[as.character(c_param)]] = list()
 		for (m_param in ms){
 			results[[as.character(c_param)]][[as.character(m_param)]] = list()
-			for (gene in gene_names[1 : 2]){
+			for (gene in gene_names[1 : 20]){
 				cat(paste("c:", c_param, "m:", m_param, "finding important tfs for gene:", gene))
 				result = find_important_tfs_for_gene_via_null_bart_sampling(gene, c = c_param, m = m_param)
 				results[[as.character(c_param)]][[as.character(m_param)]][[gene]] = list()
@@ -148,6 +150,7 @@ run_simulation_for_all_genes_cs_and_ms = function(){
 					results[[as.character(c_param)]][[as.character(m_param)]][[gene]][[method]] = result[[method]]
 				}
 				cat(paste(" (completed in", result[["time_elapsed"]], "min)\n"))
+				save.image("gene_results.RData")
 			}
 		}
 	}
