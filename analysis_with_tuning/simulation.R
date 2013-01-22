@@ -150,7 +150,7 @@ run_simulation_for_all_genes_cs_and_ms = function(){
 					results[[as.character(c_param)]][[as.character(m_param)]][[gene]][[method]] = result[[method]]
 				}
 				cat(paste(" (completed in", result[["time_elapsed"]], "min)\n"))
-				save.image("gene_results.RData")
+				save.image(results, file = "gene_results.RData")
 			}
 		}
 	}
