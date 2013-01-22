@@ -1,5 +1,3 @@
-tryCatch(library(parallel), error = function(e){install.packages("parallel")}, finally = library(parallel))
-
 #simulation params
 
 cs = c(
@@ -74,10 +72,13 @@ find_important_tfs_for_gene_via_null_bart_sampling = function(gene, c_param, m, 
 	barplot(var_props_avg, names = names(var_props_avg), las = 2, main = paste("important tfs for gene", gene, "m =", m, "c =", c_param))
 	
 	#do the null permute sampling over many cores
-	permute_list = mclapply(1 : NUM_PERMUTE_SAMPLES, get_permute_iter, training_data = training_data, m = m, mc.cores = NUM_CORES)
-	#manipulate it to be in the correct format
-	permute_mat = t(do.call(cbind, permute_list))
+	permute_mat = matrix(NA, nrow = NUM_PERMUTE_SAMPLES, ncol = ncol(tf_train))
 	colnames(permute_mat) = colnames(tf_train)
+	
+	for (b in 1 : NUM_PERMUTE_SAMPLES){
+		permute_mat[b, ] = get_null_permute_var_importances(training_data, m)
+	}
+	
 	
 	#find tfs likely to be important - there are three methods to do this
 	
@@ -121,15 +122,15 @@ get_averaged_true_var_props = function(training_data, cov_prior, m){
 	var_props / NUM_REP_FOR_TRAIN
 }
 
-get_permute_iter = function(iter, training_data, m){
+get_null_permute_var_importances = function(training_data, m){
 	#permute the responses to disconnect x and y
 	training_data$y = sample(training_data$y, replace = FALSE)
 	#build BART on this permuted training data
 	bart_machine = build_bart_machine(training_data, 
-			num_trees = m, 
-			num_burn_in = NUM_BURN_IN, 
-			num_iterations_after_burn_in = NUM_ITER_AFTER,
-			verbose = FALSE)
+		num_trees = m, 
+		num_burn_in = NUM_BURN_IN, 
+		num_iterations_after_burn_in = NUM_ITER_AFTER,
+		verbose = FALSE)
 	#just return the variable proportions	
 	get_var_props_over_chain(bart_machine)
 }
