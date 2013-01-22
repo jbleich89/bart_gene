@@ -1,16 +1,21 @@
+
+
+
+
+
 #simulation params
 
 cs = c(
 	0, #no prior
-	0.5,
+	0.5, #weak prior
 	1,
 	2,
-	4,
-	10000 #all prior
+	4, #medium strength prior
+	10000 #prior dominates
 )
 
 ms = c(
-	10,
+#	10,
 	20
 )
 
@@ -22,15 +27,25 @@ NUM_CORES = 1
 ALPHA = 0.05
 METHODS = c("important_tfs_at_alpha_pointwise", "important_tfs_at_alpha_simul_max", "important_tfs_at_alpha_simul_se")
 NUM_TREES_FOR_EVAL = 200
+GENE_START = 1
+GENE_END = 10
+
+#read in arguments supplied by R CMD BATCH
+args = commandArgs(TRUE)
+if (length(args) > 0){
+	for (i in 1 : length(args)){
+		eval(parse(text = args[[i]]))
+	}
+}
 
 #get necessary functions and data
 
-#setwd("C:/Users/Kapelner/workspace/bart_gene")
-setwd("~/workspace/bart_gene")
+setwd("C:/Users/Kapelner/workspace/bart_gene")
+#setwd("~/workspace/bart_gene")
 source("helper_functions.R")
 
-#setwd("C:/Users/Kapelner/Desktop/Dropbox/BART_gene")
-setwd("~/Desktop/shane_data")
+setwd("C:/Users/Kapelner/Desktop/Dropbox/BART_gene")
+#setwd("~/Desktop/shane_data")
 
 priors = read.table("CHIP.priorprobs.39.txt", header = TRUE)
 gene.exp = read.table("expression.genes.txt", header = TRUE)
@@ -50,10 +65,9 @@ tf_test = result[["tf.test"]]##TF train and TF test: rows are obs and cols are T
 gene_names = as.character(gene.exp[, 2]) ##gene names
 
 #now load up the BART stuff
-#setwd("C:/Users/Kapelner/workspace/CGMBART_GPL/")
-setwd("~/workspace/CGMBART_GPL/")
+setwd("C:/Users/Kapelner/workspace/CGMBART_GPL/")
+#setwd("~/workspace/CGMBART_GPL/")
 source("r_scripts/bart_package.R")
-
 
 
 
@@ -63,12 +77,12 @@ find_important_tfs_for_gene_via_null_bart_sampling = function(gene, c_param, m, 
 	#pull the (adjusted) probabilities that the biologists give us and use as a prior
 	cov_probs = prior_mat_adj[gene,]
 	#as we discussed, we're going to weight the biologists guesses and bootstrap over them
-	cov_prior = 1 + c_param * cov_probs #cov_prior = cov_prior / sum(cov_prior)	
+	cov_prior_vec = 1 + c_param * cov_probs #cov_prior = cov_prior / sum(cov_prior)	
 	#pull out the responses and add them to the training data
 	y = gene_train[, gene]
 	training_data = data.frame(tf_train, y)
 	#run BART many times and average the importances
-	var_props_avg = get_averaged_true_var_props(training_data, cov_prior, m)
+	var_props_avg = get_averaged_true_var_props(training_data, cov_prior_vec, m)
 	barplot(var_props_avg, names = names(var_props_avg), las = 2, main = paste("important tfs for gene", gene, "m =", m, "c =", c_param))
 	
 	#do the null permute sampling over many cores
@@ -106,14 +120,15 @@ find_important_tfs_for_gene_via_null_bart_sampling = function(gene, c_param, m, 
 	)
 }
 
-get_averaged_true_var_props = function(training_data, cov_prior, m){
+get_averaged_true_var_props = function(training_data, cov_prior_vec, m){
 	var_props = rep(0, ncol(training_data) - 1)
 	for (i in 1 : NUM_REP_FOR_TRAIN){
 		bart_machine = build_bart_machine(training_data, 
 			num_trees = m, 
 			num_burn_in = NUM_BURN_IN, 
 			num_iterations_after_burn_in = NUM_ITER_AFTER, 
-			cov_prior_vec = cov_prior,
+			cov_prior_vec = cov_prior_vec,
+			run_in_sample = FALSE,
 			verbose = FALSE)
 		var_props = var_props + get_var_props_over_chain(bart_machine)
 #		plot_sigsqs_convergence_diagnostics(bart_machine)
@@ -130,43 +145,47 @@ get_null_permute_var_importances = function(training_data, m){
 		num_trees = m, 
 		num_burn_in = NUM_BURN_IN, 
 		num_iterations_after_burn_in = NUM_ITER_AFTER,
+		run_in_sample = FALSE,
 		verbose = FALSE)
-	#just return the variable proportions	
+#	#just return the variable proportions	
 	get_var_props_over_chain(bart_machine)
 }
 
 
 #run for all genes and all c's and all m's
-run_simulation_for_all_genes_cs_and_ms = function(){
+run_simulation_for_all_genes_cs_and_ms = function(gene_start, gene_end){
 	results = list()
 	for (c_param in cs){ 
 		results[[as.character(c_param)]] = list()
 		for (m_param in ms){
 			results[[as.character(c_param)]][[as.character(m_param)]] = list()
-			for (gene in gene_names[1 : 20]){
-				cat(paste("c:", c_param, "m:", m_param, "finding important tfs for gene:", gene))
+			for (gene in gene_names[gene_start : gene_end]){
+				cat(paste("c:", c_param, "m:", m_param, "finding important tfs for gene:", gene, "\n"))
 				result = find_important_tfs_for_gene_via_null_bart_sampling(gene, c = c_param, m = m_param)
 				results[[as.character(c_param)]][[as.character(m_param)]][[gene]] = list()
 				for (method in METHODS){
 					results[[as.character(c_param)]][[as.character(m_param)]][[gene]][[method]] = result[[method]]
 				}
 				cat(paste(" (completed in", result[["time_elapsed"]], "min)\n"))
-				save.image(results, file = "gene_results.RData")
+				save(results, file = paste("gene_results_", gene_start, "_", gene_end, ".RData", sep = ""))
 			}
 		}
 	}
+	results
 }
+
+
 
 #go through results and validate
 
 validate_for_all_genes_cs_and_ms = function(){
 	validation_oos_rmses = list()
-	for (c_param in cs){
+	for (c_param in c(0)){
 		validation_oos_rmses[[as.character(c_param)]] = list()
 		for (m_param in ms){
 			validation_oos_rmses[[as.character(c_param)]][[as.character(m_param)]] = list()
-			for (gene in gene_names[1 : 2]){
-				
+			for (gene in gene_names[1 : 3]){
+				validation_oos_rmses[[as.character(c_param)]][[as.character(m_param)]][[gene]] = list()
 				for (method in METHODS){
 					#get important tfs for this combination of c, m, gene, and method
 					important_tfs = names(results[[as.character(c_param)]][[as.character(m_param)]][[gene]][[method]])
@@ -182,58 +201,29 @@ validate_for_all_genes_cs_and_ms = function(){
 						
 						#now run BART model with 200 trees
 						bart_machine = build_bart_machine(training_data, 
-								num_trees = NUM_TREES_FOR_EVAL, 
-								num_burn_in = NUM_BURN_IN, 
-								num_iterations_after_burn_in = NUM_ITER_AFTER,
-								verbose = FALSE)
+							num_trees = NUM_TREES_FOR_EVAL, 
+							num_burn_in = NUM_BURN_IN, 
+							num_iterations_after_burn_in = NUM_ITER_AFTER,
+							verbose = FALSE)
 						
 						#predict on cv data set only with important tf's						
 						cv_data = data.frame(tf_cv, y = y_cv)
 						cv_data = cv_data[, c(important_tfs, "y")]
 						predict_obj = bart_predict_for_test_data(bart_machine, cv_data)
-						validation_oos_rmses[[as.character(c_param)]][[as.character(m_param)]][[method]] = predict_obj$rmse						
+						validation_oos_rmses[[as.character(c_param)]][[as.character(m_param)]][[gene]][[method]] = predict_obj$rmse						
 					} else {
 						L2_err = sum((y_cv - mean(y_train))^2)
-						rmse = sqrt(L2_err / n)						
-						validation_oos_rmses[[as.character(c_param)]][[as.character(m_param)]][[method]] = rmse
+						rmse = sqrt(L2_err / length(y_train))						
+						validation_oos_rmses[[as.character(c_param)]][[as.character(m_param)]][[gene]][[method]] = rmse
 					}
 
 				}
 			}
 		}
 	}
+	validation_oos_rmses
 }
 
-#now go through each validation
-
-
-
-
-
-
-
-
-
-
-
-#gene = gene_names[[3]]
-#y = gene.train[, gene]
-#training_data = data.frame(tf.train, y)
-#
-#graphics.off()
-#for (j in 1 : 3){
-#	Nsim = 10
-#	var_props = rep(0, ncol(training_data) - 1)
-#	for (i in 1 : Nsim){
-#		bart_machine = build_bart_machine(training_data, 
-#				num_trees = m, 
-#				num_burn_in = NUM_BURN_IN, 
-#				num_iterations_after_burn_in = NUM_ITER_AFTER, 
-#				cov_prior_vec = cov_prior)
-#		var_props = var_props + get_var_props_over_chain(bart_machine)
-#	}
-#	#average over many runs
-#	var_props = var_props / Nsim
-#	windows()
-#	barplot(var_props, names = names(var_props), las = 2)
-#}
+#now run the simulation and validate
+results = run_simulation_for_all_genes_cs_and_ms(GENE_START, GENE_END)
+#validation_oos_rmses = validate_for_all_genes_cs_and_ms()
