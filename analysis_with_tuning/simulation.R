@@ -1,8 +1,3 @@
-
-
-
-
-
 #simulation params
 
 cs = c(
@@ -52,7 +47,7 @@ gene.exp = read.table("expression.genes.txt", header = TRUE)
 tf.exp = read.table("expression.tfs.39.txt", header = TRUE)
 
 priorMat = as.matrix(priors[, 3 : ncol(priors)])
-rownames(priorMat) = priors[,1] 
+rownames(priorMat) = priors[, 1] 
 colnames(priorMat) = colnames(priors)[3 : ncol(priors)]
 prior_mat_adj = prior_adj(priorMat)
 result = setup() ##5 objects
