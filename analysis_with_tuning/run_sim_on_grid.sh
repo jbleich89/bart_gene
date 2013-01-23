@@ -10,4 +10,4 @@ let START=$END
 
 echo "starting R task # $SGE_TASK_ID START: $START END: $END"
 
-R --no-save '--args GENE_START=$START GENE_END=$END' < analysis_with_tuning/simulation.R
+R --no-save --args GENE_START=$START GENE_END=$END < analysis_with_tuning/simulation.R
