@@ -3,7 +3,7 @@
 #$ -m e -M kapelner@wharton.upenn.edu
 #$ -j y
 #$ -N tf_discovery_for_gene_expression
-#$ -t 20
+#$ -t 1-20
 
 let END=$SGE_TASK_ID*1
 let START=$END
