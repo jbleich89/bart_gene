@@ -5,8 +5,8 @@
 #$ -N tf_discovery_for_gene_expression
 #$ -t 2
 
-let START=$END
 let END=$SGE_TASK_ID*1
+let START=$END
 
 echo "starting R task # $SGE_TASK_ID START: $START END: $END"
 
