@@ -149,16 +149,18 @@ get_null_permute_var_importances = function(training_data, m){
 #run for all genes and all c's and all m's
 run_simulation_for_all_genes_cs_and_ms = function(gene_start, gene_end){
 	results = list()
-	for (c_param in cs){ 
-		results[[as.character(c_param)]] = list()
-		for (m_param in ms){
-			results[[as.character(c_param)]][[as.character(m_param)]] = list()
-			for (gene in gene_names[gene_start : gene_end]){
+	for (gene in gene_names[gene_start : gene_end]){
+		results[[gene]] = list()
+		for (c_param in cs){ 
+			results[[gene]][[as.character(c_param)]] = list()
+			for (m_param in ms){
+				results[[gene]][[as.character(c_param)]][[as.character(m_param)]] = list()
 				cat(paste("c:", c_param, "m:", m_param, "finding important tfs for gene:", gene, "\n"))
+				#now actually find the important tf's
 				result = find_important_tfs_for_gene_via_null_bart_sampling(gene, c = c_param, m = m_param)
-				results[[as.character(c_param)]][[as.character(m_param)]][[gene]] = list()
+				
 				for (method in METHODS){
-					results[[as.character(c_param)]][[as.character(m_param)]][[gene]][[method]] = result[[method]]
+					results[[gene]][[as.character(c_param)]][[as.character(m_param)]][[method]] = result[[method]]
 				}
 				cat(paste(" (completed in", result[["time_elapsed"]], "min)\n"))
 				save(results, file = paste("gene_results_", gene_start, "_", gene_end, ".RData", sep = ""))
@@ -220,4 +222,5 @@ validate_for_all_genes_cs_and_ms = function(){
 
 #now run the simulation and validate
 results = run_simulation_for_all_genes_cs_and_ms(GENE_START, GENE_END)
-#validation_oos_rmses = validate_for_all_genes_cs_and_ms()
+validation_oos_rmses = validate_for_all_genes_cs_and_ms()
+save(validate_for_all_genes_cs_and_ms, file = paste("validation_results_", gene_start, "_", gene_end, ".RData", sep = ""))
