@@ -208,5 +208,6 @@ validate_for_all_genes_cs_and_ms = function(gene_num){
 }
 
 #now run the simulation and validate
-results = run_simulation_for_all_genes_cs_and_ms(GENE_NUM)
+#results = run_simulation_for_all_genes_cs_and_ms(GENE_NUM)
+load(paste("gene_results_", gene_num, ".RData", sep = ""))
 validation_oos_rmses = validate_for_all_genes_cs_and_ms(GENE_NUM)

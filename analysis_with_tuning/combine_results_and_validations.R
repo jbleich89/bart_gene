@@ -2,6 +2,8 @@
 
 if (.Platform$OS.type == "windows"){
 	setwd("C:/Users/Kapelner/workspace/bart_gene/")
+} else {
+	setwd("../bart_gene")
 }
 
 source("analysis_with_tuning/simulation_params.R")
@@ -14,7 +16,7 @@ if (.Platform$OS.type == "windows"){
 }
 
 
-MAX_GENE_NUM = 20
+MAX_GENE_NUM = 100
 
 all_results = list()
 all_validations = list()
@@ -46,6 +48,7 @@ for (gene_num in 1 : length(all_results)){
 	for (c_param in c(0,1,2)){	
 		c_param = as.character(c_param)
 		for (method in METHODS){
+			print(gene_name)
 			oo_rmse = all_validations[[gene_name]][[c_param]][["20"]][[method]]
 			if (oo_rmse < min){
 				min = oo_rmse
