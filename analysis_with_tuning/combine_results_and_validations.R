@@ -1,4 +1,5 @@
-
+options(width = 150)
+MAX_GENE_NUM = 100
 
 if (.Platform$OS.type == "windows"){
 	setwd("C:/Users/Kapelner/workspace/bart_gene/")
@@ -15,8 +16,6 @@ if (.Platform$OS.type == "windows"){
 	setwd("../CGMBART_GPL")
 }
 
-
-MAX_GENE_NUM = 100
 
 all_results = list()
 all_validations = list()
@@ -48,7 +47,6 @@ for (gene_num in 1 : length(all_results)){
 	for (c_param in c(0,1,2)){	
 		c_param = as.character(c_param)
 		for (method in METHODS){
-			print(gene_name)
 			oo_rmse = all_validations[[gene_name]][[c_param]][["20"]][[method]]
 			if (oo_rmse < min){
 				min = oo_rmse
@@ -68,3 +66,5 @@ for (gene_num in 1 : length(all_results)){
 	gene_name = names(all_results)[gene_num]
 	aggregated_wins = aggregated_wins + wins[[gene_name]]
 }
+aggregated_wins
+sum(aggregated_wins)

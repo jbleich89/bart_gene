@@ -2,8 +2,8 @@
 
 #$ -j y
 #$ -N tf_discovery_for_gene_expression
-#$ -t 1-100
-#$ -q bigram
+#$ -t 1-500
+#$ -q all.q
 
 echo "starting R for gene # $SGE_TASK_ID"
 export _JAVA_OPTIONS="-Xms128m -Xmx7000m"
