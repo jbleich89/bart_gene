@@ -14,10 +14,10 @@ ms = c(
 	20
 )
 
-NUM_PERMUTE_SAMPLES = 2
+NUM_PERMUTE_SAMPLES = 100
 NUM_BURN_IN = 2000
 NUM_ITER_AFTER = 2000
-NUM_REP_FOR_TRAIN = 1
+NUM_REP_FOR_TRAIN = 10
 NUM_CORES = 1
 ALPHA = 0.05
 METHODS = c("important_tfs_at_alpha_pointwise", "important_tfs_at_alpha_simul_max", "important_tfs_at_alpha_simul_se")
