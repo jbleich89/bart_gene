@@ -1,31 +1,8 @@
-#simulation params
+setwd("C:/Users/Kapelner/workspace/bart_gene")
 
-cs = c(
-	0, #no prior
-	0.5, #weak prior
-	1,
-	2,
-	4, #medium strength prior
-	10000 #prior dominates
-)
+source("simulation_params.R")
 
-ms = c(
-#	10,
-	20
-)
-
-NUM_PERMUTE_SAMPLES = 100
-NUM_BURN_IN = 2000
-NUM_ITER_AFTER = 2000
-NUM_REP_FOR_TRAIN = 10
-NUM_CORES = 1
-ALPHA = 0.05
-METHODS = c("important_tfs_at_alpha_pointwise", "important_tfs_at_alpha_simul_max", "important_tfs_at_alpha_simul_se")
-NUM_TREES_FOR_EVAL = 200
-GENE_START = 1
-GENE_END = 10
-
-#read in arguments supplied by R CMD BATCH
+#read in arguments supplied by qsub - this will tell use which gene to process
 args = commandArgs(TRUE)
 if (length(args) > 0){
 	for (i in 1 : length(args)){
@@ -35,7 +12,7 @@ if (length(args) > 0){
 
 #get necessary functions and data
 
-setwd("C:/Users/Kapelner/workspace/bart_gene")
+
 source("helper_functions.R")
 
 setwd("C:/Users/Kapelner/Desktop/Dropbox/BART_gene")
@@ -147,24 +124,23 @@ get_null_permute_var_importances = function(training_data, m){
 
 
 #run for all genes and all c's and all m's
-run_simulation_for_all_genes_cs_and_ms = function(gene_start, gene_end){
+run_simulation_for_all_genes_cs_and_ms = function(gene_num){
 	results = list()
-	for (gene in gene_names[gene_start : gene_end]){
-		results[[gene]] = list()
-		for (c_param in cs){ 
-			results[[gene]][[as.character(c_param)]] = list()
-			for (m_param in ms){
-				results[[gene]][[as.character(c_param)]][[as.character(m_param)]] = list()
-				cat(paste("c:", c_param, "m:", m_param, "finding important tfs for gene:", gene, "\n"))
-				#now actually find the important tf's
-				result = find_important_tfs_for_gene_via_null_bart_sampling(gene, c = c_param, m = m_param)
-				
-				for (method in METHODS){
-					results[[gene]][[as.character(c_param)]][[as.character(m_param)]][[method]] = result[[method]]
-				}
-				cat(paste(" (completed in", result[["time_elapsed"]], "min)\n"))
-				save(results, file = paste("gene_results_", gene_start, "_", gene_end, ".RData", sep = ""))
+	gene = gene_names[gene_num]
+	results[[gene]] = list()
+	for (c_param in cs){ 
+		results[[gene]][[as.character(c_param)]] = list()
+		for (m_param in ms){
+			results[[gene]][[as.character(c_param)]][[as.character(m_param)]] = list()
+			cat(paste("c:", c_param, "m:", m_param, "finding important tfs for gene:", gene, "\n"))
+			#now actually find the important tf's
+			result = find_important_tfs_for_gene_via_null_bart_sampling(gene, c = c_param, m = m_param)
+			
+			for (method in METHODS){
+				results[[gene]][[as.character(c_param)]][[as.character(m_param)]][[method]] = result[[method]]
 			}
+			cat(paste(" (completed in", result[["time_elapsed"]], "min)\n"))
+			save(results, file = paste("gene_results_", gene_num, ".RData", sep = ""))
 		}
 	}
 	results
@@ -174,53 +150,54 @@ run_simulation_for_all_genes_cs_and_ms = function(gene_start, gene_end){
 
 #go through results and validate
 
-validate_for_all_genes_cs_and_ms = function(){
+validate_for_all_genes_cs_and_ms = function(gene_num){
+	gene = gene_names[gene_num]
 	validation_oos_rmses = list()
-	for (c_param in c(0)){
-		validation_oos_rmses[[as.character(c_param)]] = list()
+	validation_oos_rmses[[gene]] = list()
+	
+	for (c_param in cs){		
+		validation_oos_rmses[[gene]][[as.character(c_param)]] = list()
+		
 		for (m_param in ms){
-			validation_oos_rmses[[as.character(c_param)]][[as.character(m_param)]] = list()
-			for (gene in gene_names[1 : 3]){
-				validation_oos_rmses[[as.character(c_param)]][[as.character(m_param)]][[gene]] = list()
-				for (method in METHODS){
-					#get important tfs for this combination of c, m, gene, and method
-					important_tfs = names(results[[as.character(c_param)]][[as.character(m_param)]][[gene]][[method]])
+			validation_oos_rmses[[gene]][[as.character(c_param)]][[as.character(m_param)]] = list()
+			
+			for (method in METHODS){
+				#get important tfs for this combination of c, m, gene, and method
+				important_tfs = names(results[[gene]][[as.character(c_param)]][[as.character(m_param)]][[method]])
+				
+				y_train = gene_train[, gene]
+				y_cv = gene_cv[, gene]
+				
+				if (length(important_tfs) > 0){
+					#build training data
 					
-					y_train = gene_train[, gene]
-					y_cv = gene_cv[, gene]
+					training_data = data.frame(tf_train, y = y_train)
+					training_data = training_data[, c(important_tfs, "y")]
 					
-					if (length(important_tfs) > 0){
-						#build training data
-						
-						training_data = data.frame(tf_train, y = y_train)
-						training_data = training_data[, c(important_tfs, "y")]
-						
-						#now run BART model with 200 trees
-						bart_machine = build_bart_machine(training_data, 
-							num_trees = NUM_TREES_FOR_EVAL, 
-							num_burn_in = NUM_BURN_IN, 
-							num_iterations_after_burn_in = NUM_ITER_AFTER,
-							verbose = FALSE)
-						
-						#predict on cv data set only with important tf's						
-						cv_data = data.frame(tf_cv, y = y_cv)
-						cv_data = cv_data[, c(important_tfs, "y")]
-						predict_obj = bart_predict_for_test_data(bart_machine, cv_data)
-						validation_oos_rmses[[as.character(c_param)]][[as.character(m_param)]][[gene]][[method]] = predict_obj$rmse						
-					} else {
-						L2_err = sum((y_cv - mean(y_train))^2)
-						rmse = sqrt(L2_err / length(y_train))						
-						validation_oos_rmses[[as.character(c_param)]][[as.character(m_param)]][[gene]][[method]] = rmse
-					}
-
+					#now run BART model with 200 trees
+					bart_machine = build_bart_machine(training_data, 
+						num_trees = NUM_TREES_FOR_EVAL, 
+						num_burn_in = NUM_BURN_IN, 
+						num_iterations_after_burn_in = NUM_ITER_AFTER,
+						verbose = FALSE)
+					
+					#predict on cv data set only with important tf's						
+					cv_data = data.frame(tf_cv, y = y_cv)
+					cv_data = cv_data[, c(important_tfs, "y")]
+					predict_obj = bart_predict_for_test_data(bart_machine, cv_data)
+					validation_oos_rmses[[gene]][[as.character(c_param)]][[as.character(m_param)]][[method]] = predict_obj$rmse						
+				} else {
+					L2_err = sum((y_cv - mean(y_train))^2)
+					rmse = sqrt(L2_err / length(y_train))						
+					validation_oos_rmses[[gene]][[as.character(c_param)]][[as.character(m_param)]][[method]] = rmse
 				}
 			}
 		}
+		save(validation_oos_rmses, file = paste("validation_results_", GENE_NUM, ".RData", sep = ""))
 	}
 	validation_oos_rmses
 }
 
 #now run the simulation and validate
-results = run_simulation_for_all_genes_cs_and_ms(GENE_START, GENE_END)
-validation_oos_rmses = validate_for_all_genes_cs_and_ms()
-save(validate_for_all_genes_cs_and_ms, file = paste("validation_results_", gene_start, "_", gene_end, ".RData", sep = ""))
+results = run_simulation_for_all_genes_cs_and_ms(GENE_NUM)
+validation_oos_rmses = validate_for_all_genes_cs_and_ms(GENE_NUM)
