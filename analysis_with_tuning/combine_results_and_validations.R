@@ -19,7 +19,7 @@ MAX_GENE_NUM = 20
 all_results = list()
 all_validations = list()
 
-for (gene_num in 4 : MAX_GENE_NUM){
+for (gene_num in 1 : MAX_GENE_NUM){
 	#get the results first
 	load(paste("gene_results_", gene_num, ".RData", sep = ""))
 	gene_name = names(results)[1]
