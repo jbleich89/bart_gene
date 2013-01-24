@@ -1,4 +1,6 @@
-setwd("C:/Users/Kapelner/workspace/bart_gene")
+if (.Platform$OS.type == "windows"){
+	setwd("C:/Users/Kapelner/workspace/bart_gene/")
+}
 
 source("analysis_with_tuning/simulation_params.R")
 
@@ -15,8 +17,11 @@ if (length(args) > 0){
 
 source("helper_functions.R")
 
-setwd("C:/Users/Kapelner/Desktop/Dropbox/BART_gene")
-#setwd("../shane_data")
+if (.Platform$OS.type == "windows"){
+	setwd("C:/Users/Kapelner/Desktop/Dropbox/BART_gene")
+} else {
+	setwd("../shane_data")
+}
 
 priors = read.table("CHIP.priorprobs.39.txt", header = TRUE)
 gene.exp = read.table("expression.genes.txt", header = TRUE)
@@ -36,8 +41,12 @@ tf_test = result[["tf.test"]]##TF train and TF test: rows are obs and cols are T
 gene_names = as.character(gene.exp[, 2]) ##gene names
 
 #now load up the BART stuff
-setwd("C:/Users/Kapelner/workspace/CGMBART_GPL/")
-#setwd("../CGMBART_GPL/")
+if (.Platform$OS.type == "windows"){
+	setwd("C:/Users/Kapelner/workspace/CGMBART_GPL/")
+} else {
+	setwd("../CGMBART_GPL/")
+}
+
 source("r_scripts/bart_package.R")
 
 
