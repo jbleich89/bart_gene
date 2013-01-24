@@ -2,7 +2,7 @@
 
 #$ -j y
 #$ -N tf_discovery_for_gene_expression
-#$ -t 1-100
+# -t 1-100
 
 echo "starting R for gene # $SGE_TASK_ID"
 export _JAVA_OPTIONS="-Xms128m -Xmx3g"
