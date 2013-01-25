@@ -14,33 +14,6 @@ if (length(args) > 0){
 	}
 }
 
-#get necessary functions and data
-
-
-source("helper_functions.R")
-
-if (.Platform$OS.type == "windows"){
-	setwd("C:/Users/Kapelner/Desktop/Dropbox/BART_gene")
-} else {
-	setwd("../shane_data")
-}
-
-priors = read.table("CHIP.priorprobs.39.txt", header = TRUE)
-gene.exp = read.table("expression.genes.txt", header = TRUE)
-tf.exp = read.table("expression.tfs.39.txt", header = TRUE)
-
-priorMat = as.matrix(priors[, 3 : ncol(priors)])
-rownames(priorMat) = priors[, 1] 
-colnames(priorMat) = colnames(priors)[3 : ncol(priors)]
-prior_mat_adj = prior_adj(priorMat)
-result = setup() ##5 objects
-gene_train = result[["gene.train"]]
-gene_cv = result[["gene.cv"]]
-gene_test = result[["gene.test"]]##gene.train and gene.test rows are obs and cols are genes
-tf_train = result[["tf.train"]]
-tf_cv = result[["tf.cv"]]
-tf_test = result[["tf.test"]]##TF train and TF test: rows are obs and cols are TFs
-gene_names = as.character(gene.exp[, 2]) ##gene names
 
 #now load up the BART stuff
 if (.Platform$OS.type == "windows"){
@@ -213,3 +186,6 @@ validate_for_all_genes_cs_and_ms = function(gene_num){
 results = run_simulation_for_all_genes_cs_and_ms(GENE_NUM)
 #load(paste("gene_results_", GENE_NUM, ".RData", sep = ""))
 validation_oos_rmses = validate_for_all_genes_cs_and_ms(GENE_NUM)
+
+
+
