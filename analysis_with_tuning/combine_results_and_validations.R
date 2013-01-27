@@ -1,5 +1,5 @@
 options(width = 150)
-MAX_GENE_NUM = 100
+MAX_GENE_NUM = 999
 
 if (.Platform$OS.type == "windows"){
 	setwd("C:/Users/Kapelner/workspace/bart_gene/")
@@ -47,8 +47,11 @@ for (gene_num in 1 : length(all_results)){
 	for (c_param in cs){	
 		c_param = as.character(c_param)
 		for (method in METHODS){
+			
 			oo_rmse = all_validations[[gene_name]][[c_param]][["20"]][[method]]
-			if (oo_rmse < min){
+			if (length(oo_rmse) == 0){
+				cat(paste("ERROR:", gene_name, c_param, method, "\n"))
+			} else if (oo_rmse < min){
 				min = oo_rmse
 				lowest_c = c_param
 				lowest_method = method
