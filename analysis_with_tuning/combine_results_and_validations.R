@@ -1,5 +1,5 @@
 options(width = 150)
-MAX_GENE_NUM = 999
+MAX_GENE_NUM = 6000
 
 if (.Platform$OS.type == "windows"){
 	setwd("C:/Users/Kapelner/workspace/bart_gene/")
@@ -29,6 +29,7 @@ for (gene_num in 1 : MAX_GENE_NUM){
 	all_validations[[gene_name]] = validation_oos_rmses[[gene_name]]
 }
 
+save(all_results, file = "all_results.RData")
 save(all_validations, file = "all_validations.RData")
 
 #now we want to see who won...
@@ -73,65 +74,5 @@ aggregated_wins
 sum(aggregated_wins)
 
 
-#now we want a boxplot
 
-rmses = array(NA, c(length(cs), length(METHODS), MAX_GENE_NUM))
 
-for (gene_num in 1 : MAX_GENE_NUM){
-	validations = all_validations[gene_num]
-	for (i in 1 : length(cs)){	
-		c_param = as.character(cs[i])
-		for (j in 1 : length(METHODS)){
-			rmses[i, j, ] = sapply(1 : length(all_validations), function(s){all_validations[[s]][[c_param]][["20"]][[METHODS[j]]]})
-		}
-	}	
-	
-}
-
-names = c()
-for (c_param in cs){
-	for (method in METHODS){
-		names = c(names, paste(method, "c =", c_param))
-	}
-}
-
-par(mar = c(20,3,3,3))
-boxplot(rmses[1, 1, ], rmses[1, 2, ], rmses[1, 3, ], 
-		rmses[2, 1, ], rmses[2, 2, ], rmses[2, 3, ], 
-		rmses[3, 1, ], rmses[3, 2, ], rmses[3, 3, ], 
-		rmses[4, 1, ], rmses[4, 2, ], rmses[4, 3, ], 
-		rmses[5, 1, ], rmses[5, 2, ], rmses[5, 3, ], 
-		rmses[6, 1, ], rmses[6, 2, ], rmses[6, 3, ], 
-		names = names, las = 2)
-
-names = c()
-
-for (method in METHODS){
-	for (c_param in cs){
-		names = c(names, paste(method, "c =", c_param))
-	}
-}
-
-par(mar = c(20,3,3,3))
-boxplot(rmses[1, 1, ], rmses[2, 1, ], rmses[3, 1, ], rmses[4, 1, ], rmses[5, 1, ], rmses[6, 1, ], 
-		rmses[1, 2, ], rmses[2, 2, ], rmses[3, 2, ], rmses[4, 2, ], rmses[5, 2, ], rmses[6, 2, ],
-		rmses[1, 3, ], rmses[2, 3, ], rmses[3, 3, ], rmses[4, 3, ], rmses[5, 3, ], rmses[6, 3, ],
-		names = names, las = 2, ylim = c(0, 1.5))
-
-#for each tf, how many genes did it appear in for each method?
-
-gene_by_tf = matrix(0, nrow = MAX_GENE_NUM, ncol = ncol(tf_train))
-rownames(gene_by_tf) = 
-colnames(gene_by_tf) = colnames(tf_train)
-for (g in 1 : MAX_GENE_NUM){
-	for (t in 1 : ncol(tf_train)){
-		names_of_all_tfs = colnames(tf_train)
-		tfs = names(all_results[[g]][['0']][['20']][["important_tfs_at_alpha_simul_max"]])
-		cols = which(names_of_all_tfs %in% tfs)
-		gene_by_tf[g, cols] = 1
-	}
-}
-
-colSums(gene_by_tf)
-rowSums(gene_by_tf)
-sum(colSums(gene_by_tf))
