@@ -1,3 +1,5 @@
+tryCatch(library(energy), error = function(e){install.packages("energy")}, finally = library(energy))
+
 
 #######boxplots
 if (.Platform$OS.type == "windows"){
@@ -58,8 +60,7 @@ boxplot(rmses[1, 1, ], rmses[2, 1, ], rmses[3, 1, ], rmses[4, 1, ], rmses[5, 1, 
 #for each tf, how many genes did it appear in for each method?
 
 gene_by_tf = matrix(0, nrow = MAX_GENE_NUM, ncol = ncol(tf_train))
-rownames(gene_by_tf) = 
-		colnames(gene_by_tf) = colnames(tf_train)
+rownames(gene_by_tf) = colnames(gene_by_tf) = colnames(tf_train)
 for (g in 1 : MAX_GENE_NUM){
 	for (t in 1 : ncol(tf_train)){
 		names_of_all_tfs = colnames(tf_train)
