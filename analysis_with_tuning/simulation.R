@@ -172,7 +172,7 @@ validate_for_all_genes_cs_and_ms = function(gene_num){
 					validation_oos_rmses[[gene]][[as.character(c_param)]][[as.character(m_param)]][[method]] = predict_obj$rmse						
 				} else {
 					L2_err = sum((y_cv - mean(y_train))^2)
-					rmse = sqrt(L2_err / length(y_train))						
+					rmse = sqrt(L2_err / length(y_cv))						
 					validation_oos_rmses[[gene]][[as.character(c_param)]][[as.character(m_param)]][[method]] = rmse
 				}
 			}

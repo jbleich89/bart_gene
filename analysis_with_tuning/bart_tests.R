@@ -26,8 +26,6 @@ rmse_list = all_validations[[gene_num]]
 validation_list = all_results[[gene_num]]
 rm(all_results) ; rm(all_validations)
 
-rmse_list
-tf_list
 
 min_rmse = Inf
 tf_list = c()
@@ -61,6 +59,7 @@ if (length(best_tfs) > 0){
   test_data = test_data[, c(best_tfs, "y")]
   predict_obj = bart_predict_for_test_data(bart_machine, test_data)
   rmse = predict_obj$rmse						
+  rmse
 } else {
   L2_err = sum((y_test - mean(y_train))^2)
   rmse = sqrt(L2_err / length(y_train))						
