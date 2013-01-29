@@ -3,35 +3,23 @@ library(MASS)
 library(glmnet)
 library(parallel)
 
-source("~/Research_Genomics/bart_gene/helper_functions.R")
+
 setwd("~/Research_Genomics/")
 
 priors = read.table("CHIP.priorprobs.39.txt", header = TRUE)
 gene.exp = read.table("expression.genes.txt", header = TRUE)
 tf.exp = read.table("expression.tfs.39.txt", header = TRUE)
 
-priorMat = as.matrix(priors[, 3 : ncol(priors)])
-rownames(priorMat) = priors[, 1] 
-colnames(priorMat) = colnames(priors)[3 : ncol(priors)]
-prior_mat_adj = prior_adj(priorMat)
-result = setup() ##5 objects
-gene_train = result[["gene.train"]]
-gene_cv = result[["gene.cv"]]
-gene_test = result[["gene.test"]]##gene.train and gene.test rows are obs and cols are genes
-tf_train = result[["tf.train"]]
-tf_cv = result[["tf.cv"]]
-tf_test = result[["tf.test"]]##TF train and TF test: rows are obs and cols are TFs
-gene_names = as.character(gene.exp[, 2]) ##gene names
+source("~/Research_Genomics/bart_gene/analysis_with_tuning/simulation_params_JB.R")
 
-
-
+NUM_CORES=20
 
 test_ols_methods_for_gene= function(gene_num){
 
   out = list()
   out[["gene"]] = colnames(gene_train)[gene_num]
   
-  y = c(gene_train[ , gene], gene_cv[ , gene_num])
+  y = c(gene_train[ , gene_num], gene_cv[ , gene_num])
   X = rbind(tf_train, tf_cv)
   
   ## OLS& Step-wise OLS
@@ -59,7 +47,8 @@ test_ols_methods_for_gene= function(gene_num){
   out
 }
 
-mclapply(X=5, FUN=test_ols_methods_for_gene)
+
+mclapply(X = 1 : length(gene_names), FUN = test_ols_methods_for_gene, mc.cores = NUM_CORES)
 
 
 
