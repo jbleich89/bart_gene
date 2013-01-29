@@ -46,7 +46,7 @@ for(j in 1 : length(gene_num_list)){
 
 names=c("Control", names)
 
-par(mar = c(20,3,3,3))
+par(mar = c(25,8,8,8))
 boxplot(control_rmses, rmses[1, 1, ], rmses[1, 2, ], rmses[1, 3, ], 
 		rmses[2, 1, ], rmses[2, 2, ], rmses[2, 3, ], 
 		rmses[3, 1, ], rmses[3, 2, ], rmses[3, 3, ], 
