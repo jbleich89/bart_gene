@@ -24,7 +24,7 @@ METHODS = c("important_tfs_at_alpha_pointwise", "important_tfs_at_alpha_simul_ma
 NUM_TREES_FOR_EVAL = 200
 GENE_NUM = 1 #this will be set by passing an arg into R below:
 
-source("helper_functions.R")
+source("../helper_functions.R")
 
 if (.Platform$OS.type == "windows"){
 	setwd("C:/Users/Kapelner/Desktop/Dropbox/BART_gene")

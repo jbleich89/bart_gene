@@ -1,42 +1,40 @@
 
 library(MASS)
-library(glmnet)
-library(parallel)
-library(randomForest)
+tryCatch(library(glmnet), error = function(e){install.packages("glmnet")}, finally = library(glmnet))
+tryCatch(library(randomForest), error = function(e){install.packages("randomForest")}, finally = library(randomForest))
 
 ##need to make as argument
 gene_num = 2
 
 ##Loads
-setwd("~/Research_Genomics/")
+setwd("C:/Users/kapelner/Desktop/Dropbox/BART_gene/")
 
+load("all_results.RData")
+load("all_validations.RData")
 priors = read.table("CHIP.priorprobs.39.txt", header = TRUE)
 gene.exp = read.table("expression.genes.txt", header = TRUE)
 tf.exp = read.table("expression.tfs.39.txt", header = TRUE)
 
-source("~/Research_Genomics/bart_gene/analysis_with_tuning/simulation_params_JB.R")
+setwd("C:/Users/Kapelner/workspace/bart_gene/analysis_with_tuning")
+source("simulation_params.R")
 
 
-setwd("C://Users/jbleich/Desktop/Dropbox/BART_gene/")
 
-load("all_results.RData")
-load("all_validations.RData")
-
-setwd("C://Users/jbleich/workspace/CGMBART_GPL/")
+setwd("C:/Users/kapelner/workspace/CGMBART_GPL/")
 source("r_scripts/bart_package.R")
 ### 
 
 
 ##OLS component
-test_other_methods_for_gene = function(gene_num){
+test_all_methods_for_gene = function(gene_num){
   out = list()
-  rmse_mat = matrix(NA,nrow=1,ncol=7)
-  num_var_mat = matrix(NA,nrow=1,ncol=7)
+  rmse_mat = matrix(NA,nrow=1,ncol=8)
+  num_vars_vec = matrix(NA,nrow=1,ncol=8)
   
   rownames(rmse_mat) = colnames(gene_train)[gene_num]
-  rownames(num_var_mat) = rownames(rmse_mat)
-  colnames(rmse_mat) = c("OLS","Stepwise","Lasso-CV" "Lasso" ,"RF", "BART-Best", "BART-S.Max")
-  colnames(num_var_mat) = colnames(rmse_mat)
+  rownames(num_vars_vec) = rownames(rmse_mat)
+  colnames(rmse_mat) = c("Null", "OLS", "Stepwise", "Lasso-CV", "Lasso", "RF", "BART-Best", "BART-S.Max")
+  colnames(num_vars_vec) = colnames(rmse_mat)
   
   y = c(gene_train[ , gene_num], gene_cv[ , gene_num])
   X = rbind(tf_train, tf_cv)
@@ -49,18 +47,18 @@ test_other_methods_for_gene = function(gene_num){
   reg = lm(y ~ . , data = train_data)
   ols_predict = predict(object = reg, newdata = as.data.frame(tf_test))
   rmse_mat[ , "OLS"] = sqrt(sum((ols_predict - y_test) ^ 2) / length(y_test))
-  num_var_mat[ , "OLS"] = 39
+  num_vars_vec[ , "OLS"] = 39
   
   step_reg = stepAIC(object = reg, direction = "backward" , trace = F)
   step_predict = predict(object = step_reg, newdata = as.data.frame(tf_test))
   rmse_mat[ , "Stepwise"] = sqrt(sum((step_predict - y_test) ^ 2) / length(y_test))
-  num_var_mat[ , "Stepwise"] = length(step_reg$coefficients) - 1 ##exclude one for intercept
+  num_vars_vec[ , "Stepwise"] = length(step_reg$coefficients) - 1 ##exclude one for intercept
   
   ##Lasso CV
   lasso_cv_fit = cv.glmnet(X, y, alpha = 1 , nfolds = 5, type.measure = "mse")
   lasso_cv_predict = predict(lasso_cv_fit, newx = tf_test)  
-  rmse_mat[ , "Lasso-CV"] = sqrt(sum((lasso_predict - y_test) ^ 2) / length(y_test))
-  num_var_mat[ , "Lasso-CV"] = lasso_fit$nzero[which(lasso_fit$lambda == lasso_fit$lambda.1se)] ##change to lambda.min
+  rmse_mat[ , "Lasso-CV"] = sqrt(sum((lasso_cv_predict - y_test) ^ 2) / length(y_test))
+  num_vars_vec[ , "Lasso-CV"] = lasso_cv_fit$nzero[which(lasso_cv_fit$lambda == lasso_cv_fit$lambda.1se)] ##change to lambda.min
   
   ##RF
   rf_fit = randomForest(x=X, y=y)
@@ -77,25 +75,27 @@ test_other_methods_for_gene = function(gene_num){
   
   ##Lasso
   ##Train
-  lasso_fit = glmnet(tf_train, y_train, alpha = 1)
+  lasso_train_fit = glmnet(tf_train, y_train, alpha = 1)
   ##CV
-  lasso_predict_mat = predict(lasso_fit, newx = tf_cv)
+  lasso_predict_mat = predict(lasso_train_fit, newx = tf_cv)
   L2_mat = (lasso_predict_mat - y_cv)^2
-  lasso_rmse_cv = sqrt(apply(L2_mat , 2 , sum) / length(y_cv))
+  lasso_rmse_cv = sqrt(apply(L2_mat, 2, sum) / length(y_cv))
   lambda = which.min(lasso_rmse_cv)
   ##Test
-  lasso_predict = predict(lasso_fit, newx = tf_test)[, lambda]
+  lasso_predict = predict(lasso_train_fit, newx = tf_test)[, lambda]
   rmse_mat[ , "Lasso"] = sqrt(sum((lasso_predict - y_test) ^ 2) / length(y_test))
-  num_var_mat[ , "Lasso"] = lasso_fit$df[lambda] ##change to lambda.min
+  num_vars_vec[ , "Lasso"] = lasso_train_fit$df[lambda] ##change to lambda.min
   
-
+  
+  rmse_mat[ , "Null"] = sqrt(sum((y_test-mean(y_train))^2)/length(y_test))
+  num_vars_vec[ , "Null"] = 0
   ##BART Runs
   rmse_list = all_validations[[gene_num]]
   validation_list = all_results[[gene_num]]
   
   ##Find best TFs##################
   min_rmse = Inf
-  tf_list = c()
+  best_tfs = c()
   for(c in cs){
     for(method in METHODS){
       if(rmse_list[[as.character(c)]][["20"]][[method]] < min_rmse){
@@ -132,7 +132,7 @@ test_other_methods_for_gene = function(gene_num){
   } 
   
   rmse_mat[ , "BART-Best"] = bart_rmse
-  num_vars_mat[, "BART-Best"] = best_tfs
+  num_vars_vec[, "BART-Best"] = length(best_tfs)
   #####
   
   ##Find best TFs for simult. max#####
@@ -170,24 +170,40 @@ test_other_methods_for_gene = function(gene_num){
     bart_rmse_s_max = sqrt(L2_err / length(y_test))						
   }
   rmse_mat[ , "BART-S.Max"] = bart_rmse_s_max
-  num_vars_mat[, "BART-S.Max"] = best_tfs_s_max
+  num_vars_vec[, "BART-S.Max"] = length(best_tfs_s_max)
   
   
   
-  list("rmse" = rmse_mat, "num_vars" = num_var_mat)
+  list(rmse_mat = rmse_mat, num_vars_vec = num_vars_vec)
 }
 
 
 
 run_combined_tests = function(gene_num){
   all_methods = test_all_methods_for_gene(gene_num)
-  rmse_results = all_methods[["rmse"]]
+  rmse_results = all_methods$rmse_mat
+  num_var_results = all_methods$num_vars_vec
   print(rmse_results)
   print(num_var_results)                        
   #save(file = paste("rmse_results", gene_num, sep = ""))
   #save(file = paste("num_var_results", gene_num, sep =""))
-  }
-save(list1000,file="sample_test.RData")
+}
+  
+run_combined_tests(12)
+run_combined_tests(13)
+run_combined_tests(14)
+run_combined_tests(15)
+run_combined_tests(16)
+run_combined_tests(17)
+run_combined_tests(18)
+run_combined_tests(19)
+run_combined_tests(20)
+run_combined_tests(21)
+run_combined_tests(22)
+run_combined_tests(23)
+run_combined_tests(24)
+
+#save(list1000,file="sample_test.RData")
 
     
 
