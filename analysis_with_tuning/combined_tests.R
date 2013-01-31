@@ -1,13 +1,21 @@
+LAST_NAME = "kapelner"
+NOT_ON_GRID = length(grep("wharton.upenn.edu", Sys.getenv(c("HOSTNAME")))) == 0
 
 library(MASS)
 tryCatch(library(glmnet), error = function(e){install.packages("glmnet")}, finally = library(glmnet))
 tryCatch(library(randomForest), error = function(e){install.packages("randomForest")}, finally = library(randomForest))
+tryCatch(library(BayesTree), error = function(e){install.packages("BayesTree")}, finally = library(BayesTree))
 
 ##need to make as argument
 gene_num = 2
 
 ##Loads
-setwd("C:/Users/kapelner/Desktop/Dropbox/BART_gene/")
+if (NOT_ON_GRID){
+	setwd(paste("C:/Users/", LAST_NAME, "/Desktop/Dropbox/BART_gene/", sep = ""))
+} else {
+	setwd("../shane_data")
+}
+
 
 load("all_results.RData")
 load("all_validations.RData")
@@ -15,26 +23,35 @@ priors = read.table("CHIP.priorprobs.39.txt", header = TRUE)
 gene.exp = read.table("expression.genes.txt", header = TRUE)
 tf.exp = read.table("expression.tfs.39.txt", header = TRUE)
 
-setwd("C:/Users/Kapelner/workspace/bart_gene/analysis_with_tuning")
+if (NOT_ON_GRID){
+	setwd(paste("C:/Users/", LAST_NAME, "/workspace/bart_gene/analysis_with_tuning", sep = ""))
+} else {
+	setwd("../bart_gene/analysis_with_tuning")
+}
+
 source("simulation_params.R")
 
 
+if (NOT_ON_GRID){
+	setwd(paste("C:/Users/", LAST_NAME, "/workspace/CGMBART_GPL/", sep = ""))
+} else {
+	setwd("../../CGMBART_GPL")
+}
 
-setwd("C:/Users/kapelner/workspace/CGMBART_GPL/")
 source("r_scripts/bart_package.R")
-### 
 
 
 ##OLS component
 test_all_methods_for_gene = function(gene_num){
   out = list()
-  rmse_mat = matrix(NA,nrow=1,ncol=8)
-  num_vars_vec = matrix(NA,nrow=1,ncol=8)
+  rmse_mat = matrix(NA, nrow = 1, ncol = 11)
+  num_vars_vec = matrix(NA, nrow = 1, ncol = 11)
   
   rownames(rmse_mat) = colnames(gene_train)[gene_num]
   rownames(num_vars_vec) = rownames(rmse_mat)
-  colnames(rmse_mat) = c("Null", "OLS", "Stepwise", "Lasso-CV", "Lasso", "RF", "BART-Best", "BART-S.Max")
-  colnames(num_vars_vec) = colnames(rmse_mat)
+  simulation_names = c("Null", "OLS", "OLS-BART-Best", "Stepwise", "Lasso-CV", "Lasso", "RF", "BART-Best", "BART-S.Max", "BART-Full", "Rob-Best")
+   colnames(rmse_mat) = simulation_names
+   colnames(num_vars_vec) = simulation_names
   
   y = c(gene_train[ , gene_num], gene_cv[ , gene_num])
   X = rbind(tf_train, tf_cv)
@@ -47,7 +64,6 @@ test_all_methods_for_gene = function(gene_num){
   reg = lm(y ~ . , data = train_data)
   ols_predict = predict(object = reg, newdata = as.data.frame(tf_test))
   rmse_mat[ , "OLS"] = sqrt(sum((ols_predict - y_test) ^ 2) / length(y_test))
-  num_vars_vec[ , "OLS"] = 39
   
   step_reg = stepAIC(object = reg, direction = "backward" , trace = F)
   step_predict = predict(object = step_reg, newdata = as.data.frame(tf_test))
@@ -86,7 +102,7 @@ test_all_methods_for_gene = function(gene_num){
   rmse_mat[ , "Lasso"] = sqrt(sum((lasso_predict - y_test) ^ 2) / length(y_test))
   num_vars_vec[ , "Lasso"] = lasso_train_fit$df[lambda] ##change to lambda.min
   
-  
+  ##NULL model
   rmse_mat[ , "Null"] = sqrt(sum((y_test-mean(y_train))^2)/length(y_test))
   num_vars_vec[ , "Null"] = 0
   ##BART Runs
@@ -115,24 +131,48 @@ test_all_methods_for_gene = function(gene_num){
     
     #now run BART model with 200 trees
     bart_machine = build_bart_machine(training_data, 
-                                      num_trees = NUM_TREES_FOR_EVAL, 
-                                      num_burn_in = NUM_BURN_IN, 
-                                      num_iterations_after_burn_in = NUM_ITER_AFTER, 
-                                      verbose = FALSE, num_cores=2)
+      num_trees = NUM_TREES_FOR_EVAL, 
+      num_burn_in = NUM_BURN_IN, 
+      num_iterations_after_burn_in = NUM_ITER_AFTER, 
+      verbose = FALSE)
     
     #predict on cv data set only with important tf's      			
     test_data = data.frame(tf_test, y = y_test)
     test_data = test_data[, c(best_tfs, "y")]
     predict_obj = bart_predict_for_test_data(bart_machine, test_data)
-    bart_rmse = predict_obj$rmse						
+	rmse_mat[, "BART-Best"] = predict_obj$rmse
+	
+	
+	#### Rob BART-best
+	rbart = bart(x.train = training_data[, 1 : (ncol(training_data) - 1)], 
+		y.train = y_train, 
+		x.test = test_data[, 1 : (ncol(test_data) - 1)],
+		ntree = NUM_TREES_FOR_EVAL, 
+		nskip = NUM_BURN_IN - 3000, 
+		ndpost = NUM_ITER_AFTER, 
+		verbose = FALSE)
+	yhat_rbart = rbart$yhat.test.mean
+	rmse_mat[, "Rob-Best"] = sqrt(sum((test_data$y - yhat_rbart)^2) / length(yhat_rbart))
+	
+	#### OLS BART-Best
+	mod = lm(y ~ ., training_data)
+	y_hat = predict(mod, test_data)
+	rmse_mat[, "OLS-BART-Best"] = sqrt(sum((test_data$y - y_hat)^2) / length(y_hat))
+	
     
   } else {
     L2_err = sum((y_test - mean(y_train))^2)
-    bart_rmse = sqrt(L2_err / length(y_test))						
+    null_rmse = sqrt(L2_err / length(y_test))
+	rmse_mat[, "BART-Best"] = null_rmse
+	rmse_mat[, "Rob-Best"] = null_rmse
+	rmse_mat[, "OLS-BART-Best"] = null_rmse
+	
   } 
   
-  rmse_mat[ , "BART-Best"] = bart_rmse
-  num_vars_vec[, "BART-Best"] = length(best_tfs)
+  num_vars_vec[, "BART-Best"] = length(best_tfs)	
+  num_vars_vec[, "Rob-Best"] = length(best_tfs)
+  num_vars_vec[, "OLS-BART-Best"] = length(best_tfs)
+  
   #####
   
   ##Find best TFs for simult. max#####
@@ -146,35 +186,46 @@ test_all_methods_for_gene = function(gene_num){
   }
   
   
-  if (length(best_tfs_s_max) > 0){
-    #build training data
-    
-    training_data = data.frame(tf_train, y = y_train)
-    training_data = training_data[, c(best_tfs_s_max, "y")]
-    
-    #now run BART model with 200 trees
-    bart_machine = build_bart_machine(training_data, 
-                                      num_trees = NUM_TREES_FOR_EVAL, 
-                                      num_burn_in = NUM_BURN_IN, 
-                                      num_iterations_after_burn_in = NUM_ITER_AFTER, 
-                                      verbose = FALSE, num_cores=2)
-    
-    #predict on cv data set only with important tf's        		
-    test_data = data.frame(tf_test, y = y_test)
-    test_data = test_data[, c(best_tfs_s_max, "y")]
-    predict_obj = bart_predict_for_test_data(bart_machine, test_data)
-    bart_rmse_s_max = predict_obj$rmse						
-    
-  } else {
-    L2_err = sum((y_test - mean(y_train))^2)
-    bart_rmse_s_max = sqrt(L2_err / length(y_test))						
-  }
-  rmse_mat[ , "BART-S.Max"] = bart_rmse_s_max
-  num_vars_vec[, "BART-S.Max"] = length(best_tfs_s_max)
+#  if (length(best_tfs_s_max) > 0){
+#    #build training data
+#    
+#    training_data = data.frame(tf_train, y = y_train)
+#    training_data = training_data[, c(best_tfs_s_max, "y")]
+#    
+#    #now run BART model with 200 trees
+#    bart_machine = build_bart_machine(training_data, 
+#      num_trees = NUM_TREES_FOR_EVAL, 
+#      num_burn_in = NUM_BURN_IN, 
+#      num_iterations_after_burn_in = NUM_ITER_AFTER, 
+#      verbose = FALSE)
+#    
+#    #predict on cv data set only with important tf's        		
+#    test_data = data.frame(tf_test, y = y_test)
+#    test_data = test_data[, c(best_tfs_s_max, "y")]
+#    predict_obj = bart_predict_for_test_data(bart_machine, test_data)
+#    bart_rmse_s_max = predict_obj$rmse						
+#    
+#  } else {
+#    L2_err = sum((y_test - mean(y_train))^2)
+#    bart_rmse_s_max = sqrt(L2_err / length(y_test))						
+#  }
+#  rmse_mat[ , "BART-S.Max"] = bart_rmse_s_max
+#  num_vars_vec[, "BART-S.Max"] = length(best_tfs_s_max)
   
+  #run a BART on the full dataset
+
+#  	training_data = data.frame(tf_train, y = y_train)
+#  	bart_machine = build_bart_machine(training_data, 
+#	  num_trees = NUM_TREES_FOR_EVAL, 
+#	  num_burn_in = NUM_BURN_IN, 
+#	  num_iterations_after_burn_in = NUM_ITER_AFTER, 
+#	  verbose = FALSE)
+#	test_data = data.frame(tf_test, y = y_test)
+#	predict_obj = bart_predict_for_test_data(bart_machine, test_data)
+#	bart_rmse = predict_obj$rmse
+#	rmse_mat[ , "BART-Full"] = bart_rmse
   
-  
-  list(rmse_mat = rmse_mat, num_vars_vec = num_vars_vec)
+	list(rmse_mat = rmse_mat, num_vars_vec = num_vars_vec)
 }
 
 
@@ -185,28 +236,38 @@ run_combined_tests = function(gene_num){
   num_var_results = all_methods$num_vars_vec
   print(rmse_results)
   print(num_var_results)                        
-  #save(file = paste("rmse_results", gene_num, sep = ""))
-  #save(file = paste("num_var_results", gene_num, sep =""))
+  save(rmse_results, file = paste("rmse_results_", gene_num, sep = ""))
+  save(num_var_results, file = paste("num_var_results_", gene_num, sep =""))
 }
   
-run_combined_tests(12)
-run_combined_tests(13)
-run_combined_tests(14)
-run_combined_tests(15)
-run_combined_tests(16)
-run_combined_tests(17)
-run_combined_tests(18)
-run_combined_tests(19)
-run_combined_tests(20)
-run_combined_tests(21)
-run_combined_tests(22)
-run_combined_tests(23)
-run_combined_tests(24)
 
-#save(list1000,file="sample_test.RData")
+###set simulation parameters here
+args = commandArgs(TRUE)
+if (length(args) > 0){
+	for (i in 1 : length(args)){
+		eval(parse(text = args[[i]]))
+	}
+}
+if (NOT_ON_GRID){
+	iter_num = 198
+}
 
-    
+print(paste("iter_num:", iter_num))
+run_combined_tests(iter_num)
+run_combined_tests(iter_num+1)
+run_combined_tests(iter_num+2)
+run_combined_tests(iter_num+3)
+run_combined_tests(iter_num+4)
+run_combined_tests(iter_num+5)
+run_combined_tests(iter_num+6)
+run_combined_tests(iter_num+7)
+run_combined_tests(iter_num+8)
+run_combined_tests(iter_num+9)
+run_combined_tests(iter_num+10)
+run_combined_tests(iter_num+11)
+run_combined_tests(iter_num+12)
 
-    
+
+
 
  
