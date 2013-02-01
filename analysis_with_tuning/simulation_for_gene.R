@@ -3,6 +3,8 @@ NOT_ON_GRID = length(grep("wharton.upenn.edu", Sys.getenv(c("HOSTNAME")))) == 0
 
 if (NOT_ON_GRID){
 	setwd(paste("C:/Users/", LAST_NAME, "/workspace/bart_gene/analysis_with_tuning/", sep = ""))
+} else {
+	setwd("analysis_with_tuning")
 }
 
 source("simulation_params.R")
