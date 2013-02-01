@@ -48,7 +48,7 @@ source("helper_functions.R")
 if (NOT_ON_GRID){
 	setwd(paste("C:/Users/", LAST_NAME, "/Desktop/Dropbox/BART_gene", sep = ""))
 } else {
-	setwd("../shane_data")
+	setwd("../../shane_data")
 }
 
 priors = read.table("CHIP.priorprobs.39.txt", header = TRUE)
