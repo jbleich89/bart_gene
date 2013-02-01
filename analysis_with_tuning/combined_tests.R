@@ -112,11 +112,11 @@ test_all_methods_for_gene = function(gene_num){
   ##Find best TFs##################
   min_rmse = Inf
   best_tfs = c()
-  for(c in cs){
-    for(method in METHODS){
-      if(rmse_list[[as.character(c)]][["20"]][[method]] < min_rmse){
-        best_tfs = names(validation_list[[as.character(c)]][["20"]][[method]])
-        min_rmse = rmse_list[[as.character(c)]][["20"]][[method]]
+  for (c in cs){
+    for (method in METHODS){
+      if (rmse_list[[as.character(c)]][["20"]][["0.05"]][[method]] < min_rmse){
+        best_tfs = names(validation_list[[as.character(c)]][["20"]][["0.05"]][[method]])
+        min_rmse = rmse_list[[as.character(c)]][["20"]][["0.05"]][[method]]
       }
     }
   }
@@ -148,8 +148,8 @@ test_all_methods_for_gene = function(gene_num){
 		y.train = y_train, 
 		x.test = test_data[, 1 : (ncol(test_data) - 1)],
 		ntree = NUM_TREES_FOR_EVAL, 
-		nskip = NUM_BURN_IN - 3000, 
-		ndpost = NUM_ITER_AFTER, 
+		nskip = 1000, 
+		ndpost = 1000, 
 		verbose = FALSE)
 	yhat_rbart = rbart$yhat.test.mean
 	rmse_mat[, "Rob-Best"] = sqrt(sum((test_data$y - yhat_rbart)^2) / length(yhat_rbart))
@@ -179,51 +179,51 @@ test_all_methods_for_gene = function(gene_num){
   min_rmse = Inf
   tf_list = c()
   for(c in cs){
-    if(rmse_list[[as.character(c)]][["20"]][[METHODS[2]]] < min_rmse){
+    if(rmse_list[[as.character(c)]][["20"]][["0.05"]][[METHODS[2]]] < min_rmse){
       best_tfs_s_max = names(validation_list[[as.character(c)]][["20"]][[METHODS[2]]])
-      min_rmse = rmse_list[[as.character(c)]][["20"]][[METHODS[2]]]
+      min_rmse = rmse_list[[as.character(c)]][["20"]][["0.05"]][[METHODS[2]]]
     }
   }
   
   
-#  if (length(best_tfs_s_max) > 0){
-#    #build training data
-#    
-#    training_data = data.frame(tf_train, y = y_train)
-#    training_data = training_data[, c(best_tfs_s_max, "y")]
-#    
-#    #now run BART model with 200 trees
-#    bart_machine = build_bart_machine(training_data, 
-#      num_trees = NUM_TREES_FOR_EVAL, 
-#      num_burn_in = NUM_BURN_IN, 
-#      num_iterations_after_burn_in = NUM_ITER_AFTER, 
-#      verbose = FALSE)
-#    
-#    #predict on cv data set only with important tf's        		
-#    test_data = data.frame(tf_test, y = y_test)
-#    test_data = test_data[, c(best_tfs_s_max, "y")]
-#    predict_obj = bart_predict_for_test_data(bart_machine, test_data)
-#    bart_rmse_s_max = predict_obj$rmse						
-#    
-#  } else {
-#    L2_err = sum((y_test - mean(y_train))^2)
-#    bart_rmse_s_max = sqrt(L2_err / length(y_test))						
-#  }
-#  rmse_mat[ , "BART-S.Max"] = bart_rmse_s_max
-#  num_vars_vec[, "BART-S.Max"] = length(best_tfs_s_max)
+  if (length(best_tfs_s_max) > 0){
+    #build training data
+    
+    training_data = data.frame(tf_train, y = y_train)
+    training_data = training_data[, c(best_tfs_s_max, "y")]
+    
+    #now run BART model with 200 trees
+    bart_machine = build_bart_machine(training_data, 
+      num_trees = NUM_TREES_FOR_EVAL, 
+      num_burn_in = NUM_BURN_IN, 
+      num_iterations_after_burn_in = NUM_ITER_AFTER, 
+      verbose = FALSE)
+    
+    #predict on cv data set only with important tf's        		
+    test_data = data.frame(tf_test, y = y_test)
+    test_data = test_data[, c(best_tfs_s_max, "y")]
+    predict_obj = bart_predict_for_test_data(bart_machine, test_data)
+    bart_rmse_s_max = predict_obj$rmse						
+    
+  } else {
+    L2_err = sum((y_test - mean(y_train))^2)
+    bart_rmse_s_max = sqrt(L2_err / length(y_test))						
+  }
+  rmse_mat[ , "BART-S.Max"] = bart_rmse_s_max
+  num_vars_vec[, "BART-S.Max"] = length(best_tfs_s_max)
   
   #run a BART on the full dataset
 
-#  	training_data = data.frame(tf_train, y = y_train)
-#  	bart_machine = build_bart_machine(training_data, 
-#	  num_trees = NUM_TREES_FOR_EVAL, 
-#	  num_burn_in = NUM_BURN_IN, 
-#	  num_iterations_after_burn_in = NUM_ITER_AFTER, 
-#	  verbose = FALSE)
-#	test_data = data.frame(tf_test, y = y_test)
-#	predict_obj = bart_predict_for_test_data(bart_machine, test_data)
-#	bart_rmse = predict_obj$rmse
-#	rmse_mat[ , "BART-Full"] = bart_rmse
+  	training_data = data.frame(tf_train, y = y_train)
+  	bart_machine = build_bart_machine(training_data, 
+	  num_trees = NUM_TREES_FOR_EVAL, 
+	  num_burn_in = NUM_BURN_IN, 
+	  num_iterations_after_burn_in = NUM_ITER_AFTER, 
+	  verbose = FALSE)
+	test_data = data.frame(tf_test, y = y_test)
+	predict_obj = bart_predict_for_test_data(bart_machine, test_data)
+	bart_rmse = predict_obj$rmse
+	rmse_mat[ , "BART-Full"] = bart_rmse
   
 	list(rmse_mat = rmse_mat, num_vars_vec = num_vars_vec)
 }
@@ -236,8 +236,8 @@ run_combined_tests = function(gene_num){
   num_var_results = all_methods$num_vars_vec
   print(rmse_results)
   print(num_var_results)                        
-  save(rmse_results, file = paste("rmse_results_", gene_num, sep = ""))
-  save(num_var_results, file = paste("num_var_results_", gene_num, sep =""))
+  save(rmse_results, file = paste("rmse_results_", gene_num, ".RData", sep = ""))
+  save(num_var_results, file = paste("num_var_results_", gene_num, ".RData", sep =""))
 }
   
 
@@ -249,7 +249,7 @@ if (length(args) > 0){
 	}
 }
 if (NOT_ON_GRID){
-	iter_num = 198
+	iter_num = 25
 }
 
 print(paste("iter_num:", iter_num))

@@ -1,7 +1,7 @@
 #to be run on GRID only!!!
 
 options(width = 150)
-MAX_GENE_NUM = 6000
+MAX_GENE_NUM = 80
 
 if (.Platform$OS.type == "windows"){
 	setwd("C:/Users/Kapelner/workspace/bart_gene/")

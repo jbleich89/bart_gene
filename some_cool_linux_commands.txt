@@ -1,0 +1,523 @@
+sas
+find -name sas
+find / -name sas
+ls
+sas
+cd /etc
+ls
+cd sas
+ls sa*
+cd sas12
+sas12
+ls s*
+cd sasl2/
+ls
+cd ..
+cd .
+cd ..
+cd usr
+ls
+cd bin
+ls
+cd ..
+cd etc
+ls
+matlab &
+Rgui
+R
+stata
+qrsh sas
+qrsh sas &
+R
+module load R
+cd /
+cd /etc
+ls
+cd /bin
+ls
+cd R
+find -name R
+find / -name "R"
+find /etc -name "R"
+find /bin -name "R"
+find /usr -name "R"
+cd ~/demo
+cd /usr/local/demo
+ls
+cd R
+ls
+R
+cd ~
+qrsh R
+qrsh R --no-save
+wget http://www.rforge.net/src/contrib/rJava_0.9-4.tar.gz
+ls
+tar -xvh rJava_0.9-4.tar.gz 
+tar -xzvh rJava_0.9-4.tar.gz 
+ls
+qrsh tar -xvh rJava_0.9-4.tar.gz 
+gzip -d rJava_0.9-4.tar.gz 
+ls
+tar -xvh rJava_0.9-4.tar 
+tar rJava_0.9-4.tar 
+tar -xf rJava_0.9-4.tar 
+ls
+cd rJava
+ls
+./configure 
+which R
+qrsh which R
+cd ..
+vim .bash_profile 
+echo R_HOME
+echo $R_HOME
+source .bash_profile 
+echo $R_HOME
+cd rJava
+./configure
+qrsh ./configure
+qrsh ./make
+
+qrsh ./install
+vim DESCRIPTION 
+vim NAMESPACE 
+vim config.log
+ls
+vim inst
+vim install-sh
+qrsh ./install-sh
+cd ..
+mf rJava R/rJava
+mv rJava R/rJava
+mkdir R
+mv rJava R/rJava
+ls
+cd R
+ls
+cd ..
+qrsh R
+qrsh R --no-save
+sas &
+qrsh sas
+echo $DISPLAY
+xterm
+qrsh sas &
+qrsh sas
+qrsh sas &
+qrsh sas
+qrsh sas &
+kill 15049
+kill -9 15049
+qrsh -i sas
+qrsh sas
+qrsh sas -nodms
+qstat
+qdel 136240
+qdel 136241
+qdel 136242
+qstat
+qstat -all
+qstat -f
+R
+qrsh R
+qrsh R --no-save
+ls
+git clone git@github.com:kapelner/CGMBART_GPL.git
+git clone git://github.com/kapelner/CGMBART_GPL.git
+cd CGMBART_GPL/
+ls
+mkdir output_plots
+mkdir debug_output
+git pull
+ant
+qrsh ant
+java -version
+qrsh java -version
+qrsh javac -version
+cd CGMBART_GPL/
+mkdir debug_output
+ls
+cd r_log
+ls
+vim bart_log.txt 
+top
+top -d .1
+vim bart_log.txt 
+top -d .1
+vim bart_log.txt 
+ls
+vim bart_log.txt 
+ls
+vim bakeoff_out.txt 
+vim bart_log.txt 
+vim bakeoff_out.txt 
+vim bart_log.txt 
+vim bakeoff_out.txt 
+ls
+ls -l
+vim bart_log.txt 
+ls
+vim bakeoff_out.txt 
+vim bart_log.txt 
+vim bakeoff_out.txt 
+qstat
+cd ..
+vim r_scripts/bart_bakeoff.R
+vim r_scripts/bart_bakeoff_params.R 
+cd r_log/
+ls
+vim bart_log.txt 
+vim bakeoff_out.txt 
+cd ..
+cd simulation_results/
+ls
+ls -l
+cd ../supercomputer/
+ls
+vim sample.job 
+qsub sample.job 
+cd ..
+ls
+cd simulation_results/
+ls
+rm *
+cd ..
+ls -l
+qstat
+top -d. 1
+top -d .1
+qstat
+cd r_log/
+ls
+vim bart_log.txt 
+qstat
+cd ../supercomputer/
+ls
+vim sample.job
+qsub sample.job
+qstat
+cd ..
+git reset --hard
+cd supercomputer/
+ls
+vim sample.job
+qsub sample.job
+qstat
+vim sample.job
+cd ..
+qrsh R --no-save < r_scripts/bart_bakeoff.R > r_log/bart_output.out -j-y -m e -M kapelner@wharton.upenn.edu
+qrsh R --no-save < r_scripts/bart_bakeoff.R > r_log/bart_output.out
+vim r_scripts/bart_bakeoff_params.R 
+vim r_scripts/bart_bakeoff.R
+qrsh R --no-save < r_scripts/bart_bakeoff.R > r_log/bart_output.out
+cd r_log/
+ls
+vim bart_output.out 
+cd ..
+git reset --hard
+git pull
+qstat
+cd supercomputer/
+ls
+rm sam*
+ls
+rm bar*
+ls
+vim wharton_grid.job 
+qsub wharton_grid.job 
+qstat
+ls
+vim wharton_grid.job.e139985 
+qsub wharton_grid.job 
+vim wharton_grid.job
+cd ..
+qsub supercomputer/wharton_grid.job
+cd supercomputer/
+ls
+rm wharton_grid.job.*
+ls
+qstat
+cd ..
+ls
+rm sample.job.*
+ls
+ls -l
+vim wharton_grid.job.e139995 
+vim wharton_grid.job.o139995 
+qstat
+cd r_log/
+ls
+ls -l
+rm bakeoff_out.txt 
+ls
+ls -l
+vim bart_output.out 
+vim bart_log.txt 
+cd ..
+cd simulation_results/
+ls
+ls -l
+vim avg_simulation_results.csv 
+ls -l
+ls
+cd ..
+ls
+cd r_log/
+ls
+vim bart_log.txt 
+rqsh sas
+qrsh sas
+qrsh sas -nodms
+ls
+cd CGMBART_GPL/
+R
+qrsh ant
+java -version
+qrsh java -version
+jar -xf bart_java.jar 
+qrsh jar -xf bart_java.jar 
+ls
+cd CGM
+cd CGM_BART
+ls
+javap -verbose Classifier.class
+qrsh javap -verbose Classifier
+ls
+javap -verbose Tools.class
+qrsh javap -verbose Tools.class
+qrsh javap -verbose Tools
+cd ..
+git reset --hard
+git pull
+ant
+qrsh ant
+R
+qrsh R
+qrsh R --no-save
+vim r_scripts/bart_bakeoff_params.R 
+vim r_scripts/bart_bakeoff.R 
+ls
+qsub supercomputer/sample.job 
+qstat
+qsub -I supercomputer/sample.job 
+cd supercomputer/
+ls
+cd ..
+cd supercomputer/
+ls
+vim sample.job 
+cd ..
+R CMD BATCH --slave r_scripts/bart_bakeoff.R
+qrsh R CMD BATCH --slave r_scripts/bart_bakeoff.R
+cd supercomputer/
+vim sample.job 
+cd ..
+qsub -I supercomputer/sample.job 
+qsub supercomputer/sample.job 
+qstat
+vim r_scripts/bart_bakeoff.R
+qsub supercomputer/sample.job 
+qstat
+vim r_scripts/bart_bakeoff.R
+top -d .1
+vim supercomputer/sample.job 
+qstat
+qdel 139995
+qstat
+cd  /usr/local/demo/R/Rmpi
+ls
+ls -all
+vim mydoRmpi.R
+vim mydoRmpi.sh
+cd ..
+ls
+vim job-script.sh 
+vim README 
+qsub -cwd job-script.sh
+qstat
+qstat -f -q all.q
+qstat
+qstat -f -q all.q
+qstat
+qstat -j 175326
+cd ~
+qsub -cwd /usr/local/demo/R/job-script.sh
+qstat
+qstat -j 175327
+qacct -j 175327
+cd ~
+ls
+cd bart_gene/
+ls
+git pull
+ls
+qsub -m e -M kapelner@wharton.upenn.edu analysis_with_tuning/run_sim_on_grid.sh 
+qstat
+qacct 175326
+qacct -j 175326
+ls
+cd analysis_with_tuning/
+ls
+cd ..
+ls -l
+vim  run_sim_on_grid.sh.e175362
+cd analysis_with_tuning/
+ls
+cd ..
+R CMD BATCH --no-save --no-restore '--args GENE_START=1 GENE_END=10' analysis_with_tuning/simulation.R simulation.out &
+qrsh R CMD BATCH --no-save --no-restore '--args GENE_START=1 GENE_END=10' analysis_with_tuning/simulation.R simulation.out &
+top -d 1
+ls
+cd analysis_with_tuning/
+ls
+cd ..
+qrsh R CMD BATCH --no-save --no-restore '--args GENE_START=1 GENE_END=10' analysis_with_tuning/simulation.R simulation.out
+ls
+qrsh R
+qrsh R --no-save
+cd ..
+vim bart_gene/analysis_with_tuning/simulation.R 
+cd bart_gene/analysis_with_tuning/
+qrsh R --no-save
+ls
+cd CGMBART_GPL/
+git pull
+git status
+git reset --HARD
+git reset --HEAD
+git reset
+git reset --hard
+git pull
+qstat
+qstat -f -q all.q
+cd ..
+git clone git@github.com:jbleich89/bart_gene.git
+git clone git://github.com/jbleich89/bart_gene.git
+qstat
+ls
+cd CGMBART_GPL/
+git pull
+ant
+ls
+qrsh ant
+ls
+ls -l
+R
+qrsh R
+qrsh R --no-save
+cd CGMBART_GPL/supercomputer/
+ls
+vi wharton_grid.job 
+cd ..
+vi r_scripts/bart_bakeoff
+vi r_scripts/bart_bakeoff.R
+more r_scripts/bart_package.R 
+ls
+qsub supercomputer/wharton_grid.job 
+qstat
+ls -ltr
+cat test_bakeoff.o179776 
+cd r_log
+ls -ltra
+cat bart_output.out 
+cd ..
+ls
+ls -ltra
+find . -mtime -1
+qsub supercomputer/wharton_grid.job 
+qstat
+exit
+R
+exit
+cd bart_gene/
+if (.Platform$OS.type == "windows"){
+setwd("C:/Users/Kapelner/workspace/bart_gene/")
+}
+source("analysis_with_tuning/simulation_params.R")
+if (.Platform$OS.type == "windows"){
+setwd("C:\\Users\\kapelner\\workspace\\CGMBART_GPL")
+} else {
+setwd("../CGMBART_GPL")
+R
+exit
+R
+cd CGMBART_GPL/
+R
+exit
+R
+cd CGMBART_GPL/
+R
+exit
+qram|more
+qstat
+exit
+find . -name 'gene_results*.RData'
+exit
+qram
+exit
+ssh ec2-174-129-86-54.compute-1.amazonaws.com
+exit
+starcluster help
+exit
+starcluster help
+ssh ec2-174-129-86-54.compute-1.amazonaws.com
+exit
+cd bart_gene/
+ls
+grep insufficient tf_discovery_for_gene_expression.o184958.*
+grep insufficient tf_discovery_for_gene_expression.o184958.*| awk -F[\.:] '{print $3}'
+grep insufficient tf_discovery_for_gene_expression.o184958.*| awk -F[\.:] '{print $3}'| sort -n
+for job in $(grep insufficient tf_discovery_for_gene_expression.o184958.*| awk -F[\.:] '{print $3}'| sort -n); do qacct -j 184958.$job; done|more
+cd bart_gene/
+ls
+qacct -j 184958|more
+qacct -j 184958|grep -e hostname -e taskid > 184958.results
+which vi
+vi 184958.results 
+exit
+cd CGMBART_GPL/
+qstat
+R
+cd bart_gene/
+ls
+grep insufficient tf_discovery_for_gene_expression.o184958.*
+grep insufficient tf_discovery_for_gene_expression.o184958.*| awk -F[\.:] '{print $3}'
+grep insufficient tf_discovery_for_gene_expression.o184958.*| awk -F[\.:] '{print $3}'| sort -n
+for job in $(grep insufficient tf_discovery_for_gene_expression.o184958.*| awk -F[\.:] '{print $3}'| sort -n); do qacct -j 184958.$job; done|more
+for job in $(grep insufficient tf_discovery_for_gene_expression.o184958.*| awk -F[\.:] '{print $3}'| sort -n); do qacct -j 184958.$job; done| grep -e failed -e hostname
+grep insufficient tf_discovery_for_gene_expression.o184958.*| awk -F[\.:] '{print $3}'| sort -n|more
+qrsh -q intel hostname
+for job in $(grep insufficient tf_discovery_for_gene_expression.o184958.*| awk -F[\.:] '{print $3}'| sort -n); do echo -n "$job "; done
+vi analysis_with_tuning/run_sim_on_grid.sh 
+for job in $(grep insufficient tf_discovery_for_gene_expression.o184958.*| awk -F[\.:] '{print $3}'| sort -n); do echo -n "$job "; done
+for job in $(grep insufficient tf_discovery_for_gene_expression.o184958.*| awk -F[\.:] '{print $3}'| sort -n); do echo "job $job"; qsub -t $job analysis_with_tuning/run_sim_on_grid.sh; done
+qdel -u kapelner
+vi analysis_with_tuning/run_sim_on_grid.sh 
+for job in $(grep insufficient tf_discovery_for_gene_expression.o184958.*| awk -F[\.:] '{print $3}'| sort -n); do echo "job $job"; qsub -t $job analysis_with_tuning/run_sim_on_grid.sh; done
+qstat
+ls -ltr
+rm tf_discovery_for_gene_expression.o184958.*
+ls
+ls -ltr
+vi junkme
+for f in $(awk '{print $9}'); do ls -l $f; done
+for f in $(awk '{print $9}') junkme; do ls -l $f; done
+for f in $(awk '{print $9}' junkme); do ls -l $f; done
+date
+for f in $(awk '{print $9}' junkme); do rm $f; done
+ls -ltr
+qstat
+qstat | grep kapelner | wc -l
+ls -l
+tail tf_discovery_for_gene_expression.o186327.480 
+grep Memory *
+qstat
+qmem
+qram
+tail tf_discovery_for_gene_expression.o186*480
+grep "^Sampling" tf_discovery_for_gene_expression.o186* | awk '{print $8}' | sort -n | tail -n 1
+grep Memory *
+while ((1)); do grep "^Sampling" tf_discovery_for_gene_expression.o186* | awk '{print $8}' | sort -n | tail -n 1); sleep 10; done
+while ((1)); do grep "^Sampling" tf_discovery_for_gene_expression.o186* | awk '{print $8}' | sort -n | tail -n 1; sleep 10; done
+cd
+exit

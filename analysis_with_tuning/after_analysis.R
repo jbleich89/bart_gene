@@ -17,33 +17,42 @@ wins = list()
 
 for (gene_num in 1 : length(all_results)){
 	gene_name = names(all_results)[gene_num]
-	wins[[gene_name]] = matrix(0, nrow = length(cs), ncol = length(METHODS))
-	rownames(wins[[gene_name]]) = as.character(cs)
-	colnames(wins[[gene_name]]) = METHODS
+	wins[[gene_name]] = array(0, c(length(cs), length(METHODS), length(alphas)))
+	dimnames(wins[[gene_name]]) = list(
+		"c" = as.character(cs),
+		"method" = METHODS,
+		"alpha" = alphas
+	) 
 	
 	min = 9999999
 	lowest_c = NULL
 	lowest_method = NULL
+	lowest_alpha = NULL
 	for (c_param in cs){	
 		c_param = as.character(c_param)
 		for (method in METHODS){
-			
-			oo_rmse = all_validations[[gene_name]][[c_param]][["20"]][[method]]
-			if (length(oo_rmse) == 0){
-				cat(paste("ERROR:", gene_name, c_param, method, "\n"))
-			} else if (oo_rmse < min){
-				min = oo_rmse
-				lowest_c = c_param
-				lowest_method = method
+			for (alpha in alphas){
+				oo_rmse = all_validations[[gene_name]][[c_param]][["20"]][[alpha]][[method]]
+				if (length(oo_rmse) == 0){
+					cat(paste("ERROR:", gene_name, c_param, method, "\n"))
+				} else if (oo_rmse < min){
+					min = oo_rmse
+					lowest_c = c_param
+					lowest_method = method
+					lowest_alpha = alpha
+				}
 			}
 		}
 	}	
-	wins[[gene_name]][lowest_c, lowest_method] = 1
+	wins[[gene_name]][lowest_c, lowest_method, lowest_alpha] = 1
 }
 
-aggregated_wins = matrix(0, nrow = length(cs), ncol = length(METHODS))
-rownames(aggregated_wins) = as.character(cs)
-colnames(aggregated_wins) = METHODS
+aggregated_wins = array(0, c(length(cs),length(METHODS), length(alphas)))
+dimnames(aggregated_wins) = list(
+	"c" = as.character(cs),
+	"method" = METHODS,
+	"alpha" = alphas
+) 
 
 for (gene_num in 1 : length(all_results)){
 	gene_name = names(all_results)[gene_num]
@@ -57,17 +66,17 @@ sum(aggregated_wins)
 
 
 
-MAX_GENE_NUM = 6000
+MAX_GENE_NUM = 80
 
 #now we want a boxplot
 
-rmses = array(NA, c(length(cs), length(METHODS), MAX_GENE_NUM - 1))
+rmses = array(NA, c(length(cs), length(METHODS), MAX_GENE_NUM))
 		
-gene_num_list = c(1 : 119, 121 : MAX_GENE_NUM)
+gene_num_list = c(1 : MAX_GENE_NUM)
 for (i in 1 : length(cs)){	
 	c_param = as.character(cs[i])
 	for (j in 1 : length(METHODS)){
-		rmses[i, j, ] = sapply(gene_num_list, function(s){all_validations[[s]][[c_param]][["20"]][[METHODS[j]]]})
+		rmses[i, j, ] = sapply(gene_num_list, function(s){all_validations[[s]][[c_param]][["20"]][["0.05"]][[METHODS[j]]]})
 	}
 }
 
@@ -89,6 +98,8 @@ for(j in 1 : length(gene_num_list)){
   control_rmses[j] = sqrt(sum((yvec - ybar) ^ 2) / length(yvec)) 
 }
 
+avg_ybar_oormse = mean(control_rmses)
+
 par(mar = c(25,8,8,8))
 boxplot(control_rmses, rmses[1, 1, ], rmses[1, 2, ], rmses[1, 3, ], 
 	rmses[2, 1, ], rmses[2, 2, ], rmses[2, 3, ], 
@@ -96,7 +107,15 @@ boxplot(control_rmses, rmses[1, 1, ], rmses[1, 2, ], rmses[1, 3, ],
 	rmses[4, 1, ], rmses[4, 2, ], rmses[4, 3, ], 
 	rmses[5, 1, ], rmses[5, 2, ], rmses[5, 3, ], 
 	rmses[6, 1, ], rmses[6, 2, ], rmses[6, 3, ], 
-	names = names, las = 2, ylim = c(0.3, 1.8))
+	names = names, las = 2, ylim = c(0.5, 1.0))
+abline(h = avg_ybar_oormse, col = "red")
+#add means to the boxlplot
+points(apply(cbind(control_rmses, rmses[1, 1, ], rmses[1, 2, ], rmses[1, 3, ], 
+	rmses[2, 1, ], rmses[2, 2, ], rmses[2, 3, ], 
+	rmses[3, 1, ], rmses[3, 2, ], rmses[3, 3, ], 
+	rmses[4, 1, ], rmses[4, 2, ], rmses[4, 3, ], 
+	rmses[5, 1, ], rmses[5, 2, ], rmses[5, 3, ], 
+	rmses[6, 1, ], rmses[6, 2, ], rmses[6, 3, ]), 2, mean), pch = "-", col = "blue", cex = 5)
 
 names = c("Control")
 
@@ -123,7 +142,7 @@ rownames(gene_by_tf) = colnames(gene_by_tf) = colnames(tf_train)
 for (g in 1 : MAX_GENE_NUM){
 	for (t in 1 : ncol(tf_train)){
 		names_of_all_tfs = colnames(tf_train)
-		tfs = names(all_results[[g]][['0']][['20']][["important_tfs_at_alpha_simul_max"]])
+		tfs = names(all_results[[g]][['0']][['20']][["0.05"]][["important_tfs_at_alpha_pointwise"]])
 		cols = which(names_of_all_tfs %in% tfs)
 		gene_by_tf[g, cols] = 1
 	}
