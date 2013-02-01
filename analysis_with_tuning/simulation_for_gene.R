@@ -2,10 +2,10 @@ LAST_NAME = "kapelner"
 NOT_ON_GRID = length(grep("wharton.upenn.edu", Sys.getenv(c("HOSTNAME")))) == 0
 
 if (NOT_ON_GRID){
-	setwd(paste("C:/Users/", LAST_NAME, "/workspace/bart_gene/", sep = ""))
+	setwd(paste("C:/Users/", LAST_NAME, "/workspace/bart_gene/analysis_with_tuning/", sep = ""))
 }
 
-source("analysis_with_tuning/simulation_params.R")
+source("simulation_params.R")
 
 #read in arguments supplied by qsub - this will tell use which gene to process
 args = commandArgs(TRUE)
