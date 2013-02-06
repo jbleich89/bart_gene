@@ -35,7 +35,7 @@ source("simulation_params.R")
 if (NOT_ON_GRID){
 	setwd(paste("C:/Users/", LAST_NAME, "/workspace/CGMBART_GPL/", sep = ""))
 } else {
-	setwd("../../CGMBART_GPL")
+	setwd("../CGMBART_GPL")
 }
 
 source("r_scripts/bart_package.R")
@@ -203,6 +203,7 @@ test_all_methods_for_gene = function(gene_num){
     test_data = data.frame(tf_test, y = y_test)
     test_data = test_data[, c(best_tfs_s_max, "y")]
     predict_obj = bart_predict_for_test_data(bart_machine, test_data)
+	destroy_bart_machine(bart_machine)
     bart_rmse_s_max = predict_obj$rmse						
     
   } else {
@@ -250,22 +251,23 @@ if (length(args) > 0){
 }
 if (NOT_ON_GRID){
 	iter_num = 25
+	print(paste("iter_num:", iter_num))
+	run_combined_tests(iter_num)
+	run_combined_tests(iter_num+1)
+	run_combined_tests(iter_num+2)
+	run_combined_tests(iter_num+3)
+	run_combined_tests(iter_num+4)
+	run_combined_tests(iter_num+5)
+	run_combined_tests(iter_num+6)
+	run_combined_tests(iter_num+7)
+	run_combined_tests(iter_num+8)
+	run_combined_tests(iter_num+9)
+	run_combined_tests(iter_num+10)
+	run_combined_tests(iter_num+11)
+	run_combined_tests(iter_num+12)	
 }
 
-print(paste("iter_num:", iter_num))
-run_combined_tests(iter_num)
-run_combined_tests(iter_num+1)
-run_combined_tests(iter_num+2)
-run_combined_tests(iter_num+3)
-run_combined_tests(iter_num+4)
-run_combined_tests(iter_num+5)
-run_combined_tests(iter_num+6)
-run_combined_tests(iter_num+7)
-run_combined_tests(iter_num+8)
-run_combined_tests(iter_num+9)
-run_combined_tests(iter_num+10)
-run_combined_tests(iter_num+11)
-run_combined_tests(iter_num+12)
+
 
 
 

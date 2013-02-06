@@ -1,12 +1,14 @@
 tryCatch(library(energy), error = function(e){install.packages("energy")}, finally = library(energy))
 
+LAST_NAME = "kapelner"
+NOT_ON_GRID = length(grep("wharton.upenn.edu", Sys.getenv(c("HOSTNAME")))) == 0
 
 #######boxplots
 if (.Platform$OS.type == "windows"){
-	setwd("C:/Users/Kapelner/workspace/bart_gene/")
+	setwd("C:/Users/Kapelner/workspace/bart_gene/analysis_with_tuning")
 }
 
-source("analysis_with_tuning/simulation_params.R")
+source("simulation_params.R")
 
 setwd("C:/Users/Kapelner/Desktop/Dropbox/BART_gene")
 load("all_results.RData")

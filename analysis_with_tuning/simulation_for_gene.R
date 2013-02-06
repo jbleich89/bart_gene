@@ -97,6 +97,7 @@ get_averaged_true_var_props = function(training_data, cov_prior_vec, m){
 			run_in_sample = FALSE,
 			verbose = FALSE)
 		var_props = var_props + get_var_props_over_chain(bart_machine)
+		destroy_bart_machine(bart_machine)
 #		plot_sigsqs_convergence_diagnostics(bart_machine)
 	}
 	#average over many runs
@@ -114,7 +115,9 @@ get_null_permute_var_importances = function(training_data, m){
 		run_in_sample = FALSE,
 		verbose = FALSE)
 #	#just return the variable proportions	
-	get_var_props_over_chain(bart_machine)
+	var_props = get_var_props_over_chain(bart_machine)
+	destroy_bart_machine(bart_machine)
+	var_props
 }
 
 
@@ -184,6 +187,7 @@ validate_for_gene_cs_and_ms = function(gene_num){
 						cv_data = data.frame(tf_cv, y = y_cv)
 						cv_data = cv_data[, c(important_tfs, "y")]
 						predict_obj = bart_predict_for_test_data(bart_machine, cv_data)
+						destroy_bart_machine(bart_machine)
 						validation_oos_rmses[[gene]][[c_param]][[m_param]][[alpha]][[method]] = predict_obj$rmse						
 					} else {
 						L2_err = sum((y_cv - mean(y_train))^2)
