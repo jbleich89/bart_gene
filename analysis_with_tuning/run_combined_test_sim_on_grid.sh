@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #$ -j y
-#$ -N tf_discovery_for_gene_expression
+#$ -N tf_discovery_for_gene_expression_combined_tests
 #$ -t 1-1000
 #$ -q intel
 

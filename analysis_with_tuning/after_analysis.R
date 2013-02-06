@@ -68,7 +68,7 @@ sum(aggregated_wins)
 
 
 
-MAX_GENE_NUM = 80
+MAX_GENE_NUM = 1150
 
 #now we want a boxplot
 
@@ -109,7 +109,7 @@ boxplot(control_rmses, rmses[1, 1, ], rmses[1, 2, ], rmses[1, 3, ],
 	rmses[4, 1, ], rmses[4, 2, ], rmses[4, 3, ], 
 	rmses[5, 1, ], rmses[5, 2, ], rmses[5, 3, ], 
 	rmses[6, 1, ], rmses[6, 2, ], rmses[6, 3, ], 
-	names = names, las = 2, ylim = c(0.5, 1.0))
+	names = names, las = 2, ylim = c(0.5, 1.8))
 abline(h = avg_ybar_oormse, col = "red")
 #add means to the boxlplot
 points(apply(cbind(control_rmses, rmses[1, 1, ], rmses[1, 2, ], rmses[1, 3, ], 
@@ -144,7 +144,7 @@ rownames(gene_by_tf) = colnames(gene_by_tf) = colnames(tf_train)
 for (g in 1 : MAX_GENE_NUM){
 	for (t in 1 : ncol(tf_train)){
 		names_of_all_tfs = colnames(tf_train)
-		tfs = names(all_results[[g]][['0']][['20']][["0.05"]][["important_tfs_at_alpha_pointwise"]])
+		tfs = names(all_results[[g]][['0']][['20']][["0.05"]][["important_tfs_at_alpha_simul_se"]])
 		cols = which(names_of_all_tfs %in% tfs)
 		gene_by_tf[g, cols] = 1
 	}
@@ -157,5 +157,5 @@ sum(rowSums(gene_by_tf) == 0) / nrow(gene_by_tf)
 
 par(mar = c(5,5,5,5))
 poissonity_pval = poisson.mtest(rowSums(gene_by_tf), R = 999)$p.value
-barplot(table(rowSums(gene_by_tf)), main = paste("# of TF's Affecting all 6,000 Genes\nPoissonity pval =", round(poissonity_pval, 3)), xlab = "# TF's", ylab = "# Genes")
+barplot(table(rowSums(gene_by_tf)), main = paste("# of TF's Affecting 1,150 Genes"), xlab = "# TF's", ylab = "# Genes")
 
