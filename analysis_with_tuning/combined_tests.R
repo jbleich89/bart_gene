@@ -251,8 +251,7 @@ if (length(args) > 0){
 }
 if (NOT_ON_GRID){
 	iter_num = 25
-	print(paste("iter_num:", iter_num))
-	run_combined_tests(iter_num)
+	print(paste("iter_num:", iter_num))	
 	run_combined_tests(iter_num+1)
 	run_combined_tests(iter_num+2)
 	run_combined_tests(iter_num+3)
@@ -266,6 +265,8 @@ if (NOT_ON_GRID){
 	run_combined_tests(iter_num+11)
 	run_combined_tests(iter_num+12)	
 }
+
+run_combined_tests(iter_num)
 
 
 
