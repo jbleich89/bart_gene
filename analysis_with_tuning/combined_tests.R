@@ -141,9 +141,9 @@ test_all_methods_for_gene = function(gene_num){
 	
 	
 	#### Rob BART-best
-	rbart = bart(x.train = training_data[, 1 : (ncol(training_data) - 1)], 
+	rbart = bart(x.train = tf_train, 
 		y.train = y_train, 
-		x.test = test_data[, 1 : (ncol(test_data) - 1)],
+		x.test = tf_test,
 		ntree = NUM_TREES_FOR_EVAL, 
 		nskip = 1000, 
 		ndpost = 1000, 
@@ -195,7 +195,7 @@ test_all_methods_for_gene = function(gene_num){
       verbose = FALSE)
     
     #predict on cv data set only with important tf's
-	test_data = as.data.frame(test_data[, best_tfs_s_max])
+	test_data = as.data.frame(tf_test[, best_tfs_s_max])
     predict_obj = bart_predict_for_test_data(bart_machine, test_data, y_test)
 	destroy_bart_machine(bart_machine)
     bart_rmse_s_max = predict_obj$rmse						
