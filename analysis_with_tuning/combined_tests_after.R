@@ -3,7 +3,7 @@
 #run on the GRID ONLY!!
 setwd("../CGMBART_GPL")
 
-MAX_GENE_NUM = 1000
+MAX_GENE_NUM = 975
 
 simulation_names = c("Null", "OLS", "OLS-BART-Best", "Stepwise", "Lasso-CV", "Lasso", "RF", "BART-Best", "BART-S.Max", "BART-Full", "Rob-Best")
 all_rmse_results = matrix(NA, nrow = MAX_GENE_NUM, ncol = length(simulation_names))
@@ -29,6 +29,25 @@ head(all_num_var_results)
 save(all_rmse_results, file = paste("all_rmse_results.RData", sep = ""))
 save(all_num_var_results, file = paste("all_num_var_results.RData", sep = ""))
 
+
+#########load results into R at this point
+
+#lasso is worse
 sum((all_rmse_results[, "Lasso"] - all_rmse_results[, "BART-Best"]) / all_rmse_results[, "BART-Best"] > 0.05)
+#bart is worse
+sum((all_rmse_results[, "BART-Best"] - all_rmse_results[, "Lasso"]) / all_rmse_results[, "BART-Best"] > 0.05)
+
 
 sum(all_rmse_results[, "BART-Best"] < all_rmse_results[, "Lasso"])
+
+
+boxplot(all_rmse_results, ylim = c(0, 1.1))
+
+points(apply(all_rmse_results, 2, mean), pch = "-", col = "blue", cex = 5)
+abline(a = mean(all_rmse_results[, 1]), b = 0, col = "red")
+
+all_num_var_results_no_na = t(sapply(1 : nrow(all_num_var_results), function(i){ifelse(is.na(all_num_var_results[i, ]), 39, all_num_var_results[i, ])}))
+
+boxplot(all_num_var_results_no_na)
+
+points(apply(all_num_var_results_no_na, 2, mean), pch = "-", col = "blue", cex = 5)

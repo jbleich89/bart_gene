@@ -177,10 +177,10 @@ test_all_methods_for_gene = function(gene_num){
   
   ##Find best TFs for simult. max#####
   min_rmse = Inf
-  tf_list = c()
+  best_tfs_s_max = c()
   for(c in cs){
     if(rmse_list[[as.character(c)]][["20"]][["0.05"]][[METHODS[2]]] < min_rmse){
-      best_tfs_s_max = names(validation_list[[as.character(c)]][["20"]][[METHODS[2]]])
+      best_tfs_s_max = names(validation_list[[as.character(c)]][["20"]][["0.05"]][[METHODS[2]]])
       min_rmse = rmse_list[[as.character(c)]][["20"]][["0.05"]][[METHODS[2]]]
     }
   }
