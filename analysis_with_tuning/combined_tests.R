@@ -135,9 +135,8 @@ test_all_methods_for_gene = function(gene_num){
       verbose = FALSE)
     
     #predict on cv data set only with important tf's      			
-    test_data = data.frame(tf_test, y = y_test)
-    test_data = test_data[, c(best_tfs, "y")]
-    predict_obj = bart_predict_for_test_data(bart_machine, test_data)
+    test_data = as.data.frame(test_data[, best_tfs])
+    predict_obj = bart_predict_for_test_data(bart_machine, test_data, y_test)
 	rmse_mat[, "BART-Best"] = predict_obj$rmse
 	
 	
@@ -186,7 +185,7 @@ test_all_methods_for_gene = function(gene_num){
   
   if (length(best_tfs_s_max) > 0){
 	#build training data from the subset
-	X_train = as.data.frame(tf_train[, best_tfs])
+	X_train = as.data.frame(tf_train[, best_tfs_s_max])
     
     #now run BART model with 200 trees
     bart_machine = build_bart_machine(X_train, y_train,
@@ -195,10 +194,9 @@ test_all_methods_for_gene = function(gene_num){
       num_iterations_after_burn_in = NUM_ITER_AFTER, 
       verbose = FALSE)
     
-    #predict on cv data set only with important tf's        		
-    test_data = data.frame(tf_test, y = y_test)
-    test_data = test_data[, c(best_tfs_s_max, "y")]
-    predict_obj = bart_predict_for_test_data(bart_machine, test_data)
+    #predict on cv data set only with important tf's
+	test_data = as.data.frame(test_data[, best_tfs_s_max])
+    predict_obj = bart_predict_for_test_data(bart_machine, test_data, y_test)
 	destroy_bart_machine(bart_machine)
     bart_rmse_s_max = predict_obj$rmse						
     
@@ -216,12 +214,12 @@ test_all_methods_for_gene = function(gene_num){
 	  num_burn_in = NUM_BURN_IN, 
 	  num_iterations_after_burn_in = NUM_ITER_AFTER, 
 	  verbose = FALSE)
-	test_data = data.frame(tf_test, y = y_test)
-	predict_obj = bart_predict_for_test_data(bart_machine, test_data)
+
+	predict_obj = bart_predict_for_test_data(bart_machine, data.frame(tf_test), y_test)
 	bart_rmse = predict_obj$rmse
 	rmse_mat[ , "BART-Full"] = bart_rmse
 	  
-		list(rmse_mat = rmse_mat, num_vars_vec = num_vars_vec)
+	list(rmse_mat = rmse_mat, num_vars_vec = num_vars_vec)
 }
 
 
