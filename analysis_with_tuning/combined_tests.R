@@ -125,7 +125,7 @@ test_all_methods_for_gene = function(gene_num){
   
   if (length(best_tfs) > 0){
     #build training data from the subset
-    X_train = tf_train[, best_tfs]
+    X_train = as.data.frame(tf_train[, best_tfs])
     
     #now run BART model with 200 trees
     bart_machine = build_bart_machine(X_train, y_train,
@@ -186,7 +186,7 @@ test_all_methods_for_gene = function(gene_num){
   
   if (length(best_tfs_s_max) > 0){
 	#build training data from the subset
-	X_train = tf_train[, best_tfs]
+	X_train = as.data.frame(tf_train[, best_tfs])
     
     #now run BART model with 200 trees
     bart_machine = build_bart_machine(X_train, y_train,
@@ -211,7 +211,7 @@ test_all_methods_for_gene = function(gene_num){
   
   #run a BART on the full dataset
 
-	bart_machine = build_bart_machine(tf_train, y_train,
+	bart_machine = build_bart_machine(as.data.frame(tf_train), y_train,
 	  num_trees = NUM_TREES_FOR_EVAL, 
 	  num_burn_in = NUM_BURN_IN, 
 	  num_iterations_after_burn_in = NUM_ITER_AFTER, 
