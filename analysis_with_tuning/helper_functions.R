@@ -23,26 +23,32 @@ setup=function(){
 	colnames(tf.full)=tf.names
 	rownames(tf.full)=colnames(tf.exp)[5:ncol(tf.exp)]
 	dim(tf.full) #check 314 conditions and 39 TFs
-	
+	n_full = nrow(tf.full)
+  
 	##randomize later
-	cv_hold=ceiling(.1*nrow(tf.full))
-	test_hold=ceiling(.1*nrow(tf.full))
-	
+  #set.seed(14)
+  n_full = 314
+  cv_size = .1 
+  test_size = .1
+  cv_idx = sample(1 : n_full, ceiling(cv_size * n_full), F)
+  idx_remaining = setdiff((1: n_full) , cv_idx)
+  test_idx = sample(idx_remaining , ceiling(test_size * n_full), F)
+  train_idx = setdiff(idx_remaining, test_idx)
+
 	#get training and test
-	train.end=nrow(tf.full)-(cv_hold + test_hold)
-	tf.train=tf.full[1:train.end,]
-	tf.cv=tf.full[(train.end+1):(train.end+cv_hold),]
-	tf.test=tf.full[(train.end+cv_hold+1):nrow(tf.full),]
+	tf.train=tf.full[train_idx, ]
+	tf.cv=tf.full[cv_idx, ]
+	tf.test=tf.full[test_idx, ]
 	
 	##Clean gene matrix
 	geneMatClean=t(gene.exp[,5:ncol(gene.exp)])
 	rownames(geneMatClean)=rownames(tf.full)
 	colnames(geneMatClean)=geneNames
-	
+
 	##Get gene test and train
-	gene.train=geneMatClean[1:train.end,]
-	gene.cv=geneMatClean[(train.end+1):(train.end+cv_hold),]
-	gene.test=geneMatClean[(train.end+cv_hold+1):nrow(geneMatClean),]
+	gene.train=geneMatClean[train_idx, ]
+	gene.cv=geneMatClean[cv_idx, ]
+	gene.test=geneMatClean[test_idx, ]
 	list(
 			tf.train=tf.train,
 			tf.cv=tf.cv, 
