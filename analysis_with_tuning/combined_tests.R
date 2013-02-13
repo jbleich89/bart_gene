@@ -143,7 +143,7 @@ test_all_methods_for_gene = function(gene_num){
 	#### Rob BART-best
 	rbart = bart(x.train = X_train, 
 		y.train = y_train, 
-		x.test = tf_test,
+		x.test = test_data,
 		ntree = NUM_TREES_FOR_EVAL, 
 		nskip = 1000, 
 		ndpost = 1000, 
