@@ -141,7 +141,7 @@ test_all_methods_for_gene = function(gene_num){
 	
 	
 	#### Rob BART-best
-	rbart = bart(x.train = tf_train, 
+	rbart = bart(x.train = X_train, 
 		y.train = y_train, 
 		x.test = tf_test,
 		ntree = NUM_TREES_FOR_EVAL, 
@@ -152,7 +152,7 @@ test_all_methods_for_gene = function(gene_num){
 	rmse_mat[, "Rob-Best"] = sqrt(sum((test_data$y - yhat_rbart)^2) / length(yhat_rbart))
 	
 	#### OLS BART-Best
-	mod = lm(y ~ ., training_data)
+	mod = lm(y_train ~ ., X_train)
 	y_hat = predict(mod, test_data)
 	rmse_mat[, "OLS-BART-Best"] = sqrt(sum((test_data$y - y_hat)^2) / length(y_hat))
 	
