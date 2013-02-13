@@ -1,4 +1,7 @@
 #simulation params
+LAST_NAME = "kapelner"
+NOT_ON_GRID = length(grep("wharton.upenn.edu", Sys.getenv(c("HOSTNAME")))) == 0
+
 
 if (NOT_ON_GRID){
 	cs = as.character(c(0))	
