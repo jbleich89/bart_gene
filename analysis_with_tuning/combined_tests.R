@@ -6,8 +6,7 @@ tryCatch(library(glmnet), error = function(e){install.packages("glmnet")}, final
 tryCatch(library(randomForest), error = function(e){install.packages("randomForest")}, finally = library(randomForest))
 tryCatch(library(BayesTree), error = function(e){install.packages("BayesTree")}, finally = library(BayesTree))
 
-##need to make as argument
-gene_num = 2
+options(error=recover)
 
 ##Loads
 if (NOT_ON_GRID){
@@ -149,12 +148,12 @@ test_all_methods_for_gene = function(gene_num){
 		ndpost = 1000, 
 		verbose = FALSE)
 	yhat_rbart = rbart$yhat.test.mean
-	rmse_mat[, "Rob-Best"] = sqrt(sum((test_data$y - yhat_rbart)^2) / length(yhat_rbart))
+	rmse_mat[, "Rob-Best"] = sqrt(sum((y_test - yhat_rbart)^2) / length(yhat_rbart))
 	
 	#### OLS BART-Best
 	mod = lm(y_train ~ ., X_train)
 	y_hat = predict(mod, test_data)
-	rmse_mat[, "OLS-BART-Best"] = sqrt(sum((test_data$y - y_hat)^2) / length(y_hat))
+	rmse_mat[, "OLS-BART-Best"] = sqrt(sum((y_test - y_hat)^2) / length(y_hat))
 	
     
   } else {
@@ -243,20 +242,20 @@ if (length(args) > 0){
 	}
 }
 if (NOT_ON_GRID){
-	iter_num = 25
+	iter_num = 997
 	print(paste("iter_num:", iter_num))	
-	run_combined_tests(iter_num+1)
-	run_combined_tests(iter_num+2)
-	run_combined_tests(iter_num+3)
-	run_combined_tests(iter_num+4)
-	run_combined_tests(iter_num+5)
-	run_combined_tests(iter_num+6)
-	run_combined_tests(iter_num+7)
-	run_combined_tests(iter_num+8)
-	run_combined_tests(iter_num+9)
-	run_combined_tests(iter_num+10)
-	run_combined_tests(iter_num+11)
-	run_combined_tests(iter_num+12)	
+#	run_combined_tests(iter_num+1)
+#	run_combined_tests(iter_num+2)
+#	run_combined_tests(iter_num+3)
+#	run_combined_tests(iter_num+4)
+#	run_combined_tests(iter_num+5)
+#	run_combined_tests(iter_num+6)
+#	run_combined_tests(iter_num+7)
+#	run_combined_tests(iter_num+8)
+#	run_combined_tests(iter_num+9)
+#	run_combined_tests(iter_num+10)
+#	run_combined_tests(iter_num+11)
+#	run_combined_tests(iter_num+12)	
 }
 
 run_combined_tests(iter_num)

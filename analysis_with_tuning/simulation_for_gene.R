@@ -39,10 +39,9 @@ find_important_tfs_for_gene_via_null_bart_sampling = function(gene, c_param, m_p
 	cov_prior_vec = 1 + as.numeric(c_param) * cov_probs #cov_prior = cov_prior / sum(cov_prior)	
 	#pull out the responses and add them to the training data
 	y = gene_train[, gene]
-	training_data = data.frame(tf_train, y)
 	#run BART many times and average the importances
 	cat("get_averaged_true_var_props\n")
-	var_props_avg = get_averaged_true_var_props(training_data, cov_prior_vec, m_param)
+	var_props_avg = get_averaged_true_var_props(tf_train, y, cov_prior_vec, m_param)
 #	barplot(var_props_avg, names = names(var_props_avg), las = 2, main = paste("important tfs for gene", gene, "m =", m, "c =", c_param))
 	
 	#do the null permute sampling over many cores
@@ -51,7 +50,7 @@ find_important_tfs_for_gene_via_null_bart_sampling = function(gene, c_param, m_p
 	
 	cat("get_null_permute_var_importances\n")
 	for (b in 1 : NUM_PERMUTE_SAMPLES){
-		permute_mat[b, ] = get_null_permute_var_importances(training_data, m_param)
+		permute_mat[b, ] = get_null_permute_var_importances(tf_train, y, m_param)
 	}
 	
 	
@@ -72,8 +71,8 @@ find_important_tfs_for_gene_via_null_bart_sampling = function(gene, c_param, m_p
 		important_tfs_at_alpha_simul_max = var_props_avg[var_props_avg >= maxcut]
 		
 		#simult. se
-		perm_se = apply(permute_mat ,2 , sd)
-		perm_mean = apply(permute_mat ,2 , mean)
+		perm_se = apply(permute_mat, 2, sd)
+		perm_mean = apply(permute_mat, 2, mean)
 		cover_constant = bisectK(tol = .01 , coverage = 1 - alpha_val, permute_mat = permute_mat, x_left = 1, x_right = 20, countLimit = 100, perm_mean = perm_mean, perm_se = perm_se)
 		important_tfs_at_alpha_simul_se = var_props_avg[which(var_props_avg >= perm_mean + cover_constant * perm_se)]
 		
@@ -86,10 +85,10 @@ find_important_tfs_for_gene_via_null_bart_sampling = function(gene, c_param, m_p
 	gene_result_c_m_methods_alphas
 }
 
-get_averaged_true_var_props = function(training_data, cov_prior_vec, m){
-	var_props = rep(0, ncol(training_data) - 1)
+get_averaged_true_var_props = function(X, y, cov_prior_vec, m){
+	var_props = rep(0, ncol(X))
 	for (i in 1 : NUM_REP_FOR_TRAIN){
-		bart_machine = build_bart_machine(training_data, 
+		bart_machine = build_bart_machine(as.data.frame(X), y, 
 			num_trees = as.numeric(m), 
 			num_burn_in = NUM_BURN_IN, 
 			num_iterations_after_burn_in = NUM_ITER_AFTER, 
@@ -104,11 +103,12 @@ get_averaged_true_var_props = function(training_data, cov_prior_vec, m){
 	var_props / NUM_REP_FOR_TRAIN
 }
 
-get_null_permute_var_importances = function(training_data, m){
+get_null_permute_var_importances = function(X, y, m){
 	#permute the responses to disconnect x and y
-	training_data$y = sample(training_data$y, replace = FALSE)
+	y_samp = sample(y, replace = FALSE)
+	
 	#build BART on this permuted training data
-	bart_machine = build_bart_machine(training_data, 
+	bart_machine = build_bart_machine(as.data.frame(X), y_samp, 
 		num_trees = as.numeric(m), 
 		num_burn_in = NUM_BURN_IN, 
 		num_iterations_after_burn_in = NUM_ITER_AFTER,
@@ -172,21 +172,18 @@ validate_for_gene_cs_and_ms = function(gene_num){
 					
 					if (length(important_tfs) > 0){
 						#build training data
-						
-						training_data = data.frame(tf_train, y = y_train)
-						training_data = training_data[, c(important_tfs, "y")]
+						X = tf_train[, important_tfs]
 						
 						#now run BART model with 200 trees
-						bart_machine = build_bart_machine(training_data, 
+						bart_machine = build_bart_machine(as.data.frame(X), y_train,
 							num_trees = NUM_TREES_FOR_EVAL, 
 							num_burn_in = NUM_BURN_IN, 
 							num_iterations_after_burn_in = NUM_ITER_AFTER,
 							verbose = FALSE)
 						
-						#predict on cv data set only with important tf's						
-						cv_data = data.frame(tf_cv, y = y_cv)
-						cv_data = cv_data[, c(important_tfs, "y")]
-						predict_obj = bart_predict_for_test_data(bart_machine, cv_data)
+						#predict on cv data set only with important tf's
+						cv_data = tf_cv[, important_tfs]
+						predict_obj = bart_predict_for_test_data(bart_machine, as.data.frame(cv_data), y_cv)
 						destroy_bart_machine(bart_machine)
 						validation_oos_rmses[[gene]][[c_param]][[m_param]][[alpha]][[method]] = predict_obj$rmse						
 					} else {
@@ -205,7 +202,8 @@ validate_for_gene_cs_and_ms = function(gene_num){
 }
 
 if (NOT_ON_GRID){
-	GENE_NUM = 770
+	GENE_NUM = 5
+	set_bart_machine_num_cores(4)
 }
 
 #now run the simulation and validate
