@@ -3,7 +3,7 @@
 #run on the GRID ONLY!!
 setwd("../CGMBART_GPL")
 
-MAX_GENE_NUM = 5000
+MAX_GENE_NUM = 4000
 
 simulation_names = c("Null", "OLS", "OLS-BART-Best", "Stepwise", "Lasso-CV", "Lasso", "RF", "BART-Best", "BART-S.Max", "BART-Full", "Rob-Best")
 all_rmse_results = matrix(NA, nrow = MAX_GENE_NUM, ncol = length(simulation_names))

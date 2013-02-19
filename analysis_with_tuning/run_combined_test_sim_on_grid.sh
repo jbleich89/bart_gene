@@ -2,7 +2,7 @@
 
 #$ -j y
 #$ -N tf_discovery_for_gene_expression_combined_tests
-#$ -t 1-5000
+#$ -t 1-4000
 #$ -q intel
 
 echo "starting combined test for gene # $SGE_TASK_ID"
