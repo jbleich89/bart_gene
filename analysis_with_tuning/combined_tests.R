@@ -125,16 +125,20 @@ test_all_methods_for_gene = function(gene_num){
   if (length(best_tfs) > 0){
     #build training data from the subset
     X_train = as.data.frame(tf_train[, best_tfs])
+	names(X_train) = seq(from = 1, to = ncol(X_train), by = 1)
     
     #now run BART model with 200 trees
     bart_machine = build_bart_machine(X_train, y_train,
       num_trees = NUM_TREES_FOR_EVAL, 
       num_burn_in = NUM_BURN_IN, 
       num_iterations_after_burn_in = NUM_ITER_AFTER, 
+	  run_in_sample = FALSE,
       verbose = FALSE)
     
     #predict on cv data set only with important tf's      			
     test_data = as.data.frame(tf_test[, best_tfs])
+	names(test_data) = seq(from = 1, to = ncol(X_train), by = 1)
+	
     predict_obj = bart_predict_for_test_data(bart_machine, test_data, y_test)
 	rmse_mat[, "BART-Best"] = predict_obj$rmse
 	
@@ -191,6 +195,7 @@ test_all_methods_for_gene = function(gene_num){
       num_trees = NUM_TREES_FOR_EVAL, 
       num_burn_in = NUM_BURN_IN, 
       num_iterations_after_burn_in = NUM_ITER_AFTER, 
+	  run_in_sample = FALSE,
       verbose = FALSE)
     
     #predict on cv data set only with important tf's
@@ -212,6 +217,7 @@ test_all_methods_for_gene = function(gene_num){
 	  num_trees = NUM_TREES_FOR_EVAL, 
 	  num_burn_in = NUM_BURN_IN, 
 	  num_iterations_after_burn_in = NUM_ITER_AFTER, 
+	  run_in_sample = FALSE,
 	  verbose = FALSE)
 
 	predict_obj = bart_predict_for_test_data(bart_machine, data.frame(tf_test), y_test)
