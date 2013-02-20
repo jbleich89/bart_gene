@@ -137,7 +137,7 @@ test_all_methods_for_gene = function(gene_num){
     
     #predict on cv data set only with important tf's      			
     test_data = as.data.frame(tf_test[, best_tfs])
-	names(test_data) = seq(from = 1, to = ncol(X_train), by = 1)
+	names(test_data) = seq(from = 1, to = ncol(test_data), by = 1)
 	
     predict_obj = bart_predict_for_test_data(bart_machine, test_data, y_test)
 	rmse_mat[, "BART-Best"] = predict_obj$rmse
