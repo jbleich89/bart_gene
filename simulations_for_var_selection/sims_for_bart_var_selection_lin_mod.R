@@ -1,6 +1,7 @@
 library(MASS)
 tryCatch(library(glmnet), error = function(e){install.packages("glmnet")}, finally = library(glmnet))
 
+
 LAST_NAME = "kapelner"
 NOT_ON_GRID = length(grep("wharton.upenn.edu", Sys.getenv(c("HOSTNAME")))) == 0
 
@@ -21,9 +22,9 @@ source("r_scripts/bart_package_variable_selection.R")
 
 ###
 n = 250
-ps = c(10, 20, 100, 200, 1000)
-po_props = c(0.1, 0.2, 0.5, 0.75, 1)
-sigsqs = c(0.1, 0.5, 1, 5, 10)
+ps = c(10, 20, 100, 200)
+po_props = c(0.01, 0.05, 0.1, 0.2, 0.5, 0.75)
+sigsqs = c(0.1, 0.5, 1, 5)
 
 param_mat = as.data.frame(matrix(NA, nrow = length(ps) * length(po_props) * length(sigsqs), ncol = 3))
 colnames(param_mat) = c("p", "po_prop", "sigsq")
@@ -58,7 +59,7 @@ sigsq = param_mat[iter_num, 3]
 
 #generate linear model data
 X = matrix(runif(n * p), ncol = p)
-p0 = round(p * po_prop)
+p0 = ceiling(p * po_prop)
 true_vars = 1 : p0
 beta_vec = c(rep(1, p0), rep(0, p - p0))
 error = rnorm(n, 0, sqrt(sigsq))
@@ -124,7 +125,21 @@ results[5, ] = c(obj$precision, obj$recall, obj$F1_measure)
 #save results
 write.csv(results, file = paste("../bart_gene/simulations_for_var_selection/var_sel_sim_p", p, "_p0_", p0, "_sigsq_", sigsq, ".csv", sep = ""))
 
-
+###load results and print them to xtable
+#sink("all_results.tex")
+#tryCatch(library(xtable), error = function(e){install.packages("xtable")}, finally = library(xtable))
+#for (p in ps){
+#	for (po_prop in po_props){
+#		for (sigsq in sigsqs){
+#			if (p != 1000){				
+#				p0 = round(p * po_prop)
+#				results = read.csv(paste("var_sel_sim_p", p, "_p0_", p0, "_sigsq_", sigsq, ".csv", sep = ""))
+#				print(xtable(results, caption = paste("$p = ", p, ", p_0 = ", p0, ", \\sigsq = ", sigsq, "$\n", sep ="")))
+#			}
+#		}			
+#	}
+#}
+#sink()
 
 #y = 10 * sin(pi * X[, 1] * X[, 2]) + 20 * (X[, 3] - 0.5)^2 + 10 * X[, 4] + 5 * X[, 5] + 
 #		10 * sin(pi * X[, 6] * X[, 7]) + 20 * (X[, 8] - 0.5)^2 + 10 * X[, 9] + 5 * X[, 10] +
