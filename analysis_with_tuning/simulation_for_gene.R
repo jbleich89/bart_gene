@@ -85,10 +85,10 @@ find_important_tfs_for_gene_via_null_bart_sampling = function(gene, c_param, m_p
 	gene_result_c_m_methods_alphas
 }
 
-get_averaged_true_var_props = function(X, y, cov_prior_vec, m){
+get_averaged_true_var_props = function(bart_machine, m){
 	var_props = rep(0, ncol(X))
 	for (i in 1 : NUM_REP_FOR_TRAIN){
-		bart_machine = build_bart_machine(as.data.frame(X), y, 
+		bart_machine = build_bart_machine(X, y, 
 			num_trees = as.numeric(m), 
 			num_burn_in = NUM_BURN_IN, 
 			num_iterations_after_burn_in = NUM_ITER_AFTER, 

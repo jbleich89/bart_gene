@@ -20,7 +20,7 @@ for (g in 1 : nrow(all_sse_results)){
 	sse_null = sum((gene_test_data - mean(gene_test_data))^2)
 	sse_reductions_per_var[g, ] = (sse_null - all_sse_results[g, ]) / all_num_var_results_no_na[g, ]
 }
-
+dev.off()
 head(sse_reductions_per_var)
 head(all_rmse_results)
 
@@ -35,15 +35,22 @@ abline(a = mean(all_rmse_results[, 1]), b = 0, col = "red")
 ##### rmse per num vars
 
 all_rmse_per_num_var = all_rmse_results / all_num_var_results_no_na
+for (i in 1 : nrow(all_rmse_results)){
+	all_rmse_per_num_var[i, ] = ifelse(is.infinite(all_rmse_per_num_var[i, ]), NA, all_rmse_per_num_var[i, ])
+}
 #
-boxplot(all_rmse_per_num_var, ylab = "out-of-sample Scaled SSE reduction", main = "Out-of-Sample Scaled SSE reduction by Method", ylim = c(0, 0.5))
-points(apply(all_rmse_per_num_var, 2, mean), pch = "-", col = "blue", cex = 5)
-abline(a = mean(all_rmse_per_num_var[, 1]), b = 0, col = "red")
+boxplot(all_rmse_per_num_var, ylab = "out-of-sample Scaled SSE reduction", main = "Out-of-Sample RMSE per TF by Method\nConditional on Finding At Least One Variable", ylim = c(0, 0.5))
+points(apply(all_rmse_per_num_var, 2, mean, na.rm = TRUE), pch = "-", col = "blue", cex = 5)
+abline(a = mean(all_rmse_per_num_var[, 1], na.rm = TRUE), b = 0, col = "red")
 
 
 
-all_rmse_minus_null_per_num_var = (all_rmse_results - matrix(rep(all_rmse_results[, 1], ncol(all_rmse_results)), ncol = ncol(all_rmse_results))) / all_num_var_results_no_na
+all_rmse_minus_null_per_num_var = (matrix(rep(all_rmse_results[, 1], ncol(all_rmse_results)), ncol = ncol(all_rmse_results)) - all_rmse_results) / all_num_var_results_no_na
+
+for (i in 1 : nrow(all_rmse_results)){
+	all_rmse_minus_null_per_num_var[i, ] = ifelse(is.infinite(all_rmse_minus_null_per_num_var[i, ]), NA, all_rmse_minus_null_per_num_var[i, ])
+}
 #
-boxplot(all_rmse_minus_null_per_num_var, ylab = "out-of-sample Scaled SSE reduction", main = "Out-of-Sample Scaled SSE reduction by Method")
-points(apply(all_rmse_minus_null_per_num_var, 2, mean), pch = "-", col = "blue", cex = 5)
-abline(a = mean(all_rmse_minus_null_per_num_var[, 1]), b = 0, col = "red")
+boxplot(all_rmse_minus_null_per_num_var, ylab = "Out-of-Sample Null RMSE minus method RMSE ", main = "Out-of-Sample RMSE improvement over Null Model by Method")
+points(apply(all_rmse_minus_null_per_num_var, 2, mean, na.rm = TRUE), pch = "-", col = "blue", cex = 5)
+abline(a = 0, b = 0, col = "red")
