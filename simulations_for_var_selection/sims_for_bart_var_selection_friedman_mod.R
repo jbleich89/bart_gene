@@ -22,19 +22,16 @@ source("r_scripts/bart_package_variable_selection.R")
 
 ###
 n = 250
-ps = c(10, 20, 100, 200)
-po_props = c(0.01, 0.05, 0.1, 0.2, 0.5, 0.75)
+ps = c(10, 20, 100, 200, 500, 1000, 2000)
 sigsqs = c(0.1, 0.5, 1, 5)
 
-param_mat = as.data.frame(matrix(NA, nrow = length(ps) * length(po_props) * length(sigsqs), ncol = 3))
-colnames(param_mat) = c("p", "po_prop", "sigsq")
+param_mat = as.data.frame(matrix(NA, nrow = length(ps) * length(sigsqs), ncol = 2))
+colnames(param_mat) = c("p", "sigsq")
 i = 1
 for (p in ps){
-	for (po_prop in po_props){
-		for (sigsq in sigsqs){
-			param_mat[i, ] = c(p, po_prop, sigsq)
-			i = i + 1
-		}			
+	for (sigsq in sigsqs){
+		param_mat[i, ] = c(p, sigsq)
+		i = i + 1
 	}
 }
 
@@ -53,38 +50,35 @@ if (NOT_ON_GRID){
 }
 
 p = param_mat[iter_num, 1]
-po_prop = param_mat[iter_num, 2]
-sigsq = param_mat[iter_num, 3]
+sigsq = param_mat[iter_num, 2]
 
 
-#generate linear model data
+#generate friedman model data
 X = matrix(runif(n * p), ncol = p)
-p0 = ceiling(p * po_prop)
-true_vars = 1 : p0
-beta_vec = c(rep(1, p0), rep(0, p - p0))
-error = rnorm(n, 0, sqrt(sigsq))
-y = as.numeric(X %*% beta_vec + error)
 X = as.data.frame(X)
 colnames(X) = seq(1, p)
-
-sqrt(sigsq) / (sum(abs(as.matrix(X) %*% beta_vec)) / n)
+error = rnorm(n, 0, sqrt(sigsq))
+y = 10 * sin(pi * X[, 1] * X[, 2]) + 20 * (X[, 3] - 0.5)^2 + 10 * X[, 4] + 5 * X[, 5] + error
+true_vars = 1 : 5
 
 
 #now build bart machine (even though we don't really have to, but it's nice to have)
 
-bart_machine = build_bart_machine(X, y, num_trees = 1)
+bart_machine = build_bart_machine(X, y, num_trees = 1, run_in_sample = FALSE)
 
 #do var selection with bart
-bart_variables_select_obj = var_selection_by_permute_response(bart_machine, num_permute_samples = 100)
+bart_variables_select_obj = var_selection_by_permute_response(bart_machine, num_permute_samples = 100, plot = ifelse(NOT_ON_GRID, TRUE, FALSE))
 bart_ptwise_vars = sort(as.numeric(bart_variables_select_obj$important_vars_pointwise))
 bart_simul_max_vars = sort(as.numeric(bart_variables_select_obj$important_vars_simul_max))
 bart_simul_se_vars = sort(as.numeric(bart_variables_select_obj$important_vars_simul_se))
 
 #do var selection with stepwise
-step_reg = stepAIC(object = lm(y ~ ., data = X), direction = "backward" , trace = F)
-stepwise_vars = names(step_reg$coefficients)
-stepwise_vars = as.numeric(gsub("`", "", stepwise_vars))
-stepwise_vars = sort(stepwise_vars[!is.na(stepwise_vars)])
+if (p < n){
+	step_reg = stepAIC(object = lm(y ~ ., data = X), direction = "backward" , trace = F)
+	stepwise_vars = names(step_reg$coefficients)
+	stepwise_vars = as.numeric(gsub("`", "", stepwise_vars))
+	stepwise_vars = sort(stepwise_vars[!is.na(stepwise_vars)])
+}
 
 #do var selection with lasso
 lasso_matrix_vars = coef(cv.glmnet(as.matrix(X), y, alpha = 1 , nfolds = 5, type.measure = "mse"))
@@ -117,13 +111,15 @@ obj = calc_prec_rec_F1(true_vars, bart_simul_max_vars)
 results[2, ] = c(obj$precision, obj$recall, obj$F1_measure)
 obj = calc_prec_rec_F1(true_vars, bart_simul_se_vars)
 results[3, ] = c(obj$precision, obj$recall, obj$F1_measure)
-obj = calc_prec_rec_F1(true_vars, stepwise_vars)
-results[4, ] = c(obj$precision, obj$recall, obj$F1_measure)
+if (p < n){
+	obj = calc_prec_rec_F1(true_vars, stepwise_vars)
+	results[4, ] = c(obj$precision, obj$recall, obj$F1_measure)
+}
 obj = calc_prec_rec_F1(true_vars, lasso_matrix_vars)
 results[5, ] = c(obj$precision, obj$recall, obj$F1_measure)
 
 #save results
-write.csv(results, file = paste("../bart_gene/simulations_for_var_selection/var_sel_sim_p", p, "_p0_", p0, "_sigsq_", sigsq, ".csv", sep = ""))
+write.csv(results, file = paste("../bart_gene/simulations_for_var_selection/var_sel_sim_friedman_p", p, "_sigsq_", sigsq, ".csv", sep = ""))
 
 ###load results and print them to xtable
 #sink("all_results.tex")
@@ -133,14 +129,11 @@ write.csv(results, file = paste("../bart_gene/simulations_for_var_selection/var_
 #		for (sigsq in sigsqs){
 #			if (p != 1000){				
 #				p0 = ceiling(p * po_prop)
-#				results = read.csv(paste("var_sel_sim_p", p, "_p0_", p0, "_sigsq_", sigsq, ".csv", sep = ""))
-#				print(xtable(results, caption = paste("$p = ", p, ",~p_0 = ", p0, ",~\\sigsq = ", sigsq, "$\n", sep ="")))
+#				results = read.csv(paste("var_sel_sim_friedman_p", p, "_sigsq_", sigsq, ".csv", sep = ""))
+#				print(xtable(results, caption = paste("$p = ", p, ",~\\sigsq = ", sigsq, "$\n", sep ="")))
 #			}
 #		}			
 #	}
 #}
 #sink()
 
-#y = 10 * sin(pi * X[, 1] * X[, 2]) + 20 * (X[, 3] - 0.5)^2 + 10 * X[, 4] + 5 * X[, 5] + 
-#		10 * sin(pi * X[, 6] * X[, 7]) + 20 * (X[, 8] - 0.5)^2 + 10 * X[, 9] + 5 * X[, 10] +
-#		error
