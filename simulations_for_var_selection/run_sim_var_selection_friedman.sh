@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #$ -j y
-#$ -N bart_for_variable_section_sims
+#$ -N bart_for_variable_selection_friedman_sims
 #$ -t 1-28
 #$ -q intel
 

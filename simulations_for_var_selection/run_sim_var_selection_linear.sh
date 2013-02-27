@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #$ -j y
-#$ -N bart_for_variable_section_sims
+#$ -N bart_for_variable_selection_linear_sims
 #$ -t 1-125
 #$ -q intel
 
