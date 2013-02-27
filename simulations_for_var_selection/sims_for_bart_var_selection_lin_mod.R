@@ -7,7 +7,7 @@ NOT_ON_GRID = length(grep("wharton.upenn.edu", Sys.getenv(c("HOSTNAME")))) == 0
 if (NOT_ON_GRID){
 	setwd("C:/Users/Kapelner/workspace/CGMBART_GPL/")
 } else {
-	setwd("../../CGMBART_GPL/")
+	setwd("../CGMBART_GPL/")
 }
 
 source("r_scripts/bart_package.R")
