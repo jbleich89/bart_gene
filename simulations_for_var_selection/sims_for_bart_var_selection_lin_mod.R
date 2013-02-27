@@ -56,7 +56,7 @@ po_prop = param_mat[iter_num, 2]
 sigsq = param_mat[iter_num, 3]
 
 
-#generate data
+#generate linear model data
 X = matrix(runif(n * p), ncol = p)
 p0 = round(p * po_prop)
 true_vars = 1 : p0
@@ -96,17 +96,6 @@ results = matrix(NA, nrow = 5, ncol = 3)
 rownames(results) = c("BART_pointwise", "BART_simul_max", "BART_simul_se", "stepwise", "lasso")
 colnames(results) = c("precision", "recall", "F1_measure")
 
-obj = calc_prec_rec_F1(true_vars, bart_ptwise_vars)
-results[1, ] = c(obj$precision, obj$recall, obj$F1_measure)
-obj = calc_prec_rec_F1(true_vars, bart_simul_max_vars)
-results[2, ] = c(obj$precision, obj$recall, obj$F1_measure)
-obj = calc_prec_rec_F1(true_vars, bart_simul_se_vars)
-results[3, ] = c(obj$precision, obj$recall, obj$F1_measure)
-obj = calc_prec_rec_F1(true_vars, stepwise_vars)
-results[4, ] = c(obj$precision, obj$recall, obj$F1_measure)
-obj = calc_prec_rec_F1(true_vars, lasso_matrix_vars)
-results[5, ] = c(obj$precision, obj$recall, obj$F1_measure)
-
 calc_prec_rec_F1 = function(true_vars, regression_vars){
 	true_vars_found = intersect(true_vars, regression_vars)
 	tps = length(true_vars_found)
@@ -121,8 +110,19 @@ calc_prec_rec_F1 = function(true_vars, regression_vars){
 	)
 }
 
+obj = calc_prec_rec_F1(true_vars, bart_ptwise_vars)
+results[1, ] = c(obj$precision, obj$recall, obj$F1_measure)
+obj = calc_prec_rec_F1(true_vars, bart_simul_max_vars)
+results[2, ] = c(obj$precision, obj$recall, obj$F1_measure)
+obj = calc_prec_rec_F1(true_vars, bart_simul_se_vars)
+results[3, ] = c(obj$precision, obj$recall, obj$F1_measure)
+obj = calc_prec_rec_F1(true_vars, stepwise_vars)
+results[4, ] = c(obj$precision, obj$recall, obj$F1_measure)
+obj = calc_prec_rec_F1(true_vars, lasso_matrix_vars)
+results[5, ] = c(obj$precision, obj$recall, obj$F1_measure)
+
 #save results
-write.csv(results, file = paste("var_sel_sim_p", p, "_p0_", p0, "_sigsq_", sigsq, ".csv", sep = ""))
+write.csv(results, file = paste("../bart_gene/simulations_for_var_selection/var_sel_sim_p", p, "_p0_", p0, "_sigsq_", sigsq, ".csv", sep = ""))
 
 
 
