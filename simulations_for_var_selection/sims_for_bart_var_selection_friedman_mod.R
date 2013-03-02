@@ -27,7 +27,7 @@ calc_prec_rec = function(true_vars, regression_vars){
 }
 
 ###
-num_replicates = 10
+num_replicates = 100
 n = 250
 ps = c(25, 100, 200, 500, 1000, 5000)
 sigsqs = c(0.1, 0.5, 1, 5)
