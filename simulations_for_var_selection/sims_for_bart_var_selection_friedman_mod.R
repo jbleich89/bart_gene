@@ -20,9 +20,14 @@ calc_prec_rec = function(true_vars, regression_vars){
 	tps = length(true_vars_found)
 	fps = length(setdiff(regression_vars, true_vars_found))
 	fns = length(setdiff(true_vars, true_vars_found))
+	if (tps + fps == 0){
+		precision = 0
+	} else {
+		precision = tps / (tps + fps)
+	}
 	list(
-			precision = tps / (tps + fps),
-			recall = tps / (tps + fns)				
+		precision = precision,
+		recall = tps / (tps + fns)				
 	)
 }
 
@@ -138,7 +143,7 @@ write.csv(results, file = paste("../bart_gene/simulations_for_var_selection/var_
 
 
 ###load results and print them to xtable
-#sink("all_results.tex")
+#sink("all_friedman_results.tex")
 #tryCatch(library(xtable), error = function(e){install.packages("xtable")}, finally = library(xtable))
 #for (p in ps){
 #	for (sigsq in sigsqs){

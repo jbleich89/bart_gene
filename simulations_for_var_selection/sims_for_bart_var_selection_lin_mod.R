@@ -19,8 +19,13 @@ calc_prec_rec = function(true_vars, regression_vars){
 	tps = length(true_vars_found)
 	fps = length(setdiff(regression_vars, true_vars_found))
 	fns = length(setdiff(true_vars, true_vars_found))
+	if (tps + fps == 0){
+		precision = 0
+	} else {
+		precision = tps / (tps + fps)
+	}
 	list(
-		precision = tps / (tps + fps),
+		precision = precision,
 		recall = tps / (tps + fns)
 	)
 }
@@ -141,9 +146,9 @@ results = cbind(results, F1s)
 
 #save results
 write.csv(results, file = paste("../bart_gene/simulations_for_var_selection/var_sel_sim_p", p, "_p0_", p0, "_sigsq_", sigsq, ".csv", sep = ""))
-
-###load results and print them to xtable
-#sink("all_results.tex")
+#
+####load results and print them to xtable
+#sink("all_linear_results.tex")
 #tryCatch(library(xtable), error = function(e){install.packages("xtable")}, finally = library(xtable))
 #for (p in ps){
 #	for (po_prop in po_props){
