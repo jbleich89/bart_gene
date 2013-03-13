@@ -143,16 +143,14 @@ results = cbind(results, F1s)
 write.csv(results, file = paste("../bart_gene/simulations_for_var_selection/var_sel_sim_p", p, "_p0_", p0, "_sigsq_", sigsq, ".csv", sep = ""))
 
 ###load results and print them to xtable
-#sink("all_results.tex")
+#sink("all_results_linear.tex")
 #tryCatch(library(xtable), error = function(e){install.packages("xtable")}, finally = library(xtable))
 #for (p in ps){
 #	for (po_prop in po_props){
-#		for (sigsq in sigsqs){
-#			if (p != 1000){				
-#				p0 = ceiling(p * po_prop)
-#				results = read.csv(paste("var_sel_sim_p", p, "_p0_", p0, "_sigsq_", sigsq, ".csv", sep = ""))
-#				print(xtable(results, caption = paste("$p = ", p, ",~p_0 = ", p0, ",~\\sigsq = ", sigsq, "$\n", sep ="")))
-#			}
+#		for (sigsq in sigsqs){			
+#			p0 = ceiling(p * po_prop)
+#			results = read.csv(paste("var_sel_sim_p", p, "_p0_", p0, "_sigsq_", sigsq, ".csv", sep = ""))
+#			print(xtable(results, caption = paste("$p = ", p, ",~p_0 = ", p0, ",~\\sigsq = ", sigsq, "$\n", sep ="")))
 #		}			
 #	}
 #}

@@ -137,8 +137,8 @@ results = cbind(results, F1s)
 write.csv(results, file = paste("../bart_gene/simulations_for_var_selection/var_sel_sim_friedman_p", p, "_sigsq_", sigsq, ".csv", sep = ""))	
 
 
-###load results and print them to xtable
-#sink("all_results.tex")
+##load results and print them to xtable
+#sink("all_results_friedman.tex")
 #tryCatch(library(xtable), error = function(e){install.packages("xtable")}, finally = library(xtable))
 #for (p in ps){
 #	for (sigsq in sigsqs){

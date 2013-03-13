@@ -4,3 +4,4 @@
 bin/
 .gitignore.swp
 .gitignore~
+*.csv
