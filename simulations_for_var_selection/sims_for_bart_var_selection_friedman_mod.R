@@ -20,16 +20,21 @@ calc_prec_rec = function(true_vars, regression_vars){
 	tps = length(true_vars_found)
 	fps = length(setdiff(regression_vars, true_vars_found))
 	fns = length(setdiff(true_vars, true_vars_found))
+	if (tps + fps == 0){
+		precision = 0
+	} else {
+		precision = tps / (tps + fps)
+	}
 	list(
-			precision = tps / (tps + fps),
-			recall = tps / (tps + fns)				
+		precision = precision,
+		recall = tps / (tps + fns)				
 	)
 }
 
 ###
-num_replicates = 10
+num_replicates = 100
 n = 250
-ps = c(25, 100, 200, 500, 1000, 5000)
+ps = c(25, 100, 200, 500, 1000, 5000, 10000)
 sigsqs = c(0.1, 0.5, 1, 5)
 
 param_mat = as.data.frame(matrix(NA, nrow = length(ps) * length(sigsqs), ncol = 2))
@@ -72,9 +77,8 @@ for (nr in 1 : num_replicates){
 	true_vars = 1 : 5
 	
 	
-	#now build bart machine (even though we don't really have to, but it's nice to have)
-	
-	bart_machine = build_bart_machine(X, y, num_trees = 1, run_in_sample = FALSE)
+	#now build bart machine	
+	bart_machine = build_bart_machine(X, y, num_trees = 1, num_burn_in = 2000, run_in_sample = FALSE)
 	
 	#do var selection with bart
 	bart_variables_select_obj = var_selection_by_permute_response(bart_machine, plot = ifelse(NOT_ON_GRID, TRUE, FALSE))
