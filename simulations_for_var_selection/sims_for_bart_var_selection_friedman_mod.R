@@ -78,7 +78,7 @@ for (nr in 1 : num_replicates){
 	
 	
 	#now build bart machine	
-	bart_machine = build_bart_machine(X, y, num_trees = 1, num_burn_in = 2000, run_in_sample = FALSE)
+	bart_machine = build_bart_machine(X, y, num_trees = 1, num_burn_in = 2000, run_in_sample = FALSE, verbose = FALSE)
 	
 	#do var selection with bart
 	bart_variables_select_obj = var_selection_by_permute_response_three_methods(bart_machine, plot = ifelse(NOT_ON_GRID, TRUE, FALSE))
