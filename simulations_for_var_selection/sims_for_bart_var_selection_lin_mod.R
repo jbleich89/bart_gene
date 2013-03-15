@@ -31,7 +31,7 @@ calc_prec_rec = function(true_vars, regression_vars){
 }
 
 ###
-num_replicates = 100
+num_replicates = 50
 n = 250
 ps = c(20, 100, 200, 500, 1000)
 po_props = c(0.01, 0.05, 0.1, 0.2)
@@ -68,7 +68,7 @@ po_prop = param_mat[iter_num, 2]
 sigsq = param_mat[iter_num, 3]
 
 
-rep_results = array(NA, c(6, 2, num_replicates))
+rep_results = array(NA, c(7, 2, num_replicates))
 
 ######replicate a few times
 for (nr in 1 : num_replicates){
@@ -89,10 +89,13 @@ for (nr in 1 : num_replicates){
 	bart_machine = build_bart_machine(X, y, num_trees = 1, num_burn_in = 2000, run_in_sample = FALSE)
 	
 	#do var selection with bart
-	bart_variables_select_obj = var_selection_by_permute_response(bart_machine, plot = FALSE)
+	bart_variables_select_obj = var_selection_by_permute_response_three_methods(bart_machine, plot = FALSE)
 	bart_ptwise_vars = sort(as.numeric(bart_variables_select_obj$important_vars_pointwise))
 	bart_simul_max_vars = sort(as.numeric(bart_variables_select_obj$important_vars_simul_max))
 	bart_simul_se_vars = sort(as.numeric(bart_variables_select_obj$important_vars_simul_se))
+	
+	#do var selection with a CV-min-RMSE
+	bart_cv_vars = var_selection_by_permute_response_cv(bart_machine)
 	
 	#do var selection with stepwise
 	if (p < n){
@@ -113,20 +116,22 @@ for (nr in 1 : num_replicates){
 	lasso_matrix_vars = sort(lasso_matrix_vars[lasso_matrix_vars != 0]) #kill intercept if it exists
 	
 	#### now what did we get right?
+	obj = calc_prec_rec(true_vars, bart_cv_vars)
+	rep_results[1, , nr] = c(obj$precision, obj$recall)	
 	obj = calc_prec_rec(true_vars, bart_ptwise_vars)
-	rep_results[1, , nr] = c(obj$precision, obj$recall)
-	obj = calc_prec_rec(true_vars, bart_simul_max_vars)
 	rep_results[2, , nr] = c(obj$precision, obj$recall)
-	obj = calc_prec_rec(true_vars, bart_simul_se_vars)
+	obj = calc_prec_rec(true_vars, bart_simul_max_vars)
 	rep_results[3, , nr] = c(obj$precision, obj$recall)
+	obj = calc_prec_rec(true_vars, bart_simul_se_vars)
+	rep_results[4, , nr] = c(obj$precision, obj$recall)
 	if (p < n){
 		obj = calc_prec_rec(true_vars, stepwise_backward_vars)
-		rep_results[4, , nr] = c(obj$precision, obj$recall)
+		rep_results[5, , nr] = c(obj$precision, obj$recall)
 		obj = calc_prec_rec(true_vars, stepwise_forward_vars)
-		rep_results[5, , nr] = c(obj$precision, obj$recall)		
+		rep_results[6, , nr] = c(obj$precision, obj$recall)		
 	}
 	obj = calc_prec_rec(true_vars, lasso_matrix_vars)
-	rep_results[6, , nr ] = c(obj$precision, obj$recall)
+	rep_results[7, , nr ] = c(obj$precision, obj$recall)
 }
 
 results = matrix(0, nrow = 6, ncol = 2)

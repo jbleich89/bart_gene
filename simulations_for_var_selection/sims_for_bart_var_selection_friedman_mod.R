@@ -32,10 +32,10 @@ calc_prec_rec = function(true_vars, regression_vars){
 }
 
 ###
-num_replicates = 100
+num_replicates = 50
 n = 250
-ps = c(25, 100, 200, 500, 1000, 5000, 10000)
-sigsqs = c(0.1, 0.5, 1, 5)
+ps = c(25, 100, 200, 500, 1000, 5000)
+sigsqs = c(1, 10, 50, 100)
 
 param_mat = as.data.frame(matrix(NA, nrow = length(ps) * length(sigsqs), ncol = 2))
 colnames(param_mat) = c("p", "sigsq")
@@ -64,7 +64,7 @@ if (NOT_ON_GRID){
 p = param_mat[iter_num, 1]
 sigsq = param_mat[iter_num, 2]
 
-rep_results = array(NA, c(6, 2, num_replicates))
+rep_results = array(NA, c(7, 2, num_replicates))
 
 ######replicate a few times
 for (nr in 1 : num_replicates){
@@ -81,10 +81,13 @@ for (nr in 1 : num_replicates){
 	bart_machine = build_bart_machine(X, y, num_trees = 1, num_burn_in = 2000, run_in_sample = FALSE)
 	
 	#do var selection with bart
-	bart_variables_select_obj = var_selection_by_permute_response(bart_machine, plot = ifelse(NOT_ON_GRID, TRUE, FALSE))
+	bart_variables_select_obj = var_selection_by_permute_response_three_methods(bart_machine, plot = ifelse(NOT_ON_GRID, TRUE, FALSE))
 	bart_ptwise_vars = sort(as.numeric(bart_variables_select_obj$important_vars_pointwise))
 	bart_simul_max_vars = sort(as.numeric(bart_variables_select_obj$important_vars_simul_max))
 	bart_simul_se_vars = sort(as.numeric(bart_variables_select_obj$important_vars_simul_se))
+	
+	#do var selection with a CV-min-RMSE
+	bart_cv_vars = var_selection_by_permute_response_cv(bart_machine)
 	
 	#do var selection with stepwise
 	if (p < n){
@@ -106,25 +109,27 @@ for (nr in 1 : num_replicates){
 	
 	
 	#### now what did we get right?
-	obj = calc_prec_rec(true_vars, bart_ptwise_vars)
+	obj = calc_prec_rec(true_vars, bart_cv_vars)
 	rep_results[1, , nr] = c(obj$precision, obj$recall)
-	obj = calc_prec_rec(true_vars, bart_simul_max_vars)
+	obj = calc_prec_rec(true_vars, bart_ptwise_vars)
 	rep_results[2, , nr] = c(obj$precision, obj$recall)
-	obj = calc_prec_rec(true_vars, bart_simul_se_vars)
+	obj = calc_prec_rec(true_vars, bart_simul_max_vars)
 	rep_results[3, , nr] = c(obj$precision, obj$recall)
+	obj = calc_prec_rec(true_vars, bart_simul_se_vars)
+	rep_results[4, , nr] = c(obj$precision, obj$recall)
 	if (p < n){
 		obj = calc_prec_rec(true_vars, stepwise_backward_vars)
-		rep_results[4, , nr] = c(obj$precision, obj$recall)
+		rep_results[5, , nr] = c(obj$precision, obj$recall)
 		obj = calc_prec_rec(true_vars, stepwise_forward_vars)
-		rep_results[5, , nr] = c(obj$precision, obj$recall)		
+		rep_results[6, , nr] = c(obj$precision, obj$recall)		
 	}
 	obj = calc_prec_rec(true_vars, lasso_matrix_vars)
-	rep_results[6, , nr ] = c(obj$precision, obj$recall)
+	rep_results[7, , nr ] = c(obj$precision, obj$recall)
 	
 }
 
-results = matrix(0, nrow = 6, ncol = 2)
-rownames(results) = c("BART_pointwise", "BART_simul_max", "BART_simul_se", "stepwise_backward",  "stepwise_forward", "lasso")
+results = matrix(0, nrow = 7, ncol = 2)
+rownames(results) = c("BART_CV", "BART_pointwise", "BART_simul_max", "BART_simul_se", "stepwise_backward",  "stepwise_forward", "lasso")
 colnames(results) = c("precision", "recall")
 
 #now dump results in
