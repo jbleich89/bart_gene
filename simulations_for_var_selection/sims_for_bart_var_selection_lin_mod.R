@@ -1,6 +1,6 @@
 library(MASS)
 tryCatch(library(glmnet), error = function(e){install.packages("glmnet")}, finally = library(glmnet))
-
+options(error = recover)
 
 LAST_NAME = "kapelner"
 NOT_ON_GRID = length(grep("wharton.upenn.edu", Sys.getenv(c("HOSTNAME")))) == 0
@@ -31,7 +31,7 @@ calc_prec_rec = function(true_vars, regression_vars){
 }
 
 ###
-num_replicates = 50
+num_replicates = 2
 n = 250
 ps = c(20, 100, 200, 500, 1000)
 po_props = c(0.01, 0.05, 0.1, 0.2)
@@ -95,7 +95,7 @@ for (nr in 1 : num_replicates){
 	bart_simul_se_vars = sort(as.numeric(bart_variables_select_obj$important_vars_simul_se))
 	
 	#do var selection with a CV-min-RMSE
-	bart_cv_vars = var_selection_by_permute_response_cv(bart_machine)
+	bart_cv_vars = var_selection_by_permute_response_cv(bart_machine)$important_vars_cv
 	
 	#do var selection with stepwise
 	if (p < n){
@@ -134,8 +134,8 @@ for (nr in 1 : num_replicates){
 	rep_results[7, , nr ] = c(obj$precision, obj$recall)
 }
 
-results = matrix(0, nrow = 6, ncol = 2)
-rownames(results) = c("BART_pointwise", "BART_simul_max", "BART_simul_se", "stepwise_backward",  "stepwise_forward", "lasso")
+results = matrix(0, nrow = 7, ncol = 2)
+rownames(results) = c("BART_CV", "BART_pointwise", "BART_simul_max", "BART_simul_se", "stepwise_backward",  "stepwise_forward", "lasso")
 colnames(results) = c("precision", "recall")
 
 #now dump results in
@@ -150,7 +150,7 @@ results = cbind(results, F1s)
 
 
 #save results
-write.csv(results, file = paste("../bart_gene/simulations_for_var_selection/var_sel_sim_p", p, "_p0_", p0, "_sigsq_", sigsq, ".csv", sep = ""))
+write.csv(results, file = paste("../bart_gene/simulations_for_var_selection/sim_results/var_sel_sim_linear_p", p, "_p0_", p0, "_sigsq_", sigsq, ".csv", sep = ""))
 
 ###load results and print them to xtable
 #sink("all_results_linear.tex")

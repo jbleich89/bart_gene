@@ -1,7 +1,0 @@
-"","precision","recall","F1s"
-"BART_pointwise",0.400635642135642,1,0.572076891495873
-"BART_simul_max",1,1,1
-"BART_simul_se",1,1,1
-"stepwise_backward",0.0177243911647078,1,0.0348314166754392
-"stepwise_forward",0.01,1,0.0198019801980198
-"lasso",0.922564213564214,1,0.959722652752269

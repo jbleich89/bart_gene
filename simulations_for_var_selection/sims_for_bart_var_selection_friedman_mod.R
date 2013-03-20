@@ -1,6 +1,6 @@
 library(MASS)
 tryCatch(library(glmnet), error = function(e){install.packages("glmnet")}, finally = library(glmnet))
-
+options(error = recover)
 
 LAST_NAME = "kapelner"
 NOT_ON_GRID = length(grep("wharton.upenn.edu", Sys.getenv(c("HOSTNAME")))) == 0
@@ -87,7 +87,7 @@ for (nr in 1 : num_replicates){
 	bart_simul_se_vars = sort(as.numeric(bart_variables_select_obj$important_vars_simul_se))
 	
 	#do var selection with a CV-min-RMSE
-	bart_cv_vars = var_selection_by_permute_response_cv(bart_machine)
+	bart_cv_vars = var_selection_by_permute_response_cv(bart_machine)$important_vars_cv
 	
 	#do var selection with stepwise
 	if (p < n){
@@ -143,7 +143,7 @@ F1s = 2 * results[, 1] * results[, 2] / (results[, 1] + results[, 2])
 results = cbind(results, F1s)
 
 #save results
-write.csv(results, file = paste("../bart_gene/simulations_for_var_selection/var_sel_sim_friedman_p", p, "_sigsq_", sigsq, ".csv", sep = ""))	
+write.csv(results, file = paste("../bart_gene/simulations_for_var_selection/sim_results/var_sel_sim_friedman_p", p, "_sigsq_", sigsq, ".csv", sep = ""))	
 
 
 ##load results and print them to xtable
