@@ -116,8 +116,8 @@ for (nr in 1 : num_replicates){
 	##do var selection with RF
 	rf = randomForest(x = X , y = y, ntree = 500 ,importance = T)
 	rf_zscore = importance(rf, type=1 ,scale=T)
-	rf_point_vars = which(abs(rf_zscore) > qnorm((1-rf_alpha/2)))
-	rf_simul_vars = which(abs(rf_zscore) > qnorm((1-rf_alpha/(2 * p))))                   
+	rf_point_vars = which(rf_zscore > qnorm(1-rf_alpha))
+	rf_simul_vars = which(rf_zscore > qnorm(1-rf_alpha / p))                   
 	
 	
 	#do var selection with lasso
