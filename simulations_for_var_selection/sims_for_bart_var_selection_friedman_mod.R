@@ -1,5 +1,7 @@
 library(MASS)
 tryCatch(library(glmnet), error = function(e){install.packages("glmnet")}, finally = library(glmnet))
+tryCatch(library(randomForest), error = function(e){install.packages("glmnet")}, finally = library(randomForest))
+
 options(error = recover)
 
 LAST_NAME = "kapelner"
@@ -37,6 +39,8 @@ n = 250
 ps = c(25, 100, 200, 500, 1000, 5000)
 sigsqs = c(1, 10, 50, 100)
 
+rf_alpha = .05
+
 param_mat = as.data.frame(matrix(NA, nrow = length(ps) * length(sigsqs), ncol = 2))
 colnames(param_mat) = c("p", "sigsq")
 i = 1
@@ -46,6 +50,7 @@ for (p in ps){
 		i = i + 1
 	}
 }
+
 
 #read in arguments supplied by qsub - this will tell use which gene to process
 args = commandArgs(TRUE)
@@ -64,7 +69,7 @@ if (NOT_ON_GRID){
 p = param_mat[iter_num, 1]
 sigsq = param_mat[iter_num, 2]
 
-rep_results = array(NA, c(7, 2, num_replicates))
+rep_results = array(NA, c(9, 2, num_replicates))
 
 ######replicate a few times
 for (nr in 1 : num_replicates){
@@ -101,7 +106,14 @@ for (nr in 1 : num_replicates){
 		stepwise_forward_vars = as.numeric(gsub("`", "", stepwise_forward_vars))
 		stepwise_forward_vars = sort(stepwise_forward_vars[!is.na(stepwise_forward_vars)])		
 	}
-	
+  
+  ##do var selection with RF
+  rf = randomForest(x = X , y = y, ntree = 500 ,importance = T)
+  rf_zscore = importance(rf, type=1 ,scale=T)
+  rf_point_vars = which(abs(rf_zscore) > qnorm((1-rf_alpha/2)))
+	rf_simul_vars = which(abs(rf_zscore) > qnorm((1-rf_alpha/(2 * p))))                   
+  
+  
 	#do var selection with lasso
 	lasso_matrix_vars = coef(cv.glmnet(as.matrix(X), y, alpha = 1 , nfolds = 5, type.measure = "mse"))
 	lasso_matrix_vars = which(lasso_matrix_vars != 0) - 1
@@ -125,11 +137,16 @@ for (nr in 1 : num_replicates){
 	}
 	obj = calc_prec_rec(true_vars, lasso_matrix_vars)
 	rep_results[7, , nr ] = c(obj$precision, obj$recall)
+	obj = calc_prec_rec(true_vars, rf_point_vars)
+	rep_results[8, , nr ] = c(obj$precision, obj$recall)
+	obj = calc_prec_rec(true_vars, rf_simul_vars)
+	rep_results[9, , nr ] = c(obj$precision, obj$recall)
+  
 	
 }
 
-results = matrix(0, nrow = 7, ncol = 2)
-rownames(results) = c("BART_CV", "BART_pointwise", "BART_simul_max", "BART_simul_se", "stepwise_backward",  "stepwise_forward", "lasso")
+results = matrix(0, nrow = 9, ncol = 2)
+rownames(results) = c("BART_CV", "BART_pointwise", "BART_simul_max", "BART_simul_se", "stepwise_backward",  "stepwise_forward", "lasso", "RF_point", "RF_simul") 
 colnames(results) = c("precision", "recall")
 
 #now dump results in
