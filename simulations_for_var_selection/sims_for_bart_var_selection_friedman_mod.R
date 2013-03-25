@@ -107,11 +107,11 @@ for (nr in 1 : num_replicates){
 		stepwise_forward_vars = sort(stepwise_forward_vars[!is.na(stepwise_forward_vars)])		
 	}
   
-  ##do var selection with RF
-  rf = randomForest(x = X , y = y, ntree = 500 ,importance = T)
-  rf_zscore = importance(rf, type=1 ,scale=T)
-	rf_point_vars = which(rf_zscore > qnorm(1-rf_alpha))
-	rf_simul_vars = which(rf_zscore > qnorm(1-rf_alpha / p))                  
+    ##do var selection with RF
+    rf = randomForest(x = X , y = y, ntree = 500 ,importance = T)
+    rf_zscore = importance(rf, type=1 ,scale=T)
+	rf_point_vars = which(rf_zscore > qnorm(1 - rf_alpha))
+	rf_simul_vars = which(rf_zscore > qnorm(1 - rf_alpha / p))                  
   
   
 	#do var selection with lasso
@@ -136,11 +136,11 @@ for (nr in 1 : num_replicates){
 		rep_results[6, , nr] = c(obj$precision, obj$recall)		
 	}
 	obj = calc_prec_rec(true_vars, lasso_matrix_vars)
-	rep_results[7, , nr ] = c(obj$precision, obj$recall)
+	rep_results[7, , nr] = c(obj$precision, obj$recall)
 	obj = calc_prec_rec(true_vars, rf_point_vars)
-	rep_results[8, , nr ] = c(obj$precision, obj$recall)
+	rep_results[8, , nr] = c(obj$precision, obj$recall)
 	obj = calc_prec_rec(true_vars, rf_simul_vars)
-	rep_results[9, , nr ] = c(obj$precision, obj$recall)
+	rep_results[9, , nr] = c(obj$precision, obj$recall)
   
 	
 }
