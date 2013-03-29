@@ -12,7 +12,7 @@ NOT_ON_GRID = length(grep("wharton.upenn.edu", Sys.getenv(c("HOSTNAME")))) == 0
 if (NOT_ON_GRID){
 	setwd("C:/Users/Kapelner/workspace/bart_gene/simulations_for_var_selection")
 } else {
-	setwd("../CGMBART_GPL/")
+	setwd("simulations_for_var_selection")
 }
 
 source("rf_cv_validator.R")
