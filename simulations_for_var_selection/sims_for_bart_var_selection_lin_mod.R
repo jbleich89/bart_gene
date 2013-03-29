@@ -130,7 +130,7 @@ for (nr in 1 : num_replicates){
 	rf_zscore = importance(rf, type=1 ,scale=T)
 	rf_point_vars = which(rf_zscore > qnorm(1 - rf_alpha))
 	rf_simul_vars = which(rf_zscore > qnorm(1 - rf_alpha / p))  
-	rf_cv_vars = rf_cv_var_selection(X, y, 500, rf_alpha)
+	rf_cv_vars = rf_cv_var_selection(X, y, 500, rf_alpha)$important_vars_cv
 	
 	
 	#do var selection with lasso
