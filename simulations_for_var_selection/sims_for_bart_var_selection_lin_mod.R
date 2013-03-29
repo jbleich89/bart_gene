@@ -19,7 +19,7 @@ source("rf_cv_validator.R")
 if (NOT_ON_GRID){
 	setwd("C:/Users/Kapelner/workspace/CGMBART_GPL/")
 } else {
-	setwd("../CGMBART_GPL/")
+	setwd("../../CGMBART_GPL/")
 }
 
 source("r_scripts/bart_package.R")
