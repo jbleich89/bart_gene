@@ -46,8 +46,9 @@ calc_prec_rec = function(true_vars, regression_vars){
 ###
 num_replicates = 50
 n = 250
-ps = c(25, 100, 200, 500, 1000, 5000)
+ps = c(25, 100, 200, 500, 1000)
 sigsqs = c(1, 10, 50, 100)
+use_prior = TRUE
 
 rf_alpha = .05
 
@@ -92,18 +93,27 @@ for (nr in 1 : num_replicates){
 	y = 10 * sin(pi * X[, 1] * X[, 2]) + 20 * (X[, 3] - 0.5)^2 + 10 * X[, 4] + 5 * X[, 5] + error
 	true_vars = 1 : 5
 	
-	
 	#now build bart machine	
-#	bart_machine = build_bart_machine(X, y, num_trees = 1, num_burn_in = 2000, run_in_sample = FALSE, verbose = FALSE)
+	if (use_prior){
+		bart_machine = build_bart_machine(X, y, 
+			cov_prior_vec = c(rep(2, 5), rep(1, p - 5)), ### 5 is a magic number because there are always p0=5 variables that matter in the Friedman data
+			num_trees = 1, 
+			num_burn_in = 2000, 
+			run_in_sample = FALSE, 
+			verbose = FALSE)
+	} else {
+		bart_machine = build_bart_machine(X, y, num_trees = 1, num_burn_in = 2000, run_in_sample = FALSE, verbose = FALSE)
+	}
+	
 	
 	#do var selection with bart
-#	bart_variables_select_obj = var_selection_by_permute_response_three_methods(bart_machine, plot = ifelse(NOT_ON_GRID, TRUE, FALSE))
-#	bart_ptwise_vars = sort(as.numeric(bart_variables_select_obj$important_vars_pointwise))
-#	bart_simul_max_vars = sort(as.numeric(bart_variables_select_obj$important_vars_simul_max))
-#	bart_simul_se_vars = sort(as.numeric(bart_variables_select_obj$important_vars_simul_se))
+	bart_variables_select_obj = var_selection_by_permute_response_three_methods(bart_machine, plot = ifelse(NOT_ON_GRID, TRUE, FALSE))
+	bart_ptwise_vars = sort(as.numeric(bart_variables_select_obj$important_vars_pointwise))
+	bart_simul_max_vars = sort(as.numeric(bart_variables_select_obj$important_vars_simul_max))
+	bart_simul_se_vars = sort(as.numeric(bart_variables_select_obj$important_vars_simul_se))
 	
 	#do var selection with a CV-min-RMSE
-#	bart_cv_vars = var_selection_by_permute_response_cv(bart_machine)$important_vars_cv
+	bart_cv_vars = var_selection_by_permute_response_cv(bart_machine)$important_vars_cv
 	
 	#do var selection with stepwise
 #	if (p < n){
@@ -119,11 +129,11 @@ for (nr in 1 : num_replicates){
 #	}
   
     ##do var selection with RF
-    rf = randomForest(x = X , y = y, ntree = 500 ,importance = T)
-    rf_zscore = importance(rf, type=1 ,scale=T)
-	rf_point_vars = which(rf_zscore > qnorm(1 - rf_alpha))
-	rf_simul_vars = which(rf_zscore > qnorm(1 - rf_alpha / p))
-	rf_cv_vars = rf_cv_var_selection(X, y, 500, rf_alpha)$important_vars_cv
+#    rf = randomForest(x = X , y = y, ntree = 500 ,importance = T)
+#    rf_zscore = importance(rf, type=1 ,scale=T)
+#	rf_point_vars = which(rf_zscore > qnorm(1 - rf_alpha))
+#	rf_simul_vars = which(rf_zscore > qnorm(1 - rf_alpha / p))
+#	rf_cv_vars = rf_cv_var_selection(X, y, 500, rf_alpha)$important_vars_cv
   
   
 	#do var selection with lasso
@@ -133,14 +143,14 @@ for (nr in 1 : num_replicates){
 	
 	
 	#### now what did we get right?
-#	obj = calc_prec_rec(true_vars, bart_cv_vars)
-#	rep_results[1, , nr] = c(obj$precision, obj$recall)
-#	obj = calc_prec_rec(true_vars, bart_ptwise_vars)
-#	rep_results[2, , nr] = c(obj$precision, obj$recall)
-#	obj = calc_prec_rec(true_vars, bart_simul_max_vars)
-#	rep_results[3, , nr] = c(obj$precision, obj$recall)
-#	obj = calc_prec_rec(true_vars, bart_simul_se_vars)
-#	rep_results[4, , nr] = c(obj$precision, obj$recall)
+	obj = calc_prec_rec(true_vars, bart_cv_vars)
+	rep_results[1, , nr] = c(obj$precision, obj$recall)
+	obj = calc_prec_rec(true_vars, bart_ptwise_vars)
+	rep_results[2, , nr] = c(obj$precision, obj$recall)
+	obj = calc_prec_rec(true_vars, bart_simul_max_vars)
+	rep_results[3, , nr] = c(obj$precision, obj$recall)
+	obj = calc_prec_rec(true_vars, bart_simul_se_vars)
+	rep_results[4, , nr] = c(obj$precision, obj$recall)
 #	if (p < n){
 #		obj = calc_prec_rec(true_vars, stepwise_backward_vars)
 #		rep_results[5, , nr] = c(obj$precision, obj$recall)
@@ -149,12 +159,12 @@ for (nr in 1 : num_replicates){
 #	}
 #	obj = calc_prec_rec(true_vars, lasso_matrix_vars)
 #	rep_results[7, , nr] = c(obj$precision, obj$recall)
-	obj = calc_prec_rec(true_vars, rf_point_vars)
-	rep_results[8, , nr] = c(obj$precision, obj$recall)
-	obj = calc_prec_rec(true_vars, rf_simul_vars)
-	rep_results[9, , nr] = c(obj$precision, obj$recall)
-	obj = calc_prec_rec(true_vars, rf_cv_vars)
-	rep_results[10, , nr] = c(obj$precision, obj$recall)  
+#	obj = calc_prec_rec(true_vars, rf_point_vars)
+#	rep_results[8, , nr] = c(obj$precision, obj$recall)
+#	obj = calc_prec_rec(true_vars, rf_simul_vars)
+#	rep_results[9, , nr] = c(obj$precision, obj$recall)
+#	obj = calc_prec_rec(true_vars, rf_cv_vars)
+#	rep_results[10, , nr] = c(obj$precision, obj$recall)  
 	
 }
 
@@ -173,7 +183,7 @@ F1s = 2 * results[, 1] * results[, 2] / (results[, 1] + results[, 2])
 results = cbind(results, F1s)
 
 #save results
-write.csv(results, file = paste("../bart_gene/simulations_for_var_selection/sim_results/rf_var_sel_sim_friedman_p", p, "_sigsq_", sigsq, ".csv", sep = ""))	
+write.csv(results, file = paste("../bart_gene/simulations_for_var_selection/sim_results/B_prior_var_sel_sim_friedman_p", p, "_sigsq_", sigsq, ".csv", sep = ""))	
 
 
 ##load results and print them to xtable
