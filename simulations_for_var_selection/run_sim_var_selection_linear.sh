@@ -2,7 +2,7 @@
 
 #$ -j y
 #$ -N bart_for_variable_selection_linear_sims
-#$ -t 1-125
+#$ -t 1-60
 #$ -q intel
 
 echo "starting R for task # $SGE_TASK_ID"
