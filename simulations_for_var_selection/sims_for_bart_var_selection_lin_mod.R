@@ -42,7 +42,7 @@ calc_prec_rec = function(true_vars, regression_vars){
 }
 
 ###
-num_replicates = 50
+num_replicates = 2
 n = 250
 ps = c(20, 100, 200, 500, 1000)
 po_props = c(0.01, 0.05, 0.1, 0.2)
@@ -72,7 +72,7 @@ if (length(args) > 0){
 	}
 }
 if (NOT_ON_GRID){
-	iter_num = 1
+	iter_num = 2
 	set_bart_machine_num_cores(4)
 }
 
@@ -102,12 +102,12 @@ for (nr in 1 : num_replicates){
 	#now build bart machine WITHOUT PRIOR	
 	bart_machine = build_bart_machine(X, y, num_trees = 1, num_burn_in = 2000, run_in_sample = FALSE, verbose = FALSE)
 	#do var selection with bart
-	bart_variables_select_obj = var_selection_by_permute_response_three_methods(bart_machine, plot = FALSE)
+	bart_variables_select_obj = var_selection_by_permute_response_three_methods(bart_machine, plot = FALSE, num_permute_samples = 5)
 	bart_ptwise_vars = sort(as.numeric(bart_variables_select_obj$important_vars_pointwise))
 	bart_simul_max_vars = sort(as.numeric(bart_variables_select_obj$important_vars_simul_max))
 	bart_simul_se_vars = sort(as.numeric(bart_variables_select_obj$important_vars_simul_se))	
 	#do var selection with a CV-min-RMSE
-	bart_cv_vars = var_selection_by_permute_response_cv(bart_machine)$important_vars_cv
+	bart_cv_vars = var_selection_by_permute_response_cv(bart_machine, num_permute_samples = 5)$important_vars_cv
 	destroy_bart_machine(bart_machine)
 	
 	
@@ -119,12 +119,12 @@ for (nr in 1 : num_replicates){
 			run_in_sample = FALSE, 
 			verbose = FALSE)
 	#do var selection with bart
-	bart_variables_select_obj = var_selection_by_permute_response_three_methods(bart_machine, plot = FALSE)
+	bart_variables_select_obj = var_selection_by_permute_response_three_methods(bart_machine, plot = FALSE, num_permute_samples = 5)
 	bart_ptwise_vars_prior = sort(as.numeric(bart_variables_select_obj$important_vars_pointwise))
 	bart_simul_max_vars_prior = sort(as.numeric(bart_variables_select_obj$important_vars_simul_max))
 	bart_simul_se_vars_prior = sort(as.numeric(bart_variables_select_obj$important_vars_simul_se))	
 	#do var selection with a CV-min-RMSE
-	bart_cv_vars_prior = var_selection_by_permute_response_cv(bart_machine)$important_vars_cv
+	bart_cv_vars_prior = var_selection_by_permute_response_cv(bart_machine, num_permute_samples = 5)$important_vars_cv
 	destroy_bart_machine(bart_machine)
 	
 	#do var selection with stepwise
