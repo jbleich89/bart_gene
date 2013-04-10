@@ -184,7 +184,7 @@ for (nr in 1 : num_replicates){
 	obj = calc_prec_rec(true_vars, rf_simul_vars)
 	rep_results[14, , nr] = c(obj$precision, obj$recall)
  
-	
+		
 }
 
 results = matrix(0, nrow = 14, ncol = 2)
