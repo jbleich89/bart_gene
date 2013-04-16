@@ -47,7 +47,7 @@ calc_prec_rec = function(true_vars, regression_vars){
 num_replicates = 25
 n = 250
 ps = c(25, 100, 200, 500, 1000)
-sigsqs = c(1, 625)
+sigsqs = c(1, 100, 625)
 
 rf_alpha = .05
 
