@@ -64,27 +64,25 @@ for (p in ps){
 
 ps = c(20, 100, 200, 500, 1000)
 po_props = c(0.01, 0.05, 0.1, 0.2)
-sigsqs = c(0.1, 0.5, 1, 5)
+sigsqs = c(1, 5, 20)
 
 graphics.off()
 par(mfrow = c(2, 2))
 graph_counter = 0
+master_iter = 0
 for (p in ps){
 	for (po_prop in po_props){
 		p0 = ceiling(p * po_prop)
 		
 		results = array(NA, length(sigsqs) * num_models + spacing * (length(sigsqs) - 1))
-		names(results)[seq(from = 6, to = length(sigsqs) * num_models + spacing * (length(sigsqs) - 1), by = 12)] = sigsqs
+		names(results)[seq(from = 7, to = length(sigsqs) * num_models + spacing * (length(sigsqs) - 1), by = length(model_colors) + spacing)] = sigsqs
 		iter = 1
 		for (sigsq in sigsqs){
-			X = read.csv(paste("var_sel_sim_linear_p", p, "_p0_", p0, "_sigsq_", sigsq, ".csv", sep = ""))
-			X2 = read.csv(paste("rf_var_sel_sim_linear_p", p, "_p0_", p0, "_sigsq_", sigsq, ".csv", sep = ""))
-#			print(X[,4])
+			master_iter = master_iter + 1
+			print(master_iter)
+			if (master_iter %in% c(24, 32, 44, 54)){next}
+			X = read.csv(paste("full_var_sel_sim_linear_p", p, "_p0_", p0, "_sigsq_", sigsq, ".csv", sep = ""))
 			F1_results = X[, 4]
-			rf_ptwise = X2[8, 4]
-			rf_simul = X2[9, 4]
-			rf_cv = X2[10, 4]
-			F1_results = c(F1_results[1:7], rf_cv, rf_ptwise, rf_simul)
 			results[iter : (iter + num_models - 1)] = F1_results
 			iter = iter + num_models + spacing
 		}
