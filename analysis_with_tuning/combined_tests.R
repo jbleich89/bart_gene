@@ -75,10 +75,7 @@ test_all_methods_for_gene = function(gene_num){
   rmse_mat[ , "Lasso-CV"] = sqrt(sum((lasso_cv_predict - y_test) ^ 2) / length(y_test))
   num_vars_vec[ , "Lasso-CV"] = lasso_cv_fit$nzero[which(lasso_cv_fit$lambda == lasso_cv_fit$lambda.1se)] ##change to lambda.min
   
-  ##RF
-  rf_fit = randomForest(x=X, y=y)
-  rf_predict = predict(rf_fit , newdata = tf_test)
-  rmse_mat[ , "RF"] = sqrt(sum((rf_predict - y_test) ^ 2) / length(y_test))
+ 
   
   
   ##Need original training data now for Lasso and BART
@@ -86,6 +83,42 @@ test_all_methods_for_gene = function(gene_num){
   y_cv = gene_cv[, gene_num]
   y_test = gene_test[, gene_num]
   
+  ##Train RF
+  ntree = 500
+  p = ncol(tf_train)
+  rf = randomForest(x = tf_train , y = y_train, ntree = 500 ,importance = T)
+  rf_zscore = importance(rf, type=1 ,scale=T)
+  rf_point_vars = which(rf_zscore > qnorm(1 - rf_alpha))
+  rf_simul_vars = which(rf_zscore > qnorm(1 - rf_alpha / p))
+  ##CV RF
+  if (length(rf_point_vars) == 0){
+    point_err= sum((y_cv - mean(y_train))^2)
+  } else {
+    rf_pointwise = randomForest(x = as.matrix(tf_train[, rf_point_vars]), y = y_train, ntree = ntree)
+    y_hat = predict(rf_pointwise, newdata = tf_cv)
+    point_err = sum((y_cv - y_hat)^2)
+  }
+  if (length(rf_simul_vars) == 0){
+    simul_err = sum((y_cv - mean(y_train))^2)
+  } else {
+    rf_simul = randomForest(x = as.matrix(tf_train[, rf_simul_vars]), y = y_train, ntree = ntree)
+    y_hat = predict(rf_simul, newdata = tf_cv)
+    simul_err = sum((y_cv - y_hat)^2)
+  }
+}
+
+##Get RMSE on test and number of vars-Test
+  fin_vars = ifelse(simul_err < point_err, rf_simul_vars, rf_point_vars)
+  if(length(fin_vars) == 0 ){
+    rmse_mat[,"RF"] = sqrt(sum((y_test-mean(y_train))^2)/length(y_test))
+    num_vars_vec[,"RF"] = 0
+  } else{
+    fin_rf_obj = ifelse(simul_err < point_err, rf_simul, rf_point)
+    yhat_rf = predict(fin_rf_obj, newdata = tf_test)
+    rmse_mat[,"RF"] = sqrt(sum((y_test-yhat_rf)^2)/length(y_test))
+    num_vars_vec[,"RF"] = length(fin_vars)
+  }
+
   
   
   ##Lasso
