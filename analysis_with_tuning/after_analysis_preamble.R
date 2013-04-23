@@ -16,4 +16,4 @@ load("all_results.RData")
 load("all_validations.RData")
 
 
-MAX_GENE_NUM = 4000
+MAX_GENE_NUM = 6026
