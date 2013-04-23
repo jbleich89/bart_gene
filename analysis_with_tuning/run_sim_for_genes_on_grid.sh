@@ -2,7 +2,7 @@
 
 #$ -j y
 #$ -N tf_discovery_for_gene_expression
-#$ -t 1-6026
+#$ -t 4140-6026
 #$ -q intel
 
 echo "starting R for gene # $SGE_TASK_ID"
