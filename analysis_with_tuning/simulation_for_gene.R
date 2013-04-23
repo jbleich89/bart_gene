@@ -41,7 +41,7 @@ find_important_tfs_for_gene_via_null_bart_sampling = function(gene, c_param, m_p
 	y = gene_train[, gene]
 	#run BART many times and average the importances
 	cat("get_averaged_true_var_props\n")
-	var_props_avg = get_averaged_true_var_props(tf_train, y, cov_prior_vec, m_param)
+	var_props_avg = get_averaged_true_var_props(data.frame(tf_train), y, cov_prior_vec, m_param)
 #	barplot(var_props_avg, names = names(var_props_avg), las = 2, main = paste("important tfs for gene", gene, "m =", m, "c =", c_param))
 	
 	#do the null permute sampling over many cores
@@ -85,7 +85,7 @@ find_important_tfs_for_gene_via_null_bart_sampling = function(gene, c_param, m_p
 	gene_result_c_m_methods_alphas
 }
 
-get_averaged_true_var_props = function(bart_machine, m){
+get_averaged_true_var_props = function(X, y, cov_prior_vec, m){
 	var_props = rep(0, ncol(X))
 	for (i in 1 : NUM_REP_FOR_TRAIN){
 		bart_machine = build_bart_machine(X, y, 
