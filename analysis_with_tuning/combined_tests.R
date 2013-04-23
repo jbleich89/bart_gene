@@ -39,6 +39,8 @@ if (NOT_ON_GRID){
 
 source("r_scripts/bart_package.R")
 
+RF_ALPHA = 0.05
+
 
 ##OLS component
 test_all_methods_for_gene = function(gene_num){
@@ -86,13 +88,14 @@ test_all_methods_for_gene = function(gene_num){
   ##Train RF
   ntree = 500
   p = ncol(tf_train)
-  rf = randomForest(x = tf_train , y = y_train, ntree = 500 ,importance = T)
-  rf_zscore = importance(rf, type=1 ,scale=T)
-  rf_point_vars = which(rf_zscore > qnorm(1 - rf_alpha))
-  rf_simul_vars = which(rf_zscore > qnorm(1 - rf_alpha / p))
+  rf = randomForest(x = tf_train , y = y_train, ntree = 500 ,importance = TRUE)
+  rf_zscore = importance(rf, type = 1 ,scale = TRUE)
+  rf_point_vars = which(rf_zscore > qnorm(1 - RF_ALPHA))
+  rf_simul_vars = which(rf_zscore > qnorm(1 - RF_ALPHA / p))
+  
   ##CV RF
   if (length(rf_point_vars) == 0){
-    point_err= sum((y_cv - mean(y_train))^2)
+    point_err = sum((y_cv - mean(y_train))^2)
   } else {
     rf_pointwise = randomForest(x = as.matrix(tf_train[, rf_point_vars]), y = y_train, ntree = ntree)
     y_hat = predict(rf_pointwise, newdata = tf_cv)
@@ -105,15 +108,23 @@ test_all_methods_for_gene = function(gene_num){
     y_hat = predict(rf_simul, newdata = tf_cv)
     simul_err = sum((y_cv - y_hat)^2)
   }
-}
 
-##Get RMSE on test and number of vars-Test
-  fin_vars = ifelse(simul_err < point_err, rf_simul_vars, rf_point_vars)
+
+  ##Get RMSE on test and number of vars-Test
+  if(simul_err < point_err){
+	  fin_vars = rf_simul_vars
+  } else {
+	  fin_vars = rf_point_vars 
+  }
   if(length(fin_vars) == 0 ){
     rmse_mat[,"RF"] = sqrt(sum((y_test-mean(y_train))^2)/length(y_test))
     num_vars_vec[,"RF"] = 0
   } else{
-    fin_rf_obj = ifelse(simul_err < point_err, rf_simul, rf_point)
+	if (simul_err < point_err){
+		fin_rf_obj = rf_simul
+	} else {
+		fin_rf_obj = rf_pointwise
+	}
     yhat_rf = predict(fin_rf_obj, newdata = tf_test)
     rmse_mat[,"RF"] = sqrt(sum((y_test-yhat_rf)^2)/length(y_test))
     num_vars_vec[,"RF"] = length(fin_vars)
