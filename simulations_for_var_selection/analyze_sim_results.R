@@ -109,4 +109,72 @@ for (p in ps){
 }
 
 
-setwd("C:/Users/Kapelner/Desktop/Dropbox/BART_gene/writeup_4_23_13")
+####FINAL PUB PLOTS
+
+make_lin_plot = function(p, p0, sigsq){
+	par(mar = c(3,4,1,0))
+	
+	X = read.csv(paste("complete_var_sel_sim_linear_p", p, "_p0_", p0, "_sigsq_", sigsq, ".csv", sep = ""))
+	F1s = X[c(1, 13,15,16), 4]
+	barplot(F1s, 
+#		xlab = "method", 
+			ylab = "F-score of avg", 
+			ylim = c(0, 1),
+			names = c("BART-CV", "Stepwise", "Lasso", "RF-CV"),
+#		main = paste("Linear F scores by sigsq and method, p =", p, "and p0 =", p0),
+			col = model_colors[c(1, 13,15,16)])
+}
+
+make_lin_plot(200, 2, 5)
+make_lin_plot(200, 2, 20)
+make_lin_plot(200, 20, 5)
+make_lin_plot(200, 20, 20)
+
+
+make_nonlin_plot = function(p, sigsq){
+	par(mar = c(3,4,1,0))
+	
+	X = read.csv(paste("complete_var_sel_sim_friedman_p", p, "_sigsq_", sigsq, ".csv", sep = ""))
+	F1s = X[c(1, 13,15,16), 4]
+	barplot(F1s, 
+#		xlab = "method", 
+			ylab = "F-score of avg", 
+			ylim = c(0, 1),
+			names = c("BART-CV", "Stepwise", "Lasso", "RF-CV"),
+#		main = paste("Linear F scores by sigsq and method, p =", p, "and p0 =", p0),
+			col = model_colors[c(1, 13,15,16)])
+}
+
+make_nonlin_plot(200, 100)
+make_nonlin_plot(200, 625)
+make_nonlin_plot(500, 100)
+make_nonlin_plot(500, 625)
+make_nonlin_plot(1000, 100)
+make_nonlin_plot(1000, 625)
+
+make_lin_prior_plot = function(p, p0, sigsq){
+	par(mar = c(3,4,1,0))
+	
+	X = read.csv(paste("complete_var_sel_sim_linear_p", p, "_p0_", p0, "_sigsq_", sigsq, ".csv", sep = ""))
+	F1s = X[c(1, 5, 9), 4]
+	barplot(F1s, 
+#		xlab = "method", 
+			ylab = "F-score of avg", 
+			ylim = c(0, 1),
+			names = c("No Prior", "Good Prior", "Bad Prior"),
+#		main = paste("Linear F scores by sigsq and method, p =", p, "and p0 =", p0),
+			col = model_colors[c(1, 5, 9)])
+}
+
+make_lin_prior_plot(200, 2, 5)
+make_lin_prior_plot(200, 2, 20)
+make_lin_prior_plot(200, 20, 5)
+make_lin_prior_plot(200, 20, 20)
+
+
+
+
+
+
+
+setwd("C:/Users/Kapelner/Desktop/Dropbox/BART_gene/")
