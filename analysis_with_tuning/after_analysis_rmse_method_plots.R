@@ -1,11 +1,24 @@
 
-rmses = array(NA, c(length(cs), length(METHODS), MAX_GENE_NUM))
 
-gene_num_list = c(1 : MAX_GENE_NUM)
+
+gene_names2 = gene_names[-c(4124, 4127, 4130, 4133, 4135, 4136, 4137, 4138, 4139)]
+rmses = array(NA, c(length(cs), length(METHODS), length(gene_names2)))
+
+
 for (i in 1 : length(cs)){	
 	c_param = as.character(cs[i])
 	for (j in 1 : length(METHODS)){
-		rmses[i, j, ] = sapply(gene_num_list, function(s){all_validations[[s]][[c_param]][["20"]][["0.05"]][[METHODS[j]]]})
+		cat("c_param", c_param, "method", METHODS[j], "\n")
+		rmse_vec = sapply(gene_names2, function(s){
+#					cat("s", s, "c_param", c_param, "method", METHODS[j], "\n")
+					all_validations[[s]][[c_param]][["20"]][["0.05"]][[METHODS[j]]]})
+		if (class(rmse_vec) == "numeric"){
+			rmses[i, j, ] = rmse_vec
+		} 
+		else {
+			rmses[i, j, ] = as.matrix(rmse_vec)
+		}
+		
 	}
 }
 
@@ -17,9 +30,9 @@ for (c_param in cs){
 }
 
 ##create ybar control
-control_rmses = numeric(length(gene_num_list))
-for (j in 1 : length(gene_num_list)){
-	gene = gene_num_list[j]
+control_rmses = numeric(length(gene_names2))
+for (j in 1 : length(gene_names2)){
+	gene = gene_names2[j]
 	ybar = mean(gene_train[ , gene ])
 	yvec = gene_cv[ , gene]
 	control_rmses[j] = sqrt(sum((yvec - ybar) ^ 2) / length(yvec)) 

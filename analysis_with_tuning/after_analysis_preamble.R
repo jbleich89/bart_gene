@@ -14,6 +14,8 @@ source("simulation_params.R")
 setwd("C:/Users/Kapelner/Desktop/Dropbox/BART_gene")
 load("all_results.RData")
 load("all_validations.RData")
+load("all_rmse_results.RData")
+load("all_num_var_results.RData")
 
 
 MAX_GENE_NUM = 6026

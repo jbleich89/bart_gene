@@ -15,6 +15,9 @@ rownames(all_num_var_results) = 1 : MAX_GENE_NUM
 
 
 for (g in 1 : MAX_GENE_NUM){
+	if (g %in% c(4124, 4127, 4130, 4133, 4135, 4136, 4137, 4138, 4139, 6026)){
+		next
+	}
 	load(file = paste("rmse_results_", g, ".RData", sep = ""))
 	load(file = paste("num_var_results_", g, ".RData", sep = ""))
 	all_rmse_results[g, ] = rmse_results
@@ -43,11 +46,53 @@ sum((all_rmse_results[, "BART-Best"] - all_rmse_results[, "Lasso"]) / all_rmse_r
 sum(all_rmse_results[, "BART-Best"] < all_rmse_results[, "Lasso"])
 
 #oos rmses for all methods
-boxplot(all_rmse_results, ylim = c(0, 1.1), ylab = "out-of-sample RMSE", main = "Out-of-Sample RMSE by Method")
-points(apply(all_rmse_results, 2, mean), pch = "-", col = "blue", cex = 5)
-abline(a = mean(all_rmse_results[, 1]), b = 0, col = "red")
+all_rmse_results_wanted = all_rmse_results[, c("Null", "OLS", "OLS-BART-Best", "Stepwise", "Lasso", "RF", "BART-Best", "BART-S.Max", "BART-Full")]
+save(all_rmse_results_wanted, file = "all_rmse_results_wanted.RData")
+boxplot(all_rmse_results_wanted, ylim = c(0, 1.1), ylab = "out-of-sample RMSE", main = "Out-of-Sample RMSE by Method")
+points(apply(all_rmse_results_wanted, 2, mean), pch = "-", col = "blue", cex = 5)
+abline(a = mean(all_rmse_results_wanted[, 1], na.rm = TRUE), b = 0, col = "red")
 
 all_num_var_results_no_na = t(sapply(1 : nrow(all_num_var_results), function(i){ifelse(is.na(all_num_var_results[i, ]), 39, all_num_var_results[i, ])}))
 
-boxplot(all_num_var_results_no_na, ylab = "Num TF's Selected", main = "Num TF's Selected by Method")
-points(apply(all_num_var_results_no_na, 2, mean), pch = "-", col = "blue", cex = 5)
+all_num_var_results_no_na_wanted = all_num_var_results_no_na[, c("Null", "OLS", "OLS-BART-Best", "Stepwise", "Lasso", "RF", "BART-Best", "BART-S.Max", "BART-Full")]
+save(all_num_var_results_no_na_wanted, file = "all_num_var_results_no_na_wanted.RData")
+
+boxplot(all_num_var_results_no_na_wanted, ylab = "Num TF's Selected", main = "Num TF's Selected by Method")
+points(apply(all_num_var_results_no_na_wanted, 2, mean), pch = "-", col = "blue", cex = 5)
+
+
+
+
+##### rmse per num vars
+
+all_rmse_per_num_var = all_rmse_results / all_num_var_results_no_na
+for (i in 1 : nrow(all_rmse_results)){
+	all_rmse_per_num_var[i, ] = ifelse(is.infinite(all_rmse_per_num_var[i, ]), NA, all_rmse_per_num_var[i, ])
+}
+
+
+all_rmse_per_num_var_wanted = all_rmse_per_num_var[, c("Null", "OLS", "OLS-BART-Best", "Stepwise", "Lasso", "RF", "BART-Best", "BART-S.Max", "BART-Full")]
+save(all_rmse_per_num_var_wanted, file = "all_rmse_per_num_var_wanted.RData")
+
+boxplot(all_rmse_per_num_var_wanted, ylab = "RMSE / variable", main = "Out-of-Sample RMSE per TF by Method\nConditional on Finding At Least One Variable", ylim = c(0, 0.5))
+points(apply(all_rmse_per_num_var_wanted, 2, mean, na.rm = TRUE), pch = "-", col = "blue", cex = 5)
+abline(a = mean(all_rmse_per_num_var_wanted[, 1], na.rm = TRUE), b = 0, col = "red")
+
+
+
+all_rmse_minus_null_per_num_var = (matrix(rep(all_rmse_results[, 1], ncol(all_rmse_results)), ncol = ncol(all_rmse_results)) - all_rmse_results) / all_num_var_results_no_na
+
+for (i in 1 : nrow(all_rmse_results)){
+	all_rmse_minus_null_per_num_var[i, ] = ifelse(is.infinite(all_rmse_minus_null_per_num_var[i, ]), NA, all_rmse_minus_null_per_num_var[i, ])
+}
+#
+
+all_rmse_minus_null_per_num_var_wanted = all_rmse_minus_null_per_num_var[, c("Null", "OLS", "OLS-BART-Best", "Stepwise", "Lasso", "RF", "BART-Best", "BART-S.Max", "BART-Full")]
+
+
+boxplot(all_rmse_minus_null_per_num_var_wanted, 
+		ylab = "Out-of-Sample Null RMSE minus method RMSE ", 
+		main = "Out-of-Sample RMSE improvement over Null Model by Method",
+		ylim = c(-0.1, 0.125))
+points(apply(all_rmse_minus_null_per_num_var_wanted, 2, mean, na.rm = TRUE), pch = "-", col = "blue", cex = 5)
+abline(a = 0, b = 0, col = "red")

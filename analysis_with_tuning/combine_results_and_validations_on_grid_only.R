@@ -21,6 +21,9 @@ all_results = list()
 all_validations = list()
 
 for (gene_num in 1 : MAX_GENE_NUM){
+	if (gene_num == 4138){
+		next
+	}
 	#get the results first
 	load(paste("gene_results_", gene_num, ".RData", sep = ""))
 	gene_name = names(results)[1]
