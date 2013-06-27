@@ -92,7 +92,7 @@ points(apply(all_num_var_results_no_na_wanted, 2, mean), pch = "-", col = "blue"
 ##Reduction per var 
 all_rmse_minus_null_per_num_var = (matrix(rep(all_rmse_results_wanted[, 1], ncol(all_rmse_results_wanted)), ncol = ncol(all_rmse_results_wanted)) - all_rmse_results_wanted) / all_num_var_results_no_na_wanted
 
-for (i in 1 : nrow(all_rmse_results)){
+for (i in 1 : nrow(all_rmse_results_wanted)){
 	all_rmse_minus_null_per_num_var[i, ] = ifelse(is.infinite(all_rmse_minus_null_per_num_var[i, ]), NA, all_rmse_minus_null_per_num_var[i, ])
 }
 #
@@ -101,13 +101,15 @@ all_rmse_minus_null_per_num_var_wanted = all_rmse_minus_null_per_num_var[, c("OL
 
 par(mgp=c(1.8,.5,0),mar=c(3,3,2,1))
 boxplot(all_rmse_minus_null_per_num_var_wanted, 
-		ylab = "RMSE Reduction per Variable ", 
+		ylab = "RMSE Reduction per TF", 
 		ylim = c(-.05, 0.2), outline = F)
 points(apply(all_rmse_minus_null_per_num_var_wanted, 2, mean, na.rm = TRUE), pch = "-", col = "blue", cex = 5)
 abline(a = 0, b = 0, col = "red")
 
+counts = apply(all_num_var_results_no_na_wanted, 2, function(s) sum(s>0))
+counts
 
-
+##############################################################3
 ##### rmse per num vars- old
 
 all_rmse_per_num_var = all_rmse_results / all_num_var_results_no_na
