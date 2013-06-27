@@ -110,19 +110,32 @@ for (p in ps){
 
 
 ####FINAL PUB PLOTS
+setwd("C:/Users/jbleich/Desktop/Dropbox/BART_gene/sim_results/") ##for justin
+
+CEX_SIZE=2.75
+CEX_SIZE_2 = 2
+METHOD_NAMES = c("BART-\nBest", "BART-\nLocal", "BART-\nG.Max","BART-\nG.SE", "Step-\nwise", "Lasso\n", "RF-\nCV")
 
 make_lin_plot = function(p, p0, sigsq){
-	par(mar = c(3,4,1,0))
-	
+	par(mar = c(6.5,5.5,2,0))
+	par(mgp=c(4,5,0))		
+
 	X = read.csv(paste("complete_var_sel_sim_linear_p", p, "_p0_", p0, "_sigsq_", sigsq, ".csv", sep = ""))
-	F1s = X[c(1, 13,15,16), 4]
+	F1s = X[c(1,2,3,4, 13,15,16), 4]
 	barplot(F1s, 
-#		xlab = "method", 
-			ylab = "F-score of avg", 
-			ylim = c(0, 1),
-			names = c("BART-CV", "Stepwise", "Lasso", "RF-CV"),
+#		xlab = "Method", 
+#		ylab = "F-Score", 
+		ylim = c(0, 1),
+     		cex.names = CEX_SIZE,
+		names = METHOD_NAMES,
+		yaxt="n",
 #		main = paste("Linear F scores by sigsq and method, p =", p, "and p0 =", p0),
-			col = model_colors[c(1, 13,15,16)])
+			col = model_colors[c(1,2,3,4, 13,15,16)])
+	
+#	axis(1, at = 1:6, labels = METHOD_NAMES, cex.axis = CEX_SIZE)
+	title(ylab="F-Score",mgp=c(3.5,1,0), cex.lab = CEX_SIZE)
+     axis(2, at= c(0,.2,.4,.6,.8,1), labels=c("0.0","0.2","0.4","0.6","0.8","1.0"),mgp=c(3,1,0),cex.axis=CEX_SIZE_2)
+	
 }
 
 make_lin_plot(200, 2, 5)
@@ -132,38 +145,54 @@ make_lin_plot(200, 20, 20)
 
 
 make_nonlin_plot = function(p, sigsq){
-	par(mar = c(3,4,1,0))
+	par(mar = c(6.5,5.5,2,0))
+	par(mgp=c(4,5,0))	
 	
 	X = read.csv(paste("complete_var_sel_sim_friedman_p", p, "_sigsq_", sigsq, ".csv", sep = ""))
-	F1s = X[c(1, 13,15,16), 4]
+	F1s = X[c(1,2,3,4, 13,15,16), 4]
 	barplot(F1s, 
-#		xlab = "method", 
-			ylab = "F-score of avg", 
-			ylim = c(0, 1),
-			names = c("BART-CV", "Stepwise", "Lasso", "RF-CV"),
+#		xlab = "Method", 
+#		ylab = "F-Score",
+		yaxt="n", 
+		ylim = c(0, 1),
+     		cex.names = CEX_SIZE,
+		names = METHOD_NAMES,
+		yaxt="n",
 #		main = paste("Linear F scores by sigsq and method, p =", p, "and p0 =", p0),
-			col = model_colors[c(1, 13,15,16)])
+			col = model_colors[c(1,2,3,4, 13,15,16)])
+	
+#	axis(1, at = 1:6, labels = METHOD_NAMES, cex.axis = CEX_SIZE)
+	title(ylab="F-Score",mgp=c(3.5,1,0), cex.lab = CEX_SIZE)
+     axis(2, at= c(0,.2,.4,.6,.8,1), labels=c("0.0","0.2","0.4","0.6","0.8","1.0"),mgp=c(3,1,0),cex.axis=CEX_SIZE_2)
+	
 }
 
-make_nonlin_plot(200, 100)
-make_nonlin_plot(200, 625)
+
+#make_nonlin_plot(200, 100)
+#make_nonlin_plot(200, 625)
 make_nonlin_plot(500, 100)
 make_nonlin_plot(500, 625)
 make_nonlin_plot(1000, 100)
 make_nonlin_plot(1000, 625)
 
 make_lin_prior_plot = function(p, p0, sigsq){
-	par(mar = c(3,4,1,0))
+	par(mar = c(6.5,5.5,2,0))
+	par(mgp=c(4,5,0))	
 	
 	X = read.csv(paste("complete_var_sel_sim_linear_p", p, "_p0_", p0, "_sigsq_", sigsq, ".csv", sep = ""))
 	F1s = X[c(1, 5, 9), 4]
 	barplot(F1s, 
 #		xlab = "method", 
-			ylab = "F-score of avg", 
+#			ylab = "F-Score", 
+			yaxt="n",
 			ylim = c(0, 1),
-			names = c("No Prior", "Good Prior", "Bad Prior"),
+			names = c("Uniform\nPrior", "Correct\nPrior", "Incorrect\nPrior"),
+			cex.names = CEX_SIZE,
 #		main = paste("Linear F scores by sigsq and method, p =", p, "and p0 =", p0),
 			col = model_colors[c(1, 5, 9)])
+
+	title(ylab="F-Score",mgp=c(3.5,1,0), cex.lab = CEX_SIZE)
+     	axis(2, at= c(0,.2,.4,.6,.8,1), labels=c("0.0","0.2","0.4","0.6","0.8","1.0"),mgp=c(3,1,0),cex.axis=CEX_SIZE_2)
 }
 
 make_lin_prior_plot(200, 2, 5)

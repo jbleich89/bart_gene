@@ -32,6 +32,7 @@ source("~/Research_Genomics/bart_gene/helper_functions.R")
 # 	setwd("../shane_data")
 # }
 
+setwd("~/Research_Genomics/")
 priors = read.table("CHIP.priorprobs.39.txt", header = TRUE)
 gene.exp = read.table("expression.genes.txt", header = TRUE)
 tf.exp = read.table("expression.tfs.39.txt", header = TRUE)

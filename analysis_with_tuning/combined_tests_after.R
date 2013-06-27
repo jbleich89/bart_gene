@@ -37,6 +37,21 @@ save(all_num_var_results, file = paste("all_num_var_results.RData", sep = ""))
 
 #########load results into R at this point ON THE LOCAL MACHINE
 
+load(file="C:/Users/jbleich/Desktop/Dropbox/BART_gene/all_rmse_results_wanted.RData")
+load(file="C:/Users/jbleich/Desktop/Dropbox/BART_gene/all_num_var_results_no_na_wanted.RData")
+load(file="C:/Users/jbleich/Desktop/Dropbox/BART_gene/all_rmse_per_num_var_wanted.RData")
+
+##Change some colnames
+colnames(all_num_var_results_no_na_wanted)[8]="BART-G.Max"
+colnames(all_rmse_per_num_var_wanted)[8]="BART-G.Max"
+colnames(all_rmse_results_wanted)[8]="BART-G.Max"
+
+rm = which(all_num_var_results_no_na_wanted[,1]==39)
+all_num_var_results_no_na_wanted = all_num_var_results_no_na_wanted[-rm,]
+all_rmse_per_num_var_wanted = all_rmse_per_num_var_wanted[-rm,]
+all_rmse_results_wanted = all_rmse_results_wanted[-rm,]
+
+
 #lasso is worse
 sum((all_rmse_results[, "Lasso"] - all_rmse_results[, "BART-Best"]) / all_rmse_results[, "BART-Best"] > 0.05)
 #bart is worse
@@ -49,15 +64,17 @@ sum(all_rmse_results[, "BART-Best"] < all_rmse_results[, "Lasso"])
 all_rmse_results_wanted = all_rmse_results[, c("Null", "OLS", "OLS-BART-Best", "Stepwise", "Lasso", "RF", "BART-Best", "BART-S.Max", "BART-Full")]
 save(all_rmse_results_wanted, file = "all_rmse_results_wanted.RData")
 boxplot(all_rmse_results_wanted, ylim = c(0, 1.1), ylab = "out-of-sample RMSE", main = "Out-of-Sample RMSE by Method")
-points(apply(all_rmse_results_wanted, 2, mean), pch = "-", col = "blue", cex = 5)
+points(apply(all_rmse_results_wanted, 2, mean, na.rm=T), pch = "-", col = "blue", cex = 5)
 abline(a = mean(all_rmse_results_wanted[, 1], na.rm = TRUE), b = 0, col = "red")
 
 all_num_var_results_no_na = t(sapply(1 : nrow(all_num_var_results), function(i){ifelse(is.na(all_num_var_results[i, ]), 39, all_num_var_results[i, ])}))
 
-all_num_var_results_no_na_wanted = all_num_var_results_no_na[, c("Null", "OLS", "OLS-BART-Best", "Stepwise", "Lasso", "RF", "BART-Best", "BART-S.Max", "BART-Full")]
+all_num_var_results_no_na_wanted = all_num_var_results_no_na[, c("Null", "OLS", "OLS-BART-Best", "Stepwise", "Lasso", "RF", "BART-Best", "BART-G.Max", "BART-Full")]
 save(all_num_var_results_no_na_wanted, file = "all_num_var_results_no_na_wanted.RData")
 
-boxplot(all_num_var_results_no_na_wanted, ylab = "Num TF's Selected", main = "Num TF's Selected by Method")
+
+colnames(all_num_var_results_no_na_wanted)
+boxplot(all_num_var_results_no_na_wanted, ylab = "Num TF's Selected", main = "Num TF's Selected by Method",las =2)
 points(apply(all_num_var_results_no_na_wanted, 2, mean), pch = "-", col = "blue", cex = 5)
 
 
