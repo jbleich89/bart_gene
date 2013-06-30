@@ -109,6 +109,7 @@ abline(a = 0, b = 0, col = "red")
 counts = apply(all_num_var_results_no_na_wanted, 2, function(s) sum(s>0))
 counts
 
+
 ##############################################################3
 ##### rmse per num vars- old
 

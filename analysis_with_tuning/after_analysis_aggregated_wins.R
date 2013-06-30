@@ -46,3 +46,10 @@ for (gene_num in 1 : length(all_results)){
 }
 aggregated_wins
 sum(aggregated_wins)
+
+##sum aggregated wins
+
+##prior stuff 
+library(xtable)
+x = aggregated_wins[,1,] + aggregated_wins[,2,]+ aggregated_wins[,3,]
+xtable(prop.table(as.table(x)))
