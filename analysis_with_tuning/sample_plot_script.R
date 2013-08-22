@@ -154,7 +154,7 @@ chisq.test(sum_var_counts_by_col, p = rep(.025, p))
 total_count
 
 colMeans(svd_mat)
-hist(colMeans(svd_mat))
+hist(colMeans(svd_mat))d
 ###could be non-linear correlation
 rmultinom
 
