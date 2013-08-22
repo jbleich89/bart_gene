@@ -108,20 +108,38 @@ for(i in 1 : NUM_DATA){
 save(probs_mat, file = "null_probs_matrix.Rdata")
 save(corrs_mat, file = "null_corrs_matrix.Rdata")
 
-var_idx = 3:42
+var_idx = 3 : 42
 
+#load items
+load("C:/Users/jbleich/Desktop/Dropbox/BART_gene/null_corrs_matrix.Rdata")
+load("C:/Users/jbleich/Desktop/Dropbox/BART_gene/null_probs_matrix.Rdata")
+par(mgp=c(1.8,.5,0), mar=c(3.5,3.5,2,1)) 
 ##within data set variation
-sd_by_dataset = sapply(var_idx, function(s) tapply(probs_mat[,s], probs_mat[,1] ,sd))
-hist(apply(sd_by_dataset, 2, mean), breaks = 50, col = "grey" ) ## avg sd across datasets for each of the genes
-hist(c(sd_by_dataset), breaks = 50, col = "grey")
+
+sd_by_dataset = sapply(var_idx, function(s) tapply(probs_mat[,s], probs_mat[, 1] ,sd))
+hist(apply(sd_by_dataset, 2, mean), breaks = 50, col = "grey", xlab =  "Average SD of Variable Inclusion Proportion", main ="" ) ## avg sd across datasets for each of the genes
+hist(c(sd_by_dataset), breaks = 50, col = "grey", xlab = "SD of Variable Inclusion Proportion", main = "")
 
 ##across data set variation
-sd_by_bart = sapply(var_idx, function(s) tapply(probs_mat[,s], probs_mat[,2] ,sd))
-hist(apply(sd_by_bart, 2, mean), breaks = 50, col = "grey" ) ## avg sd across datasets for each of the genes
-hist(c(sd_by_bart), breaks = 50, col = "grey")
+sd_by_bart = sapply(var_idx, function(s) tapply(probs_mat[,s], probs_mat[, 2] ,sd))
+hist(apply(sd_by_bart, 2, mean), breaks = 50, col = "grey", xlab = "Average SD of Variable Inclusion Proportion", main ="" ) ## avg sd across datasets for each of the genes
+hist(c(sd_by_bart), breaks = 50, col = "grey",xlab = "SD of Variable Inclusion Proportion", main = "" )
+
+
+##histogram across data sets for 1 var
+#across data sets
+sample_var_over_data = tapply(probs_mat[,3], probs_mat[,1], mean)
+mean(sample_var_over_data)
+hist(sample_var_over_data, breaks = 25, col = "grey", xlab = "Average Variable Inclusion Proportion", main = "")
+#within data sets
+sd(sample_var_over_data)
+avg_in_bart_run = probs_mat[1 : 50, 3]
+hist(avg_in_bart_run)
+hist(avg_in_bart_run, breaks = 25, col = "grey", xlab = "Average Variable Inclusion Proportion", main = "")
 
 ##correlation stuff 
-avg_by_dataset = sapply(var_idx, function(s) tapply(probs_mat[,s], probs_mat[,1] ,mean))
+avg_by_dataset = sapply(var_idx, function(s) tapply(probs_mat[,s], probs_mat[, 1] ,mean))
+
 dim(avg_by_dataset)
 
 dim(corrs_mat)
@@ -142,21 +160,39 @@ nsim_svd = 1
 svd_mat = matrix(nrow = nsim_svd, ncol = p)
 
 for(j in 1 : nsim_svd){
-  bart_svd = build_bart_machine(X = ux, y = uy, num_trees = NTREE, num_burn_in = BURN_SIZE, num_iterations_after_burn_in = POST_SIZE, verbose = F, run_in_sample = F)
-  sum_var_counts = get_var_counts_over_chain(bart_svd)
+  bart_svd = build_bart_machine(X = ux, y = uy, num_trees = NTREE, num_burn_in = 1, num_iterations_after_burn_in = POST_SIZE, verbose = F, run_in_sample = F)
+#  sum_var_counts = get_var_counts_over_chain(bart_svd)
   avg_var_counts_by_col = colSums(var_counts)
   total_count = sum(sum_var_counts_by_col)
-  destroy_bart_machine(bart_svd)
+  svd_mat[j, ] = get_var_props_over_chain(bart_svd)
+  #destroy_bart_machine(bart_svd)
 }
 
-exp_count = rep(total_count/p, times = p)
-chisq.test(sum_var_counts_by_col, p = rep(.025, p))
-total_count
+
+counts = get_var_counts_over_chain(bart_svd)
+
+cums = apply(counts,2,cumsum)
+cum_props = cums/apply(cums,1,sum)
+dim(cum_props)
+ymax = max(cum_props[100 : POST_SIZE,])
+ymin = min(cum_props[10 : POST_SIZE,])
+ymax
+rain = rainbow(p)
+
+plot(1 : (POST_SIZE), cum_props[,1], type = "l", col = rain[1], ylim = c(ymin , ymax),
+     xlab = "Gibbs Sample", ylab = "Variable Inclusion Proportion")
+sapply(2 : p, function(s) points(1 : ( POST_SIZE) ,cum_props[,s], type = "l", col = rain[s]))
+abline(h = .025, col = "black", lwd = 3, lty = 2)
+
+#exp_count = rep(total_count/p, times = p)
+#chisq.test(sum_var_counts_by_col, p = rep(.025, p))
+#total_count
 
 colMeans(svd_mat)
-hist(colMeans(svd_mat))d
+hist(colMeans(svd_mat), col = "grey", main = "", breaks = 25, xlab = "Variable Inclusion Proportion")
+
 ###could be non-linear correlation
-rmultinom
+
 
 
 
