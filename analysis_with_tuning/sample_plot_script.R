@@ -114,16 +114,27 @@ var_idx = 3 : 42
 load("C:/Users/jbleich/Desktop/Dropbox/BART_gene/null_corrs_matrix.Rdata")
 load("C:/Users/jbleich/Desktop/Dropbox/BART_gene/null_probs_matrix.Rdata")
 par(mgp=c(1.8,.5,0), mar=c(3.5,3.5,2,1)) 
-##within data set variation
+##across data set variation
 
 sd_by_dataset = sapply(var_idx, function(s) tapply(probs_mat[,s], probs_mat[, 1] ,sd))
 hist(apply(sd_by_dataset, 2, mean), breaks = 50, col = "grey", xlab =  "Average SD of Variable Inclusion Proportion", main ="" ) ## avg sd across datasets for each of the genes
 hist(c(sd_by_dataset), breaks = 50, col = "grey", xlab = "SD of Variable Inclusion Proportion", main = "")
 
-##across data set variation
+mean_by_dataset = sapply(var_idx, function(s) tapply(probs_mat[,s], probs_mat[, 1] ,mean))
+#
+hist(mean_by_dataset, breaks = 50, col = "grey", xlab = "SD of Variable Inclusion Proportion", main = "")
+
+
+#overall mean
+hist(apply(probs_mat[,var_idx], 2, mean), breaks = 50, col = "grey", xlab =  "Average Variable Inclusion Proportion", main ="" ) 
+
+
+##within data set variation
 sd_by_bart = sapply(var_idx, function(s) tapply(probs_mat[,s], probs_mat[, 2] ,sd))
 hist(apply(sd_by_bart, 2, mean), breaks = 50, col = "grey", xlab = "Average SD of Variable Inclusion Proportion", main ="" ) ## avg sd across datasets for each of the genes
 hist(c(sd_by_bart), breaks = 50, col = "grey",xlab = "SD of Variable Inclusion Proportion", main = "" )
+
+
 
 
 ##histogram across data sets for 1 var
@@ -193,6 +204,8 @@ hist(colMeans(svd_mat), col = "grey", main = "", breaks = 25, xlab = "Variable I
 
 ###could be non-linear correlation
 
+
+##overall mean and SD
 
 
 
