@@ -141,6 +141,7 @@ hist(c(sd_by_bart), breaks = 50, col = "grey",xlab = "SD of Variable Inclusion P
 #Shane comment 3 - dual plot above
 ##first plot takes sd of numbers across data sets, second across bart runs
 ##need to stack. 
+par(mfrow = c(2,1))
 hist(c(sd_by_dataset), breaks = 50, col = "grey", xlab = "SD of Variable Inclusion Proportion", main = "", xlim= c(0,.0175)) ##across data set var
 hist(c(sd_by_bart), breaks = 50, col = "grey",xlab = "SD of Variable Inclusion Proportion", main = "",xlim= c(0,.0175 )) ##across bart var
      
@@ -148,6 +149,7 @@ hist(c(sd_by_bart), breaks = 50, col = "grey",xlab = "SD of Variable Inclusion P
 sd_k = apply(probs_mat[,3:42], 1, sd)
 hist(sd_k, breaks = 50, col = "grey", xlab = "SD of Variable Inclusion Proportions", main = "", xlim = c(0,.025))
 hist(c(sd_by_dataset), breaks = 50, col = "grey", xlab = "SD of Variable Inclusion Proportion", main = "", xlim= c(0,.025)) ##across data set var     
+par(mfrow = c(1,1))     
      
 ##histogram across data sets for 1 var
 #across data sets
@@ -156,7 +158,7 @@ mean(sample_var_over_data)
 hist(sample_var_over_data, breaks = 25, col = "grey", xlab = "Average Variable Inclusion Proportion", main = "")
 
 all_var_over_data = sapply(var_idx, function(s) tapply(probs_mat[,s], probs_mat[, 1] ,mean))  
-boxplot(all_var_over_data) ##Shane comment 1
+boxplot(all_var_over_data, ylab = "Variable Inclusion Proprtion", xlab ="Variable") ##Shane comment 1
      #within data sets
 sd(sample_var_over_data)
 avg_in_bart_run = probs_mat[1 : 50, 3]
@@ -164,7 +166,7 @@ hist(avg_in_bart_run)
 hist(avg_in_bart_run, breaks = 25, col = "grey", xlab = "Average Variable Inclusion Proportion", main = "")
 
 
-boxplot(probs_mat[1:50,3:42]) ##shane comment 1 - within single bart over 50 runs     
+boxplot(probs_mat[1:50,3:42], ylab = "Variable Inclusion Proprtion", xlab ="Variable") ##shane comment 1 - within single bart over 50 runs     
 
 #shane comment 2:
 s1_data = tapply(probs_mat[,3], probs_mat[,1], mean)
@@ -172,7 +174,8 @@ s2_data = tapply(probs_mat[,4], probs_mat[,1], mean)
 s1_bart = probs_mat[1:50,3]
 s2_bart = probs_mat[1:50,4]
 cols = c("red","blue","red","blue")
-boxplot(s1_data, s2_data, s1_bart, s2_bart, col = cols)      
+boxplot(s1_data, s2_data, s1_bart, s2_bart, col = cols,names= c("1","1","2","2"),
+        xlab = "Variable", ylab = "Variable Inclusion Proportion")      
      
 ##correlation stuff 
 avg_by_dataset = sapply(var_idx, function(s) tapply(probs_mat[,s], probs_mat[, 1] ,mean))
@@ -247,6 +250,7 @@ anova_data$X1 = as.factor(anova_data$X1)
 anova_data$X2 = as.factor(anova_data$X2)
 colnames(anova_data) = c("dataset","bart_run","inclusion_prop")
 str(anova_data)
-anova_mod = aov(inclusion_prop ~ dataset + bart_run,data = anova_data)
-(anova_data[1:150,])
+anova_mod = lm(inclusion_prop ~ dataset + bart_run,data = anova_data)
+summary(anova_mod)
+write.table(anova_data,file="anova_data.txt")
      
