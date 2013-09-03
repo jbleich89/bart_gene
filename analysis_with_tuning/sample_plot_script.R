@@ -108,14 +108,18 @@ for(i in 1 : NUM_DATA){
 save(probs_mat, file = "null_probs_matrix.Rdata")
 save(corrs_mat, file = "null_corrs_matrix.Rdata")
 
-var_idx = 3 : 42
+
 
 #load items
-load("C:/Users/jbleich/Desktop/Dropbox/BART_gene/null_corrs_matrix.Rdata")
+load("C:/Users/Justin/Dropbox/BART_gene/null_corrs_matrix.Rdata")
+load("C:/Users/Justin/Dropbox/BART_gene/null_probs_matrix.Rdata")
+load(paste("C:/Users/jbleich/Desktop/Dropbox/BART_gene/null_corrs_matrix.Rdata")
 load("C:/Users/jbleich/Desktop/Dropbox/BART_gene/null_probs_matrix.Rdata")
 par(mgp=c(1.8,.5,0), mar=c(3.5,3.5,2,1)) 
 ##across data set variation
 
+var_idx = 3 : 42
+     
 sd_by_dataset = sapply(var_idx, function(s) tapply(probs_mat[,s], probs_mat[, 1] ,sd))
 hist(apply(sd_by_dataset, 2, mean), breaks = 50, col = "grey", xlab =  "Average SD of Variable Inclusion Proportion", main ="" ) ## avg sd across datasets for each of the genes
 hist(c(sd_by_dataset), breaks = 50, col = "grey", xlab = "SD of Variable Inclusion Proportion", main = "")
@@ -134,26 +138,49 @@ sd_by_bart = sapply(var_idx, function(s) tapply(probs_mat[,s], probs_mat[, 2] ,s
 hist(apply(sd_by_bart, 2, mean), breaks = 50, col = "grey", xlab = "Average SD of Variable Inclusion Proportion", main ="" ) ## avg sd across datasets for each of the genes
 hist(c(sd_by_bart), breaks = 50, col = "grey",xlab = "SD of Variable Inclusion Proportion", main = "" )
 
-
-
-
+#Shane comment 3 - dual plot above
+##first plot takes sd of numbers across data sets, second across bart runs
+##need to stack. 
+hist(c(sd_by_dataset), breaks = 50, col = "grey", xlab = "SD of Variable Inclusion Proportion", main = "", xlim= c(0,.0175)) ##across data set var
+hist(c(sd_by_bart), breaks = 50, col = "grey",xlab = "SD of Variable Inclusion Proportion", main = "",xlim= c(0,.0175 )) ##across bart var
+     
+##shane comment 5:
+sd_k = apply(probs_mat[,3:42], 1, sd)
+hist(sd_k, breaks = 50, col = "grey", xlab = "SD of Variable Inclusion Proportions", main = "", xlim = c(0,.025))
+hist(c(sd_by_dataset), breaks = 50, col = "grey", xlab = "SD of Variable Inclusion Proportion", main = "", xlim= c(0,.025)) ##across data set var     
+     
 ##histogram across data sets for 1 var
 #across data sets
 sample_var_over_data = tapply(probs_mat[,3], probs_mat[,1], mean)
 mean(sample_var_over_data)
 hist(sample_var_over_data, breaks = 25, col = "grey", xlab = "Average Variable Inclusion Proportion", main = "")
-#within data sets
+
+all_var_over_data = sapply(var_idx, function(s) tapply(probs_mat[,s], probs_mat[, 1] ,mean))  
+boxplot(all_var_over_data) ##Shane comment 1
+     #within data sets
 sd(sample_var_over_data)
 avg_in_bart_run = probs_mat[1 : 50, 3]
 hist(avg_in_bart_run)
 hist(avg_in_bart_run, breaks = 25, col = "grey", xlab = "Average Variable Inclusion Proportion", main = "")
 
+
+boxplot(probs_mat[1:50,3:42]) ##shane comment 1 - within single bart over 50 runs     
+
+#shane comment 2:
+s1_data = tapply(probs_mat[,3], probs_mat[,1], mean)
+s2_data = tapply(probs_mat[,4], probs_mat[,1], mean)
+s1_bart = probs_mat[1:50,3]
+s2_bart = probs_mat[1:50,4]
+cols = c("red","blue","red","blue")
+boxplot(s1_data, s2_data, s1_bart, s2_bart, col = cols)      
+     
 ##correlation stuff 
 avg_by_dataset = sapply(var_idx, function(s) tapply(probs_mat[,s], probs_mat[, 1] ,mean))
 
 dim(avg_by_dataset)
 
 dim(corrs_mat)
+hist(corrs_mat, breaks = 40, col = "grey", xlab = "Correlations", main = "") ##Shane comment 7.
 var_corrs = sapply(1 : 40, function(s) cor(avg_by_dataset[,s], corrs_mat[,s]))
 var_corrs
 hist(var_corrs, breaks = 20, col = "grey")
@@ -205,9 +232,21 @@ hist(colMeans(svd_mat), col = "grey", main = "", breaks = 25, xlab = "Variable I
 ###could be non-linear correlation
 
 
-##overall mean and SD
+##ANOVA
+anova_mat = matrix(nrow = 1, ncol = 3)
+for(i in 1:nrow(probs_mat)){
+  temp = matrix(rep(probs_mat[i,1:2], each = 40), ncol =2)
+  anova_mat = rbind(anova_mat,cbind(temp,probs_mat[i,3:42]))
+  if(i %% 50 == 0) print(i)
+}
 
-
-
-
-
+anova_mat = anova_mat[-1,]     
+dim(anova_mat)
+anova_data = data.frame(anova_mat)
+anova_data$X1 = as.factor(anova_data$X1)
+anova_data$X2 = as.factor(anova_data$X2)
+colnames(anova_data) = c("dataset","bart_run","inclusion_prop")
+str(anova_data)
+anova_mod = aov(inclusion_prop ~ dataset + bart_run,data = anova_data)
+(anova_data[1:150,])
+     
