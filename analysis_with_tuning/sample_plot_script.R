@@ -113,8 +113,9 @@ save(corrs_mat, file = "null_corrs_matrix.Rdata")
 #load items
 load("C:/Users/Justin/Dropbox/BART_gene/null_corrs_matrix.Rdata")
 load("C:/Users/Justin/Dropbox/BART_gene/null_probs_matrix.Rdata")
-load(paste("C:/Users/jbleich/Desktop/Dropbox/BART_gene/null_corrs_matrix.Rdata")
+load("C:/Users/jbleich/Desktop/Dropbox/BART_gene/null_corrs_matrix.Rdata")
 load("C:/Users/jbleich/Desktop/Dropbox/BART_gene/null_probs_matrix.Rdata")
+setwd("C:/Users/jbleich/Desktop/Dropbox/BART_gene/null_distribution/")
 par(mgp=c(1.8,.5,0), mar=c(3.5,3.5,2,1)) 
 ##across data set variation
 
@@ -142,15 +143,20 @@ hist(c(sd_by_bart), breaks = 50, col = "grey",xlab = "SD of Variable Inclusion P
 ##first plot takes sd of numbers across data sets, second across bart runs
 ##need to stack. 
 par(mfrow = c(2,1))
-hist(c(sd_by_dataset), breaks = 50, col = "grey", xlab = "SD of Variable Inclusion Proportion", main = "", xlim= c(0,.0175)) ##across data set var
+hist(c(sd_by_dataset), breaks = 200, col = "grey", xlab = "SD of Variable Inclusion Proportion", main = "", xlim= c(0,.0175)) ##across data set var
 hist(c(sd_by_bart), breaks = 50, col = "grey",xlab = "SD of Variable Inclusion Proportion", main = "",xlim= c(0,.0175 )) ##across bart var
-     
+dev.copy2pdf(file = "dual_dataset_bart.pdf", out.type="pdf")
+dev.off()
+
+
 ##shane comment 5:
+par(mfrow = c(2,1))
 sd_k = apply(probs_mat[,3:42], 1, sd)
-hist(sd_k, breaks = 50, col = "grey", xlab = "SD of Variable Inclusion Proportions", main = "", xlim = c(0,.025))
 hist(c(sd_by_dataset), breaks = 50, col = "grey", xlab = "SD of Variable Inclusion Proportion", main = "", xlim= c(0,.025)) ##across data set var     
-par(mfrow = c(1,1))     
-     
+hist(sd_k, breaks = 50, col = "grey", xlab = "SD of Variable Inclusion Proportion", main = "", xlim = c(0,.025))  
+#dev.copy2pdf(file = "dual_dataset_var.pdf", out.type="pdf")
+#dev.off()
+
 ##histogram across data sets for 1 var
 #across data sets
 sample_var_over_data = tapply(probs_mat[,3], probs_mat[,1], mean)
@@ -159,6 +165,9 @@ hist(sample_var_over_data, breaks = 25, col = "grey", xlab = "Average Variable I
 
 all_var_over_data = sapply(var_idx, function(s) tapply(probs_mat[,s], probs_mat[, 1] ,mean))  
 boxplot(all_var_over_data, ylab = "Variable Inclusion Proprtion", xlab ="Variable") ##Shane comment 1
+
+#dev.copy2pdf(file = "all_vars_across_data.pdf", out.type="pdf")
+#dev.off()
      #within data sets
 sd(sample_var_over_data)
 avg_in_bart_run = probs_mat[1 : 50, 3]
@@ -167,6 +176,8 @@ hist(avg_in_bart_run, breaks = 25, col = "grey", xlab = "Average Variable Inclus
 
 
 boxplot(probs_mat[1:50,3:42], ylab = "Variable Inclusion Proprtion", xlab ="Variable") ##shane comment 1 - within single bart over 50 runs     
+#dev.copy2pdf(file = "all_vars_across_bart_run.pdf", out.type="pdf")
+#dev.off()
 
 #shane comment 2:
 s1_data = tapply(probs_mat[,3], probs_mat[,1], mean)
@@ -174,19 +185,23 @@ s2_data = tapply(probs_mat[,4], probs_mat[,1], mean)
 s1_bart = probs_mat[1:50,3]
 s2_bart = probs_mat[1:50,4]
 cols = c("red","blue","red","blue")
-boxplot(s1_data, s2_data, s1_bart, s2_bart, col = cols,names= c("1","1","2","2"),
+boxplot(s1_data, s1_bart, s2_data, s2_bart, col = cols,names= c("1","1","2","2"),
         xlab = "Variable", ylab = "Variable Inclusion Proportion")      
-     
+dev.copy2pdf(file = "red_blue.pdf", out.type="pdf")
+dev.off()
+
 ##correlation stuff 
 avg_by_dataset = sapply(var_idx, function(s) tapply(probs_mat[,s], probs_mat[, 1] ,mean))
 
 dim(avg_by_dataset)
 
 dim(corrs_mat)
-hist(corrs_mat, breaks = 40, col = "grey", xlab = "Correlations", main = "") ##Shane comment 7.
+hist(corrs_mat, breaks = 40, col = "grey", xlab = "Data Correlations", main = "") ##Shane comment 7.
+#dev.copy2pdf(file = "data_corrs.pdf", out.type="pdf")
+#dev.off()
 var_corrs = sapply(1 : 40, function(s) cor(avg_by_dataset[,s], corrs_mat[,s]))
 var_corrs
-hist(var_corrs, breaks = 20, col = "grey")
+hist(var_corrs, breaks = 40, col = "grey", xlab = "Correlations", main = "")
 
 ###SVD for orthogonal stuff
 x.train = data.frame(matrix(rnorm(N * p,0,1),nrow = N, ncol = p))
