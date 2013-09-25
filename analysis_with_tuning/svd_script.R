@@ -154,3 +154,38 @@ var_corrs
 hist(var_corrs, breaks = 40, col = "grey", xlab = "Correlations", main = "")
 #dev.copy2pdf(file = "bart_corrs_svd.pdf", out.type="pdf")
 #dev.off()
+
+
+##Nested Anova calcs
+#var i_k
+p_i_dot_k = sapply(var_idx, function(s) tapply(probs_mat_svd[,s], probs_mat_svd[, 1] ,mean))
+dim(p_i_dot_k)
+var_i_dot_k = matrix(nrow = NUM_DATA, ncol = p)
+for(i in 1 : NUM_DATA){
+  
+  temp = probs_mat_svd[which(probs_mat_svd[ ,1] == i), var_idx] ##just get what we need
+  var_i_dot_k[i,] = sapply(1:p, function(s){ sum((temp[,s] - p_i_dot_k[i ,(s)])^2)/50})
+}
+
+##var_k
+p_dot_dot_k = apply(probs_mat_svd[ ,var_idx], 2, mean)
+var_k = sapply(1:p, function(s) {sum((p_i_dot_k[ ,s] - p_dot_dot_k[s])^2)/100} )
+var_k
+
+
+##var
+grand_mean = mean(apply(probs_mat_svd[,var_idx], 2, mean))
+grand_mean
+col_means = apply(probs_mat_svd[, var_idx],2, mean)
+var = sum((col_means - grand_mean)^2)/p
+var
+
+
+
+par(mgp=c(3.5,.5,0), mar=c(5,5,2,1)) 
+boxplot(sqrt(var_i_dot_k), ylim = c(0,.017), ylab = "Standard Deviation", xlab = "Predictor", las = 1, outline = F)
+points(sqrt(var_k), pch = 16, col = "blue", cex = 2.5)
+abline(h = sqrt(var), col = "red", lty = 2, lwd = 3)
+dev.copy2pdf(file="anova_plot_svd.pdf", out.type = "pdf")
+dev.off()
+
