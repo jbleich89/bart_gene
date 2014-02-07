@@ -1,8 +1,10 @@
 library(MASS)
 tryCatch(library(glmnet), error = function(e){install.packages("glmnet")}, finally = library(glmnet))
 tryCatch(library(randomForest), error = function(e){install.packages("glmnet")}, finally = library(randomForest))
+tryCatch(library(dynaTree), error = function(e){install.packages("dynaTree")}, finally = library(dynaTree))
+tryCatch(library(bartMachine), error = function(e){install.packages("bartMachine")}, finally = library(bartMachine))
+tryCatch(library(spikeslab), error = function(e){install.packages("spikeslab")}, finally = library(spikeslab))
 options(error = recover)
-
 
 
 LAST_NAME = "kapelner"
@@ -15,6 +17,7 @@ if (NOT_ON_GRID){
 }
 
 source("rf_cv_validator.R")
+source("dynatree_var_sel.R")
 
 if (NOT_ON_GRID){
 	setwd("C:/Users/Kapelner/workspace/CGMBART_GPL/")
@@ -22,8 +25,6 @@ if (NOT_ON_GRID){
 	setwd("../../CGMBART_GPL/")
 }
 
-source("r_scripts/bart_package.R")
-source("r_scripts/bart_package_variable_selection.R")
 
 calc_prec_rec = function(true_vars, regression_vars){
 	true_vars_found = intersect(true_vars, regression_vars)
@@ -42,7 +43,9 @@ calc_prec_rec = function(true_vars, regression_vars){
 }
 
 ###
-num_replicates = 25
+NUM_ALGOS = 20
+
+num_replicates = 100
 n = 250
 ps = c(20, 100, 200, 500, 1000)
 po_props = c(0.01, 0.05, 0.1, 0.2)
@@ -52,6 +55,7 @@ rf_alpha = .05
 
 param_mat = as.data.frame(matrix(NA, nrow = length(ps) * length(po_props) * length(sigsqs), ncol = 3))
 colnames(param_mat) = c("p", "po_prop", "sigsq")
+
 i = 1
 for (p in ps){
 	for (po_prop in po_props){
@@ -81,7 +85,7 @@ po_prop = param_mat[iter_num, 2]
 sigsq = param_mat[iter_num, 3]
 
 
-rep_results = array(NA, c(18, 2, num_replicates))
+rep_results = array(NA, c(NUM_ALGOS, 2, num_replicates))
 
 ######replicate a few times
 for (nr in 1 : num_replicates){
@@ -102,11 +106,11 @@ for (nr in 1 : num_replicates){
 	bart_machine = build_bart_machine(X, y, num_trees = 1, num_burn_in = 2000, run_in_sample = FALSE, verbose = FALSE)
 	#do var selection with bart
 	bart_variables_select_obj = var_selection_by_permute_response_three_methods(bart_machine, plot = FALSE)
-	bart_ptwise_vars = sort(as.numeric(bart_variables_select_obj$important_vars_pointwise))
-	bart_simul_max_vars = sort(as.numeric(bart_variables_select_obj$important_vars_simul_max))
-	bart_simul_se_vars = sort(as.numeric(bart_variables_select_obj$important_vars_simul_se))	
+	bart_ptwise_vars = sort(as.numeric(bart_variables_select_obj$important_vars_local_names))
+	bart_simul_max_vars = sort(as.numeric(bart_variables_select_obj$important_global_max_names))
+	bart_simul_se_vars = sort(as.numeric(bart_variables_select_obj$important_vars_global_se_names))	
 	#do var selection with a CV-min-RMSE
-	bart_cv_vars = var_selection_by_permute_response_cv(bart_machine)$important_vars_cv
+	bart_cv_vars = as.numeric(var_selection_by_permute_response_cv(bart_machine)$important_vars_cv)
 	destroy_bart_machine(bart_machine)
 	
 	
@@ -119,11 +123,11 @@ for (nr in 1 : num_replicates){
 			verbose = FALSE)
 	#do var selection with bart
 	bart_variables_select_obj = var_selection_by_permute_response_three_methods(bart_machine, plot = FALSE)
-	bart_ptwise_vars_good_prior = sort(as.numeric(bart_variables_select_obj$important_vars_pointwise))
-	bart_simul_max_vars_good_prior = sort(as.numeric(bart_variables_select_obj$important_vars_simul_max))
-	bart_simul_se_vars_good_prior = sort(as.numeric(bart_variables_select_obj$important_vars_simul_se))	
+	bart_ptwise_vars = sort(as.numeric(bart_variables_select_obj$important_vars_local_names))
+	bart_simul_max_vars = sort(as.numeric(bart_variables_select_obj$important_global_max_names))
+	bart_simul_se_vars = sort(as.numeric(bart_variables_select_obj$important_vars_global_se_names))	
 	#do var selection with a CV-min-RMSE
-	bart_cv_vars_good_prior = var_selection_by_permute_response_cv(bart_machine)$important_vars_cv
+	bart_cv_vars_good_prior = as.numeric(var_selection_by_permute_response_cv(bart_machine)$important_vars_cv)
 	destroy_bart_machine(bart_machine)
 	
 	#now build bart machine WITH BAD PRIOR	
@@ -135,11 +139,12 @@ for (nr in 1 : num_replicates){
 			verbose = FALSE)
 	#do var selection with bart
 	bart_variables_select_obj = var_selection_by_permute_response_three_methods(bart_machine, plot = FALSE)
-	bart_ptwise_vars_bad_prior = sort(as.numeric(bart_variables_select_obj$important_vars_pointwise))
-	bart_simul_max_vars_bad_prior = sort(as.numeric(bart_variables_select_obj$important_vars_simul_max))
-	bart_simul_se_vars_bad_prior = sort(as.numeric(bart_variables_select_obj$important_vars_simul_se))	
+	bart_ptwise_vars = sort(as.numeric(bart_variables_select_obj$important_vars_local_names))
+	bart_simul_max_vars = sort(as.numeric(bart_variables_select_obj$important_global_max_names))
+	bart_simul_se_vars = sort(as.numeric(bart_variables_select_obj$important_vars_global_se_names))	
+
 	#do var selection with a CV-min-RMSE
-	bart_cv_vars_bad_prior = var_selection_by_permute_response_cv(bart_machine)$important_vars_cv
+	bart_cv_vars_bad_prior = as.numeric(var_selection_by_permute_response_cv(bart_machine)$important_vars_cv)
 	destroy_bart_machine(bart_machine)	
 	
 	#do var selection with stepwise
@@ -167,7 +172,16 @@ for (nr in 1 : num_replicates){
 	lasso_matrix_vars = coef(cv.glmnet(as.matrix(X), y, alpha = 1 , nfolds = 5, type.measure = "mse"))
 	lasso_matrix_vars = which(lasso_matrix_vars != 0) - 1
 	lasso_matrix_vars = sort(lasso_matrix_vars[lasso_matrix_vars != 0]) #kill intercept if it exists
-	
+  
+  
+  ##do var selection with dynaTree
+  dynatree_vars = as.numeric(var_sel_dynaTree(as.matrix(X), y, n_particles = 2500))
+  
+  ##do var selection with spikeslab
+	spikeslab_mod = spikeslab(x = as.matrix(X), y = y, verbose = F, 
+                             bigp.smalln = ifelse(ncol(X) > nrow(X), T, F), max.var = 100)
+  spikeslab_vars = which(spikeslab_mod$gnet > 0)
+  
 	#### now what did we get right?
 	#BART vanilla
 	obj = calc_prec_rec(true_vars, bart_cv_vars)
@@ -206,6 +220,7 @@ for (nr in 1 : num_replicates){
 	#LASSO
 	obj = calc_prec_rec(true_vars, lasso_matrix_vars)
 	rep_results[15, , nr] = c(obj$precision, obj$recall)
+  
 	#The RF methods
 	obj = calc_prec_rec(true_vars, rf_cv_vars)
 	rep_results[16, , nr] = c(obj$precision, obj$recall) 	
@@ -213,12 +228,20 @@ for (nr in 1 : num_replicates){
 	rep_results[17, , nr] = c(obj$precision, obj$recall)
 	obj = calc_prec_rec(true_vars, rf_simul_vars)
 	rep_results[18, , nr] = c(obj$precision, obj$recall)
+  
+  ##dynatree
+	obj = calc_prec_rec(true_vars, dynatree_vars)
+	rep_results[19, , nr] = c(obj$precision, obj$recall)
 	
+	##spikeslab 
+	obj = calc_prec_rec(true_vars, spikeslab_vars)
+	rep_results[20, , nr] = c(obj$precision, obj$recall)  
+  
 	write.csv(rep_results[, , nr], file = paste("../bart_gene/simulations_for_var_selection/sim_results/partial_neg_prior_var_sel_sim_linear_p", p, "_p0_", p0, "_sigsq_", sigsq, "_nr_", nr, ".csv", sep = ""))	
 	
 }
 
-results = matrix(0, nrow = 18, ncol = 2)
+results = matrix(0, nrow = NUM_ALGOS, ncol = 2)
 rownames(results) = c(
 		"BART_CV", 
 		"BART_pointwise", 
@@ -237,7 +260,9 @@ rownames(results) = c(
 		"lasso", 
 		"RF_CV",
 		"RF_point", 
-		"RF_simul") 
+		"RF_simul",
+    "dynaTree",
+    "spikeSlab") 
 colnames(results) = c("precision", "recall")
 
 

@@ -3,8 +3,11 @@ NOT_ON_GRID = length(grep("wharton.upenn.edu", Sys.getenv(c("HOSTNAME")))) == 0
 
 library(MASS)
 tryCatch(library(glmnet), error = function(e){install.packages("glmnet")}, finally = library(glmnet))
-tryCatch(library(randomForest), error = function(e){install.packages("randomForest")}, finally = library(randomForest))
-tryCatch(library(BayesTree), error = function(e){install.packages("BayesTree")}, finally = library(BayesTree))
+tryCatch(library(randomForest), error = function(e){install.packages("glmnet")}, finally = library(randomForest))
+tryCatch(library(dynaTree), error = function(e){install.packages("dynaTree")}, finally = library(dynaTree))
+tryCatch(library(bartMachine), error = function(e){install.packages("bartMachine")}, finally = library(bartMachine))
+tryCatch(library(spikeslab), error = function(e){install.packages("spikeslab")}, finally = library(spikeslab))
+#tryCatch(library(BayesTree), error = function(e){install.packages("BayesTree")}, finally = library(BayesTree))
 
 options(error=recover)
 
@@ -29,7 +32,7 @@ if (NOT_ON_GRID){
 }
 
 source("simulation_params.R")
-
+source("dynatree_var_sel.R")
 
 if (NOT_ON_GRID){
 	setwd(paste("C:/Users/", LAST_NAME, "/workspace/CGMBART_GPL/", sep = ""))
@@ -37,7 +40,7 @@ if (NOT_ON_GRID){
 	setwd("../CGMBART_GPL")
 }
 
-source("r_scripts/bart_package.R")
+#source("r_scripts/bart_package.R")
 
 RF_ALPHA = 0.05
 
@@ -45,12 +48,12 @@ RF_ALPHA = 0.05
 ##OLS component
 test_all_methods_for_gene = function(gene_num){
   out = list()
-  rmse_mat = matrix(NA, nrow = 1, ncol = 11)
-  num_vars_vec = matrix(NA, nrow = 1, ncol = 11)
+  rmse_mat = matrix(NA, nrow = 1, ncol = 13)
+  num_vars_vec = matrix(NA, nrow = 1, ncol = 13)
   
   rownames(rmse_mat) = colnames(gene_train)[gene_num]
   rownames(num_vars_vec) = rownames(rmse_mat)
-  simulation_names = c("Null", "OLS", "OLS-BART-Best", "Stepwise", "Lasso-CV", "Lasso", "RF", "BART-Best", "BART-S.Max", "BART-Full", "Rob-Best")
+  simulation_names = c("Null", "OLS", "OLS-BART-Best", "Stepwise", "Lasso-CV", "Lasso", "RF", "BART-Best", "BART-S.Max", "BART-Full", "Rob-Best", "dynaTree", "spikeslab")
    colnames(rmse_mat) = simulation_names
    colnames(num_vars_vec) = simulation_names
   
@@ -77,14 +80,25 @@ test_all_methods_for_gene = function(gene_num){
   rmse_mat[ , "Lasso-CV"] = sqrt(sum((lasso_cv_predict - y_test) ^ 2) / length(y_test))
   num_vars_vec[ , "Lasso-CV"] = lasso_cv_fit$nzero[which(lasso_cv_fit$lambda == lasso_cv_fit$lambda.1se)] ##change to lambda.min
   
- 
+ ##dynatree
+  vars = var_sel_dynaTree(as.matrix(X), y, n_particles = 2500)
+  dt_final = dynaTree(X = as.matrix(X[,vars]), y = y, model = "linear", N = n_particles)
+  dt_preds = predict(dt, XX = tf_test, quants = F)$mean
+  rmse_mat[ , "dynaTree"] = sqrt(sum((dt_preds - y_test) ^ 2) / length(y_test))
+  num_vars_vec[ , "dynaTree"] = length(vars)
+  
+  ##spike slab
+  spikeslab_mod = spikeslab(x = as.matrix(X), y = y, verbose = F) #90%
+  spikeslab_preds = predict(spikeslab_mod, tf_test)
+  rmse_mat[ , "spikeslab"] = sqrt(sum((spikeslab_preds$yhat.gnet - y_test) ^ 2) / length(y_test))
+  num_vars_vec[ , "spikeslab"] = sum(spikeslab_mod$gnet > 0) 
   
   
-  ##Need original training data now for Lasso and BART
+  ##Need original training data now for Lasso, and BART, RF
   y_train = gene_train[, gene_num]
   y_cv = gene_cv[, gene_num]
   y_test = gene_test[, gene_num]
-  
+   
   ##Train RF
   ntree = 500
   p = ncol(tf_train)
@@ -186,23 +200,23 @@ test_all_methods_for_gene = function(gene_num){
     predict_obj = bart_predict_for_test_data(bart_machine, test_data, y_test)
 	rmse_mat[, "BART-Best"] = predict_obj$rmse
 	
+##DEFUNCT	
+# 	#### Rob BART-best
+# 	rbart = bart(x.train = X_train, 
+# 		y.train = y_train, 
+# 		x.test = test_data,
+# 		ntree = NUM_TREES_FOR_EVAL, 
+# 		nskip = 1000, 
+# 		ndpost = 1000, 
+# 		verbose = FALSE)
+# 	yhat_rbart = rbart$yhat.test.mean
+# 	rmse_mat[, "Rob-Best"] = sqrt(sum((y_test - yhat_rbart)^2) / length(yhat_rbart))
 	
-	#### Rob BART-best
-	rbart = bart(x.train = X_train, 
-		y.train = y_train, 
-		x.test = test_data,
-		ntree = NUM_TREES_FOR_EVAL, 
-		nskip = 1000, 
-		ndpost = 1000, 
-		verbose = FALSE)
-	yhat_rbart = rbart$yhat.test.mean
-	rmse_mat[, "Rob-Best"] = sqrt(sum((y_test - yhat_rbart)^2) / length(yhat_rbart))
-	
-	#### OLS BART-Best
-	mod = lm(y_train ~ ., X_train)
-	y_hat = predict(mod, test_data)
-	rmse_mat[, "OLS-BART-Best"] = sqrt(sum((y_test - y_hat)^2) / length(y_hat))
-	
+# 	#### OLS BART-Best
+# 	mod = lm(y_train ~ ., X_train)
+# 	y_hat = predict(mod, test_data)
+# 	rmse_mat[, "OLS-BART-Best"] = sqrt(sum((y_test - y_hat)^2) / length(y_hat))
+# 	
     
   } else {
     L2_err = sum((y_test - mean(y_train))^2)
