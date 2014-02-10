@@ -2,11 +2,11 @@ library(MASS)
 tryCatch(library(glmnet), error = function(e){install.packages("glmnet")}, finally = library(glmnet))
 tryCatch(library(randomForest), error = function(e){install.packages("glmnet")}, finally = library(randomForest))
 tryCatch(library(dynaTree), error = function(e){install.packages("dynaTree")}, finally = library(dynaTree))
-tryCatch(library(bartMachine), error = function(e){install.packages("bartMachine")}, finally = library(bartMachine))
 tryCatch(library(spikeslab), error = function(e){install.packages("spikeslab")}, finally = library(spikeslab))
-options(error = recover)
+library(bartMachine, lib.loc=.libPaths()[2])
 
 options(error = recover)
+
 
 LAST_NAME = "kapelner"
 NOT_ON_GRID = length(grep("wharton.upenn.edu", Sys.getenv(c("HOSTNAME")))) == 0
@@ -18,13 +18,6 @@ if (NOT_ON_GRID){
 }
 
 source("rf_cv_validator.R")
-
-if (NOT_ON_GRID){
-	setwd("C:/Users/Kapelner/workspace/CGMBART_GPL/")
-} else {
-	setwd("../../CGMBART_GPL/")
-}
-
 
 calc_prec_rec = function(true_vars, regression_vars){
 	true_vars_found = intersect(true_vars, regression_vars)
@@ -77,6 +70,10 @@ if (NOT_ON_GRID){
 	set_bart_machine_num_cores(4)
 }
 
+##set bart memory
+set_bart_machine_memory(3000)
+
+
 p = param_mat[iter_num, 1]
 sigsq = param_mat[iter_num, 2]
 
@@ -113,11 +110,11 @@ for (nr in 1 : num_replicates){
 			verbose = FALSE)	
 	#do var selection with bart WITH  PRIOR
 	bart_variables_select_obj = var_selection_by_permute_response_three_methods(bart_machine, plot = FALSE)
-	bart_ptwise_vars = sort(as.numeric(bart_variables_select_obj$important_vars_local_names))
-	bart_simul_max_vars = sort(as.numeric(bart_variables_select_obj$important_global_max_names))
-	bart_simul_se_vars = sort(as.numeric(bart_variables_select_obj$important_vars_global_se_names))	
+	bart_ptwise_vars_good_prior = sort(as.numeric(bart_variables_select_obj$important_vars_local_names))
+	bart_simul_max_vars_good_prior = sort(as.numeric(bart_variables_select_obj$important_global_max_names))
+	bart_simul_se_vars_good_prior = sort(as.numeric(bart_variables_select_obj$important_vars_global_se_names))	
 	#do var selection with a CV-min-RMSE
-	bart_cv_vars = as.numeric(var_selection_by_permute_response_cv(bart_machine)$important_vars_cv)
+	bart_cv_vars_good_prior = as.numeric(var_selection_by_permute_response_cv(bart_machine)$important_vars_cv)
 	destroy_bart_machine(bart_machine)
 	
 	
@@ -130,11 +127,11 @@ for (nr in 1 : num_replicates){
 			verbose = FALSE)	
 	#do var selection with bart WITH PRIOR
 	bart_variables_select_obj = var_selection_by_permute_response_three_methods(bart_machine, plot = FALSE)
-	bart_ptwise_vars = sort(as.numeric(bart_variables_select_obj$important_vars_local_names))
-	bart_simul_max_vars = sort(as.numeric(bart_variables_select_obj$important_global_max_names))
-	bart_simul_se_vars = sort(as.numeric(bart_variables_select_obj$important_vars_global_se_names))	
+	bart_ptwise_vars_bad_prior = sort(as.numeric(bart_variables_select_obj$important_vars_local_names))
+	bart_simul_max_vars_bad_prior = sort(as.numeric(bart_variables_select_obj$important_global_max_names))
+	bart_simul_se_vars_bad_prior = sort(as.numeric(bart_variables_select_obj$important_vars_global_se_names))	
 	#do var selection with a CV-min-RMSE
-	bart_cv_vars = as.numeric(var_selection_by_permute_response_cv(bart_machine)$important_vars_cv)
+	bart_cv_vars_bad_prior = as.numeric(var_selection_by_permute_response_cv(bart_machine)$important_vars_cv)
 	destroy_bart_machine(bart_machine)
   
   
@@ -227,6 +224,9 @@ for (nr in 1 : num_replicates){
 	obj = calc_prec_rec(true_vars, spikeslab_vars)
 	rep_results[20, , nr] = c(obj$precision, obj$recall)  
 		
+	 write.csv(rep_results[, , nr], file = paste("../bart_gene/simulations_for_var_selection/sim_results/partial_var_sel_sim_friedman_p", p, "_sigsq_", sigsq, ,"_nr_", nr "_revised.csv", sep = ""))  
+	
+  
 }
 
 results = matrix(0, nrow = NUM_ALGOS, ncol = 2)
@@ -265,7 +265,7 @@ F1s = 2 * results[, 1] * results[, 2] / (results[, 1] + results[, 2])
 results = cbind(results, F1s)
 
 #save results
-write.csv(results, file = paste("../bart_gene/simulations_for_var_selection/sim_results/complete_var_sel_sim_friedman_p", p, "_sigsq_", sigsq, ".csv", sep = ""))	
+write.csv(results, file = paste("../bart_gene/simulations_for_var_selection/sim_results/complete_var_sel_sim_friedman_p", p, "_sigsq_", sigsq, "_revised.csv", sep = ""))	
 
 
 ##load results and print them to xtable
