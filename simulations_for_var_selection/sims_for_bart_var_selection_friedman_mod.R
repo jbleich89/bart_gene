@@ -3,7 +3,7 @@ tryCatch(library(glmnet), error = function(e){install.packages("glmnet")}, final
 tryCatch(library(randomForest), error = function(e){install.packages("glmnet")}, finally = library(randomForest))
 tryCatch(library(dynaTree), error = function(e){install.packages("dynaTree")}, finally = library(dynaTree))
 tryCatch(library(spikeslab), error = function(e){install.packages("spikeslab")}, finally = library(spikeslab))
-library(bartMachine, lib.loc=.libPaths()[2])
+
 
 options(error = recover)
 
@@ -13,8 +13,10 @@ NOT_ON_GRID = length(grep("wharton.upenn.edu", Sys.getenv(c("HOSTNAME")))) == 0
 
 if (NOT_ON_GRID){
 	setwd("C:/Users/Kapelner/workspace/bart_gene/simulations_for_var_selection")
+	library(bartMachine, lib.loc = .libPaths()[2])
 } else {
 	setwd("simulations_for_var_selection")
+	library(bartMachine, lib.loc = "~/R")
 }
 
 source("rf_cv_validator.R")

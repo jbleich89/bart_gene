@@ -23,9 +23,15 @@ if (length(args) > 0){
 #now load up the BART stuff
 if (NOT_ON_GRID){
 	setwd("C:/Users/Kapelner/workspace/CGMBART_GPL/")
+	library(bartMachine, lib.loc = .libPaths()[2])
 } else {
 	setwd("../CGMBART_GPL/")
+	library(bartMachine, lib.loc = "~/R")
 }
+
+##set bart memory
+set_bart_machine_memory(3000)
+
 
 source("r_scripts/bart_package.R")
 

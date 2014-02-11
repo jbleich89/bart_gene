@@ -14,9 +14,15 @@ options(error=recover)
 ##Loads
 if (NOT_ON_GRID){
 	setwd(paste("C:/Users/", LAST_NAME, "/Desktop/Dropbox/BART_gene/", sep = ""))
+	library(bartMachine, lib.loc = .libPaths()[2])
 } else {
 	setwd("../shane_data")
+	library(bartMachine, lib.loc = "~/R")
 }
+
+##set bart memory
+set_bart_machine_memory(3000)
+
 
 
 load("all_results.RData")
@@ -39,8 +45,6 @@ if (NOT_ON_GRID){
 } else {
 	setwd("../CGMBART_GPL")
 }
-
-#source("r_scripts/bart_package.R")
 
 RF_ALPHA = 0.05
 
@@ -80,7 +84,7 @@ test_all_methods_for_gene = function(gene_num){
   rmse_mat[ , "Lasso-CV"] = sqrt(sum((lasso_cv_predict - y_test) ^ 2) / length(y_test))
   num_vars_vec[ , "Lasso-CV"] = lasso_cv_fit$nzero[which(lasso_cv_fit$lambda == lasso_cv_fit$lambda.1se)] ##change to lambda.min
   
- ##dynatree
+  ##dynatree
   vars = var_sel_dynaTree(as.matrix(X), y, n_particles = 2500)
   dt_final = dynaTree(X = as.matrix(X[,vars]), y = y, model = "linear", N = n_particles)
   dt_preds = predict(dt, XX = tf_test, quants = F)$mean
