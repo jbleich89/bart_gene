@@ -267,7 +267,7 @@ F1s = 2 * results[, 1] * results[, 2] / (results[, 1] + results[, 2])
 results = cbind(results, F1s)
 
 #save results
-write.csv(results, file = paste("../bart_gene/simulations_for_var_selection/sim_results/complete_var_sel_sim_friedman_p", p, "_sigsq_", sigsq, "_revised.csv", sep = ""))	
+write.csv(results, file = paste("complete_var_sel_sim_friedman_p", p, "_sigsq_", sigsq, "_revised.csv", sep = ""))	
 
 
 ##load results and print them to xtable

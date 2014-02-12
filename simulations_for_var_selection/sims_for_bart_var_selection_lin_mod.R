@@ -285,7 +285,7 @@ results = cbind(results, F1s)
 
 
 #save results
-write.csv(results, file = paste("sim_results/complete_var_sel_sim_linear_p", p, "_p0_", p0, "_sigsq_", sigsq, "_revised.csv", sep = ""))
+write.csv(results, file = paste("complete_var_sel_sim_linear_p", p, "_p0_", p0, "_sigsq_", sigsq, "_revised.csv", sep = ""))
 
 ###load results and print them to xtable
 #sink("all_results_linear.tex")
