@@ -244,7 +244,7 @@ for (nr in 1 : num_replicates){
 	obj = calc_prec_rec(true_vars, spikeslab_vars)
 	rep_results[20, , nr] = c(obj$precision, obj$recall)  
   
-	write.csv(rep_results[, , nr], file = paste("../bart_gene/simulations_for_var_selection/sim_results/partial_var_sel_sim_linear_p", p, "_p0_", p0, "_sigsq_", sigsq, "_nr_", nr, "_revised.csv", sep = ""))	
+	write.csv(rep_results[, , nr], file = paste("partial_var_sel_sim_linear_p", p, "_p0_", p0, "_sigsq_", sigsq, "_nr_", nr, "_revised.csv", sep = ""))	
 	
 }
 
