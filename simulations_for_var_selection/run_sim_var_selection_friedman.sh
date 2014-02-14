@@ -2,7 +2,7 @@
 
 #$ -j y
 #$ -N bart_for_variable_selection_friedman_sims
-#$ -t 1-10
+#$ -t 11,12,14,15
 #$ -q intel
 
 echo "starting R for task # $SGE_TASK_ID"

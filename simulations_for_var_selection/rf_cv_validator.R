@@ -4,8 +4,7 @@ rf_cv_var_selection = function(X, y, ntree, rf_alpha, k_folds = 5, type = 1){
 	if (k_folds <= 1 || k_folds > n_cv){
 		stop("The number of folds must be at least 2 and less than or equal to n, use \"Inf\" for leave one out")
 	}
-	
-	
+		
 	if (k_folds == Inf){ #leave-one-out
 		k_folds = n_cv
 	}	
