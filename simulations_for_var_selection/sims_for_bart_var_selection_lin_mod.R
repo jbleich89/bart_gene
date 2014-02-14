@@ -62,6 +62,8 @@ for (p in ps){
 	}
 }
 
+param_mat = param_mat[c(26, 27, 32, 33, 40, 41, 43, 44), ]
+
 #read in arguments supplied by qsub - this will tell use which gene to process
 args = commandArgs(TRUE)
 print(paste("args:", args))

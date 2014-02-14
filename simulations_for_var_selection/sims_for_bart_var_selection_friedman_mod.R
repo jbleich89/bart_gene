@@ -56,6 +56,7 @@ for (p in ps){
 		i = i + 1
 	}
 }
+param_mat = param_mat[c(11,12,14,15),]
 
 
 #read in arguments supplied by qsub - this will tell use which gene to process
