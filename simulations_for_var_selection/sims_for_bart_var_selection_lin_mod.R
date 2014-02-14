@@ -4,19 +4,17 @@ tryCatch(library(randomForest), error = function(e){install.packages("glmnet")},
 tryCatch(library(dynaTree), error = function(e){install.packages("dynaTree")}, finally = library(dynaTree))
 tryCatch(library(spikeslab), error = function(e){install.packages("spikeslab")}, finally = library(spikeslab))
 
-library(bartMachine, lib.loc=.libPaths()[2])
 options(error = recover)
-
-
-#setwd("C:/Users/jbleich/workspace/bart_gene/simulations_for_var_selection")
 
 LAST_NAME = "kapelner"
 NOT_ON_GRID = length(grep("wharton.upenn.edu", Sys.getenv(c("HOSTNAME")))) == 0
 
 if (NOT_ON_GRID){
 	setwd("C:/Users/Kapelner/workspace/bart_gene/simulations_for_var_selection")
+	library(bartMachine, lib.loc = .libPaths()[2])
 } else {
 	setwd("simulations_for_var_selection")
+	library(bartMachine, lib.loc = "~/R")
 }
 
 source("rf_cv_validator.R")
@@ -240,7 +238,7 @@ for (nr in 1 : num_replicates){
 	obj = calc_prec_rec(true_vars, spikeslab_vars)
 	rep_results[20, , nr] = c(obj$precision, obj$recall)  
   
-	write.csv(rep_results[, , nr], file = paste("../bart_gene/simulations_for_var_selection/sim_results/partial_var_sel_sim_linear_p", p, "_p0_", p0, "_sigsq_", sigsq, "_nr_", nr, "_revised.csv", sep = ""))	
+	write.csv(rep_results[, , nr], file = paste("partial_var_sel_sim_linear_p", p, "_p0_", p0, "_sigsq_", sigsq, "_nr_", nr, "_revised.csv", sep = ""))	
 	
 }
 
@@ -281,7 +279,7 @@ results = cbind(results, F1s)
 
 
 #save results
-write.csv(results, file = paste("../bart_gene/simulations_for_var_selection/sim_results/complete_var_sel_sim_linear_p", p, "_p0_", p0, "_sigsq_", sigsq, "_revised.csv", sep = ""))
+write.csv(results, file = paste("complete_var_sel_sim_linear_p", p, "_p0_", p0, "_sigsq_", sigsq, "_revised.csv", sep = ""))
 
 ###load results and print them to xtable
 #sink("all_results_linear.tex")
