@@ -8,6 +8,8 @@ var_sel_dynaTree = function(X, y,  n_particles = 1000){ ##package default
   ##select variables using their metric -- postive value
   selected_col_names = selected_col_names[which(apply(dt$relevance, 2 ,median) > 0)]
   
+  if(length(selected_col_names) == 0) return(-1) 
+  
   ##now loop through backward selection until the Bayes Factor is smaller
   bf = -1
   while(bf < 0){
