@@ -1,5 +1,5 @@
 
-rf_cv_var_selection = function(X, y, ntree, rf_alpha, k_folds = 5){
+rf_cv_var_selection = function(X, y, ntree, rf_alpha, k_folds = 5, type = 1){
 	n_cv = nrow(X)
 	if (k_folds <= 1 || k_folds > n_cv){
 		stop("The number of folds must be at least 2 and less than or equal to n, use \"Inf\" for leave one out")
@@ -30,7 +30,7 @@ rf_cv_var_selection = function(X, y, ntree, rf_alpha, k_folds = 5){
 		
 		#do the stuff
 		rf = randomForest(x = as.matrix(training_X_k) , y = training_y_k, ntree = ntree, importance = T)
-		rf_zscore = importance(rf, type=1 ,scale=T)
+		rf_zscore = importance(rf, type = type ,scale = T)
 		rf_point_vars = which(rf_zscore > qnorm(1 - rf_alpha))
 		rf_simul_vars = which(rf_zscore > qnorm(1 - rf_alpha / p))
 		
@@ -58,7 +58,7 @@ rf_cv_var_selection = function(X, y, ntree, rf_alpha, k_folds = 5){
 	#now (finally) do var selection on the entire data and then return the vars from the best method found via cross-validation
 	cat("final", "\n")
 	rf = randomForest(x = X , y = y, ntree = ntree, importance = T)
-	rf_zscore = importance(rf, type=1 ,scale=T)
+	rf_zscore = importance(rf, type = type ,scale=T)
 	rf_point_vars = which(rf_zscore > qnorm(1 - rf_alpha))
 	rf_simul_vars = which(rf_zscore > qnorm(1 - rf_alpha / p))
 	
