@@ -54,7 +54,7 @@ for (nr in 1 : num_replicates){
   rep_results[1, , nr] = c(obj$precision, obj$recall)
   print(rep_results[1, , nr])
   
-  write.csv(rep_results[1, , nr], file = paste("sim_results/partial_var_sel_sim_linear_p", p, "_p0_", p0, "_sigsq_", sigsq, "_nr_", nr, "_revised_dtree_only.csv", sep = ""))	
+  write.csv(rep_results[1, , nr], file = paste("partial_var_sel_sim_linear_p", p, "_p0_", p0, "_sigsq_", sigsq, "_nr_", nr, "_revised_dtree_only.csv", sep = ""))	
   
 }
 
@@ -75,5 +75,5 @@ results = cbind(results, F1s)
 
 
 #save results
-write.csv(results, file = paste("../bart_gene/simulations_for_var_selection/sim_results/complete_var_sel_sim_linear_p", p, "_p0_", p0, "_sigsq_", sigsq, "_revised_dtree_only.csv", sep = ""))
+write.csv(results, file = paste("complete_var_sel_sim_linear_p", p, "_p0_", p0, "_sigsq_", sigsq, "_revised_dtree_only.csv", sep = ""))
 
