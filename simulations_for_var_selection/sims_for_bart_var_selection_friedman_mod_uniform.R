@@ -43,7 +43,7 @@ NUM_ALGOS = 20
 num_replicates = 100
 n = 250
 ps = c(25, 100, 200, 500, 1000)
-sigsqs = c(1, 100, 625)
+sigsqs = c(1, 25, 100)
 
 rf_alpha = .05
 
@@ -56,7 +56,7 @@ for (p in ps){
     i = i + 1
   }
 }
-param_mat = param_mat[c(11,12,14,15),]
+param_mat = param_mat[c(10:15),]
 
 
 
@@ -81,7 +81,7 @@ set_bart_machine_memory(3000)
 p = param_mat[iter_num, 1]
 sigsq = param_mat[iter_num, 2]
 
-rep_results = array(NA, c(18, 2, num_replicates))
+rep_results = array(NA, c(NUM_ALGOS, 2, num_replicates))
 
 ######replicate a few times
 for (nr in 1 : num_replicates){

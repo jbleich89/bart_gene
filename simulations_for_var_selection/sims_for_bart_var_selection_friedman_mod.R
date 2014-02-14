@@ -80,7 +80,7 @@ set_bart_machine_memory(3000)
 p = param_mat[iter_num, 1]
 sigsq = param_mat[iter_num, 2]
 
-rep_results = array(NA, c(18, 2, num_replicates))
+rep_results = array(NA, c(NUM_ALGOS, 2, num_replicates))
 
 ######replicate a few times
 for (nr in 1 : num_replicates){
