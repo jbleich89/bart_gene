@@ -295,7 +295,7 @@ test_all_methods_for_gene = function(gene_num){
 
 
 
-# run_combined_tests = function(gene_num){
+ run_combined_tests = function(gene_num){
   all_methods = test_all_methods_for_gene(gene_num)
   rmse_results = all_methods$rmse_mat
   num_var_results = all_methods$num_vars_vec
