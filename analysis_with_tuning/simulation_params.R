@@ -1,5 +1,5 @@
 #simulation params
-LAST_NAME = "kapelner"
+LAST_NAME = "jbleich"
 NOT_ON_GRID = length(grep("wharton.upenn.edu", Sys.getenv(c("HOSTNAME")))) == 0
 
 

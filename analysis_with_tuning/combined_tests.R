@@ -85,9 +85,12 @@ test_all_methods_for_gene = function(gene_num){
 #   num_vars_vec[ , "Lasso-CV"] = lasso_cv_fit$nzero[which(lasso_cv_fit$lambda == lasso_cv_fit$lambda.1se)] ##change to lambda.min
   
   ##dynatree
-  vars = var_sel_dynaTree(as.matrix(X), y, n_particles = 3000)
+  n_particles = 3000
+  vars = var_sel_dynaTree(as.matrix(X), y, n_particles = n_particles)
+  #dt_final = dynaTrees(X = as.matrix(X[,vars]), y = y, model = "linear", N = n_particles, verb = 1, XX = tf_test[,vars], R = 2)
   dt_final = dynaTree(X = as.matrix(X[,vars]), y = y, model = "linear", N = n_particles)
-  dt_preds = predict(dt, XX = tf_test, quants = F)$mean
+  #dt_preds = apply(dt_final$mean,1,mean)
+  dt_preds = predict(dt_final, XX = tf_test[,vars], quants = F)$mean
   rmse_mat[ , "dynaTree"] = sqrt(sum((dt_preds - y_test) ^ 2) / length(y_test))
   num_vars_vec[ , "dynaTree"] = length(vars)
   
