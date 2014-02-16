@@ -1,4 +1,5 @@
-LAST_NAME = "kapelner"
+LAST_NAME = "jbleich"
+
 NOT_ON_GRID = length(grep("wharton.upenn.edu", Sys.getenv(c("HOSTNAME")))) == 0
 
 if (NOT_ON_GRID){
@@ -33,7 +34,7 @@ if (NOT_ON_GRID){
 set_bart_machine_memory(3000)
 
 
-source("r_scripts/bart_package.R")
+#source("r_scripts/bart_package.R")
 
 
 
