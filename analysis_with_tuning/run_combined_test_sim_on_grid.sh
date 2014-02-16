@@ -3,7 +3,8 @@
 #$ -j y
 #$ -N tf_discovery_for_gene_expression_combined_tests
 #$ -t 1-6026
-#$ -q intel
+
+
 
 echo "starting combined test for gene # $SGE_TASK_ID"
 export _JAVA_OPTIONS="-Xms128m -Xmx5000m"
