@@ -37,8 +37,9 @@ if (NOT_ON_GRID){
 	setwd("../bart_gene/analysis_with_tuning")
 }
 
-source("simulation_params.R")
 source("dynatree_var_sel.R")
+source("simulation_params.R")
+
 
 # if (NOT_ON_GRID){
 # 	setwd(paste("C:/Users/", LAST_NAME, "/workspace/CGMBART_GPL/", sep = ""))
@@ -329,6 +330,7 @@ if (NOT_ON_GRID){
 #	run_combined_tests(iter_num+12)	
 }
 
+print(iter_num)
 run_combined_tests(iter_num)
 
 
