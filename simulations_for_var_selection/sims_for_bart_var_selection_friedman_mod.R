@@ -20,6 +20,7 @@ if (NOT_ON_GRID){
 }
 
 source("rf_cv_validator.R")
+source("dynatree_var_sel.R")
 
 calc_prec_rec = function(true_vars, regression_vars){
 	true_vars_found = intersect(true_vars, regression_vars)
