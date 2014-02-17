@@ -331,7 +331,7 @@ if (NOT_ON_GRID){
 }
 
 print(iter_num)
-gene_to_run = c(2671,3999,4124,4127,4130,4133,4135,4136,4137,4138,4139,4897,6026)
+gene_to_run = c(2671,4897)
 
 run_combined_tests(gene_to_run[iter_num])
 

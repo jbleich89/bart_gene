@@ -50,25 +50,33 @@ rownames(all_num_var_results_dt_spike) = 1 : MAX_GENE_NUM
 
 
 for (g in 1 : MAX_GENE_NUM){
-  if (g %in% c(40, 4124, 4127, 4130, 4133, 4135, 4136, 4137, 4138, 4139, 6026)){
+  if (g %in% c(4124, 4127, 4130, 4133, 4135, 4136, 4137, 4138, 4139, 6026)){
     next
   }
-  load(file = paste("rmse_results_dt_spike_", g, ".RData", sep = ""))
-  load(file = paste("num_var_results_dt_spike_", g, ".RData", sep = ""))
+  rmse_results = matrix(rep(NA,12), ncol = 13)
+  num_var_results = NA
+  tryCatch(load(file = paste("rmse_results_dt_spike_", g, ".RData", sep = "")), error = function(e) {return(1)})
+  tryCatch(load(file = paste("num_var_results_dt_spike_", g, ".RData", sep = "")), error = function(e) {print(g)})
+  if(is.na(rmse_results[,12]) ) next
   all_rmse_results_dt_spike[g, ] = rmse_results
   rownames(all_rmse_results_dt_spike)[g] = rownames(rmse_results)
   all_num_var_results_dt_spike[g, ] = num_var_results
   rownames(all_num_var_results_dt_spike)[g] = rownames(num_var_results)[1]
 }
 
-head(all_rmse_results)
-head(all_num_var_results)
+head(all_rmse_results_dt_spike)
+head(all_num_var_results_dt_spike)
+boxplot(all_num_var_results_dt_spike[,12:13])
 tail(all_rmse_results)
 tail(all_num_var_results)
 
 
+redos = unique(c(which(is.na(all_rmse_results_dt_spike[,12])),
+which(all_rmse_results_dt_spike[,12] > 10)))
 
+max(all_rmse_results_dt_spike[,12], na.rm = T)
 
+paste(redos, collapse = ",")
 
 #########load results into R at this point ON THE LOCAL MACHINE
 ##work
