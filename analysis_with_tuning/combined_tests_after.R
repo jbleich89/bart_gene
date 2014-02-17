@@ -5,7 +5,7 @@ setwd("../CGMBART_GPL")
 
 MAX_GENE_NUM = 6026
 
-simulation_names = c("Null", "OLS", "OLS-BART-Best", "Stepwise", "Lasso-CV", "Lasso", "RF", "BART-Best", "BART-S.Max", "BART-Full", "Rob-Best")
+simulation_names = c("Null", "OLS", "OLS-BART-Best", "Stepwise", "Lasso-CV", "Lasso", "RF", "BART-Best", "BART-S.Max", "BART-Full", "Rob-Best", "dynaTree", "spikeslab")
 all_rmse_results = matrix(NA, nrow = MAX_GENE_NUM, ncol = length(simulation_names))
 colnames(all_rmse_results) = simulation_names
 rownames(all_rmse_results) = 1 : MAX_GENE_NUM
@@ -33,6 +33,41 @@ tail(all_num_var_results)
 
 save(all_rmse_results, file = paste("all_rmse_results.RData", sep = ""))
 save(all_num_var_results, file = paste("all_num_var_results.RData", sep = ""))
+
+###Get DT and Spike
+
+setwd("C:/Users/jbleich/Dropbox/BART_gene/dt_spike_results_raw")
+
+MAX_GENE_NUM = 6026
+
+simulation_names = c("Null", "OLS", "OLS-BART-Best", "Stepwise", "Lasso-CV", "Lasso", "RF", "BART-Best", "BART-S.Max", "BART-Full", "Rob-Best", "dynaTree", "spikeslab")
+all_rmse_results_dt_spike = matrix(NA, nrow = MAX_GENE_NUM, ncol = length(simulation_names))
+colnames(all_rmse_results_dt_spike) = simulation_names
+rownames(all_rmse_results_dt_spike) = 1 : MAX_GENE_NUM
+all_num_var_results_dt_spike = matrix(NA, nrow = MAX_GENE_NUM, ncol = length(simulation_names))
+colnames(all_num_var_results_dt_spike) = simulation_names
+rownames(all_num_var_results_dt_spike) = 1 : MAX_GENE_NUM
+
+
+for (g in 1 : MAX_GENE_NUM){
+  if (g %in% c(40, 4124, 4127, 4130, 4133, 4135, 4136, 4137, 4138, 4139, 6026)){
+    next
+  }
+  load(file = paste("rmse_results_dt_spike_", g, ".RData", sep = ""))
+  load(file = paste("num_var_results_dt_spike_", g, ".RData", sep = ""))
+  all_rmse_results_dt_spike[g, ] = rmse_results
+  rownames(all_rmse_results_dt_spike)[g] = rownames(rmse_results)
+  all_num_var_results_dt_spike[g, ] = num_var_results
+  rownames(all_num_var_results_dt_spike)[g] = rownames(num_var_results)[1]
+}
+
+head(all_rmse_results)
+head(all_num_var_results)
+tail(all_rmse_results)
+tail(all_num_var_results)
+
+
+
 
 
 #########load results into R at this point ON THE LOCAL MACHINE
