@@ -64,6 +64,10 @@ for (g in 1 : MAX_GENE_NUM){
   rownames(all_num_var_results_dt_spike)[g] = rownames(num_var_results)[1]
 }
 
+
+median(all_rmse_results_dt_spike[,12], na.rm = T)
+
+
 head(all_rmse_results_dt_spike)
 head(all_num_var_results_dt_spike)
 boxplot(all_num_var_results_dt_spike[,12:13])
@@ -78,29 +82,48 @@ max(all_rmse_results_dt_spike[,12], na.rm = T)
 
 paste(redos, collapse = ",")
 
+
+new_all_rmse_results_wanted = cbind(all_rmse_results_wanted, all_rmse_results_dt_spike[,12:13])
+head(new_all_rmse_wanted)
+boxplot(new_all_rmse_results_wanted, na.rm = T)
+save(new_all_rmse_results_wanted, file = "new_all_rmse_results_wanted.Rdata")
+
+new_all_num_var_results_no_na_wanted = cbind(all_num_var_results_no_na_wanted, all_num_var_results_dt_spike[,12 :13])
+boxplot(new_all_num_var_results_no_na_wanted, na.rm = T)
+save(new_all_num_var_results_no_na_wanted, file = "new_all_num_var_results_no_na_wanted.Rdata")
+
 #########load results into R at this point ON THE LOCAL MACHINE
 ##work
-load("C:/Users/jbleich/Desktop/Dropbox/BART_gene/all_rmse_results_wanted.RData")
-load("C:/Users/jbleich/Desktop/Dropbox/BART_gene/all_num_var_results_no_na_wanted.RData")
-load("C:/Users/jbleich/Desktop/Dropbox/BART_gene/all_rmse_per_num_var_wanted.RData")
-#home
-load("C:/Users/Justin/Dropbox/BART_gene/all_rmse_per_num_var_wanted.RData")
-load("C:/Users/Justin/Dropbox/BART_gene/all_num_var_results_no_na_wanted.RData")
-load("C:/Users/Justin/Dropbox/BART_gene/all_rmse_results_wanted.RData")
-load("C:/Users/Justin/Dropbox/BART_gene/all_rmse_results.RData")
-load("C:/Users/Justin/Dropbox/BART_gene/all_num_var_results.RData")
+#load("C:/Users/jbleich/Dropbox/BART_gene/all_rmse_results_wanted.RData")
+ #load("C:/Users/jbleich/Dropbox/BART_gene/all_num_var_results.RData")
+ #load("C:/Users/jbleich//Dropbox/BART_gene/all_num_var_results_no_na_wanted.RData")
+# load("C:/Users/jbleich/Desktop/Dropbox/BART_gene/all_rmse_per_num_var_wanted.RData")
+# #home
+# load("C:/Users/Justin/Dropbox/BART_gene/all_rmse_per_num_var_wanted.RData")
+# load("C:/Users/Justin/Dropbox/BART_gene/all_num_var_results_no_na_wanted.RData")
+# load("C:/Users/Justin/Dropbox/BART_gene/all_rmse_results_wanted.RData")
+# load("C:/Users/Justin/Dropbox/BART_gene/all_rmse_results.RData")
+# load("C:/Users/Justin/Dropbox/BART_gene/all_num_var_results.RData")
+
+load("C:/Users/jbleich/Dropbox/BART_gene/new_all_rmse_results_wanted.Rdata")
+load("C:/Users/jbleich/Dropbox/BART_gene/new_all_num_var_results_no_na_wanted.Rdata")
 
 
 ##Change some colnames
-colnames(all_num_var_results_no_na_wanted)[8]="BART-G.Max"
-colnames(all_rmse_per_num_var_wanted)[8]="BART-G.Max"
-colnames(all_rmse_results_wanted)[8]="BART-G.Max"
+colnames(new_all_num_var_results_no_na_wanted)[8]="BART-G.Max"
+colnames(new_all_rmse_per_num_var_wanted)[8]="BART-G.Max"
+colnames(new_all_rmse_results_wanted)[8]="BART-G.Max"
 
+colnames(new_all_num_var_results_no_na_wanted)[10]="DT"
+colnames(new_all_rmse_results_wanted)[10]="DT"
 
-rm = which(all_num_var_results_no_na_wanted[,1]==39) ##why? these are bad genes
-all_num_var_results_no_na_wanted = all_num_var_results_no_na_wanted[-rm,]
-all_rmse_per_num_var_wanted = all_rmse_per_num_var_wanted[-rm,]
-all_rmse_results_wanted = all_rmse_results_wanted[-rm,]
+colnames(new_all_num_var_results_no_na_wanted)[11]="spike-slab"
+colnames(new_all_rmse_results_wanted)[11]="spike-slab"
+
+rm = which(new_all_num_var_results_no_na_wanted[,1]==39) ##why? these are bad genes we didn't get results for
+all_num_var_results_no_na_wanted = new_all_num_var_results_no_na_wanted[-rm,]
+#all_rmse_per_num_var_wanted = all_rmse_per_num_var_wanted[-rm,]
+all_rmse_results_wanted = new_all_rmse_results_wanted[-rm,]
 
 #oos rmses for all methods
 
@@ -109,7 +132,7 @@ all_rmse_results_wanted = all_rmse_results_wanted[-rm,]
 #save(all_rmse_results_wanted, file = "all_rmse_results_wanted.RData")
 
 ##rm OLS BART BEST
-all_rmse_results_wanted = all_rmse_results_wanted[, c("Null", "OLS", "Stepwise", "Lasso", "RF", "BART-Best", "BART-G.Max", "BART-Full")]
+all_rmse_results_wanted = all_rmse_results_wanted[, c("Null", "OLS", "Stepwise", "Lasso", "RF", "BART-Best", "BART-G.Max", "BART-Full", "DT", "spike-slab")]
 
 par(mgp=c(1.8,.5,0),mar=c(3,3,2,1))
 boxplot(all_rmse_results_wanted, ylim = c(0, 1.1), ylab = "out-of-sample RMSE", outline = F)
@@ -125,7 +148,7 @@ points(apply(all_rmse_results_wanted, 2, mean, na.rm = T), pch = "-", col = "blu
 #save(all_num_var_results_no_na_wanted, file = "all_num_var_results_no_na_wanted.RData")
 
 ##rm ols bart best
-all_num_var_results_no_na_wanted = all_num_var_results_no_na_wanted[, c("Null", "OLS", "Stepwise", "Lasso", "RF", "BART-Best", "BART-G.Max", "BART-Full")]
+all_num_var_results_no_na_wanted = all_num_var_results_no_na_wanted[, c("Null", "OLS", "Stepwise", "Lasso", "RF", "BART-Best", "BART-G.Max", "BART-Full", "DT", "spike-slab")]
 
 par(mgp=c(1.8,.5,0),mar=c(3,3,2,1))
 boxplot(all_num_var_results_no_na_wanted, ylab = "Number of TF's Selected", outline = F)
@@ -140,7 +163,7 @@ for (i in 1 : nrow(all_rmse_results_wanted)){
 }
 #
 
-all_rmse_minus_null_per_num_var_wanted = all_rmse_minus_null_per_num_var[, c("OLS", "Stepwise", "Lasso", "RF", "BART-Best", "BART-G.Max", "BART-Full")]
+all_rmse_minus_null_per_num_var_wanted = all_rmse_minus_null_per_num_var[, c("OLS", "Stepwise", "Lasso", "RF", "BART-Best", "BART-G.Max", "BART-Full", "DT", "spike-slab")]
 
 par(mgp=c(1.8,.5,0),mar=c(3,3,2,1))
 boxplot(all_rmse_minus_null_per_num_var_wanted, 
