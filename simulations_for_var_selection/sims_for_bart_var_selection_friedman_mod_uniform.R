@@ -85,7 +85,7 @@ sigsq = param_mat[iter_num, 2]
 rep_results = array(NA, c(NUM_ALGOS, 2, num_replicates))
 
 ######replicate a few times
-for (nr in 1 : num_replicates){
+for (nr in 24 : num_replicates){
   cat("replicate #", nr, "\n")
   #generate friedman model data
   X = matrix(runif(n * p), ncol = p)
