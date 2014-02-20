@@ -75,7 +75,7 @@ if (NOT_ON_GRID){
 }
 
 ##set bart memory
-set_bart_machine_memory(3000)
+set_bart_machine_memory(4000)
 
 
 p = param_mat[iter_num, 1]
@@ -84,7 +84,7 @@ sigsq = param_mat[iter_num, 2]
 rep_results = array(NA, c(NUM_ALGOS, 2, num_replicates))
 
 ######replicate a few times
-for (nr in 12 : num_replicates){
+for (nr in 14 : num_replicates){
 	cat("replicate #", nr, "\n")
 	#generate friedman model data
 	X = matrix(rnorm(n * p), ncol = p)
