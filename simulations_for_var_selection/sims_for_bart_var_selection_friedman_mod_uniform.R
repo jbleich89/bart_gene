@@ -41,7 +41,7 @@ calc_prec_rec = function(true_vars, regression_vars){
 ###
 NUM_ALGOS = 20
 
-num_replicates = 100
+num_replicates = 50
 n = 250
 ps = c(25, 100, 200, 500, 1000)
 sigsqs = c(1, 25, 100)
@@ -85,7 +85,7 @@ sigsq = param_mat[iter_num, 2]
 rep_results = array(NA, c(NUM_ALGOS, 2, num_replicates))
 
 ######replicate a few times
-for (nr in 24 : num_replicates){
+for (nr in 40 : num_replicates){
   cat("replicate #", nr, "\n")
   #generate friedman model data
   X = matrix(runif(n * p), ncol = p)

@@ -1,4 +1,10 @@
 
+
+
+
+
+
+
 setwd("C:/Users/Kapelner/workspace/bart_gene/simulations_for_var_selection/sim_results")
 
 #bar colors for method
@@ -25,112 +31,32 @@ model_colors = c(
 
 num_models = length(model_colors)
 
-##friedman analysis
-##friedman analysis
-##friedman analysis
-ps = c(25, 100, 200, 500, 1000)
-sigsqs = c(1, 100, 625)
-
-
-spacing = 2
-
-graphics.off()
-par(mfrow = c(2, 1))
-graph_counter = 0
-for (p in ps){
-	results = array(NA, length(sigsqs) * num_models + spacing * (length(sigsqs) - 1))
-	names(results)[seq(from = 7, to = length(sigsqs) * num_models + spacing * (length(sigsqs) - 1), by = length(model_colors))] = sigsqs
-	iter = 1
-	for (sigsq in sigsqs){
-		X = read.csv(paste("complete_var_sel_sim_friedman_p", p, "_sigsq_", sigsq, ".csv", sep = ""))
-		F1_results = X[, 4]
-		F1_results[c(2,3,4,6,7,8,10,11,12,17,18)] = 0
-		results[iter : (iter + num_models - 1)] = F1_results
-		iter = iter + num_models + spacing
-	}
-	barplot(results, 
-			xlab = "sigsq + method", 
-			ylab = "F-score of avg", 
-			ylim = c(0, 1),
-			main = paste("Friedman F scores by sigsq and method, p =", p),
-			col = rep(c(model_colors, rep(NA, spacing)), length(sigsqs)))
-	
-	graph_counter = graph_counter + 1
-	if (graph_counter %% 2 == 0){
-		windows()
-		par(mfrow = c(2, 1))
-	}
-}
-
-
-##linear model analysis
-##linear model analysis
-##linear model analysis
-
-ps = c(20, 100, 200, 500, 1000)
-po_props = c(0.01, 0.05, 0.1, 0.2)
-sigsqs = c(1, 5, 20)
-
-graphics.off()
-par(mfrow = c(2, 2))
-graph_counter = 0
-master_iter = 0
-for (p in ps){
-	for (po_prop in po_props){
-		p0 = ceiling(p * po_prop)
-		
-		results = array(NA, length(sigsqs) * num_models + spacing * (length(sigsqs) - 1))
-		names(results)[seq(from = 7, to = length(sigsqs) * num_models + spacing * (length(sigsqs) - 1), by = length(model_colors) + spacing)] = sigsqs
-		iter = 1
-		for (sigsq in sigsqs){
-			master_iter = master_iter + 1
-			print(master_iter)
-			X = read.csv(paste("complete_var_sel_sim_linear_p", p, "_p0_", p0, "_sigsq_", sigsq, ".csv", sep = ""))
-			F1_results = X[, 4]
-			F1_results[c(2,3,4,6,7,8,10,11,12,17,18)] = 0
-			results[iter : (iter + num_models - 1)] = F1_results
-			iter = iter + num_models + spacing
-		
-		}
-		barplot(results, 
-				xlab = "sigsq + method", 
-				ylab = "F-score of avg", 
-				ylim = c(0, 1),
-				main = paste("Linear F scores by sigsq and method, p =", p, "and p0 =", p0),
-				col = rep(c(model_colors, rep(NA, spacing)), length(sigsqs)))
-		
-		graph_counter = graph_counter + 1
-		if (graph_counter %% 4 == 0){
-			windows()
-			par(mfrow = c(2, 2))
-		}		
-	}
-
-}
-
 
 ####FINAL PUB PLOTS
-setwd("C:/Users/jbleich/Desktop/Dropbox/BART_gene/sim_results/") ##for justin
+setwd("C:/Users/jbleich/Dropbox/BART_gene/sim_results_new/") ##for justin
 
 CEX_SIZE=2.75
 CEX_SIZE_2 = 2
-METHOD_NAMES = c("BART-\nBest", "BART-\nLocal", "BART-\nG.Max","BART-\nG.SE", "Step-\nwise", "Lasso\n", "RF-\nCV")
+METHOD_NAMES = c("BART-\nBest", "BART-\nLocal", "BART-\nG.Max","BART-\nG.SE", "Step-\nwise", "Lasso\n", "RF-\nCV", "DT\n", "spike-\nslab")
 
 make_lin_plot = function(p, p0, sigsq){
 	par(mar = c(6.5,5.5,2,0))
 	par(mgp=c(4,5,0))		
 
-	X = read.csv(paste("complete_var_sel_sim_linear_p", p, "_p0_", p0, "_sigsq_", sigsq, ".csv", sep = ""))
-	F1s = X[c(1,2,3,4, 13,15,16), 4]
+	load(file = paste("results_p", p, "_p", p0, "_sigsq", sigsq, ".Rdata", sep = ""))
+	obj = eval(as.name(paste("results_p", p, "_p", p0, "_sigsq", sigsq, sep = "")))
+	F1s = apply(obj[,,3], 1, mean)[c(1,2,3,4, 13,15,16, 19, 20)]
+  
+  windows()
 	barplot(F1s, 
 #		xlab = "Method", 
 #		ylab = "F-Score", 
 		ylim = c(0, 1),
      		cex.names = CEX_SIZE,
 		names = METHOD_NAMES,
-		yaxt="n",
+		yaxt="n")
 #		main = paste("Linear F scores by sigsq and method, p =", p, "and p0 =", p0),
-			col = model_colors[c(1,2,3,4, 13,15,16)])
+		#col = model_colors[c(1,2,3,4, 13,15,16)])
 	
 #	axis(1, at = 1:6, labels = METHOD_NAMES, cex.axis = CEX_SIZE)
 	title(ylab="F-Score",mgp=c(3.5,1,0), cex.lab = CEX_SIZE)
