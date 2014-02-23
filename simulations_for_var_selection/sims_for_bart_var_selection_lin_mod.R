@@ -76,7 +76,7 @@ if (NOT_ON_GRID){
 	set_bart_machine_num_cores(4)
 }
 ##set bart memeory
-set_bart_machine_memory(3000)
+set_bart_machine_memory(4000)
 
 p = param_mat[iter_num, 1]
 po_prop = param_mat[iter_num, 2]
