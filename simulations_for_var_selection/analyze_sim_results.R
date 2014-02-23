@@ -33,7 +33,7 @@ num_models = length(model_colors)
 
 
 ####FINAL PUB PLOTS
-setwd("C:/Users/jbleich/Dropbox/BART_gene/sim_results_new/") ##for justin
+setwd("C:/Users/jbleich/Dropbox/BART_gene/sim_results_new/linear/") ##for justin
 
 CEX_SIZE=2.75
 CEX_SIZE_2 = 2
@@ -69,13 +69,22 @@ make_lin_plot(200, 2, 20)
 make_lin_plot(200, 20, 5)
 make_lin_plot(200, 20, 20)
 
+##friedman uniform
+setwd("C:/Users/jbleich/Dropbox/BART_gene/sim_results_new/friedman_uniform/") ##for justin
+
+CEX_SIZE=1
+CEX_SIZE_2 = 2
+METHOD_NAMES = c("BART-\nBest", "BART-\nLocal", "BART-\nG.Max","BART-\nG.SE", "Step-\nwise", "Lasso\n", "RF-\nCV", "DT\n", "spike-\nslab")
 
 make_nonlin_plot = function(p, sigsq){
 	par(mar = c(6.5,5.5,2,0))
 	par(mgp=c(4,5,0))	
 	
-	X = read.csv(paste("complete_var_sel_sim_friedman_p", p, "_sigsq_", sigsq, ".csv", sep = ""))
-	F1s = X[c(1,2,3,4, 13,15,16), 4]
+	load(file = paste("results_fried_unif_p", p, "_sigsq", sigsq, ".Rdata", sep = ""))
+	obj = eval(as.name(paste("results_fried_unif_p", p, "_sigsq", sigsq, sep = "")))
+	F1s = apply(obj[,,3], 1, mean)[c(1,2,3,4, 13,15,16, 19, 20)]
+
+  windows()
 	barplot(F1s, 
 #		xlab = "Method", 
 #		ylab = "F-Score",
@@ -83,9 +92,9 @@ make_nonlin_plot = function(p, sigsq){
 		ylim = c(0, 1),
      		cex.names = CEX_SIZE,
 		names = METHOD_NAMES,
-		yaxt="n",
+		yaxt="n")
 #		main = paste("Linear F scores by sigsq and method, p =", p, "and p0 =", p0),
-			col = model_colors[c(1,2,3,4, 13,15,16)])
+		#	col = model_colors[c(1,2,3,4, 13,15,16)])
 	
 #	axis(1, at = 1:6, labels = METHOD_NAMES, cex.axis = CEX_SIZE)
 	title(ylab="F-Score",mgp=c(3.5,1,0), cex.lab = CEX_SIZE)
@@ -96,7 +105,7 @@ make_nonlin_plot = function(p, sigsq){
 
 #make_nonlin_plot(200, 100)
 #make_nonlin_plot(200, 625)
-make_nonlin_plot(500, 100)
+make_nonlin_plot(500, 1)
 make_nonlin_plot(500, 625)
 make_nonlin_plot(1000, 100)
 make_nonlin_plot(1000, 625)

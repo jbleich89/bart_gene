@@ -100,7 +100,7 @@ for (nr in 26 : 29){
 	#now build bart machine WITHOUT PRIOR
 	bart_variables_select_obj = var_selection_by_permute_response_three_methods(bart_machine, plot = FALSE)
 	bart_ptwise_vars = sort(as.numeric(bart_variables_select_obj$important_vars_local_names))
-	bart_simul_max_vars = sort(as.numeric(bart_variables_select_obj$important_global_max_names))
+	bart_simul_max_vars = sort(as.numeric(bart_variables_select_obj$important_vars_global_max_names))
 	bart_simul_se_vars = sort(as.numeric(bart_variables_select_obj$important_vars_global_se_names))	
 	#do var selection with a CV-min-RMSE
 	bart_cv_vars = as.numeric(var_selection_by_permute_response_cv(bart_machine)$important_vars_cv)
@@ -116,7 +116,7 @@ for (nr in 26 : 29){
 	#do var selection with bart WITH  PRIOR
 	bart_variables_select_obj = var_selection_by_permute_response_three_methods(bart_machine, plot = FALSE)
 	bart_ptwise_vars_good_prior = sort(as.numeric(bart_variables_select_obj$important_vars_local_names))
-	bart_simul_max_vars_good_prior = sort(as.numeric(bart_variables_select_obj$important_global_max_names))
+	bart_simul_max_vars_good_prior = sort(as.numeric(bart_variables_select_obj$important_vars_global_max_names))
 	bart_simul_se_vars_good_prior = sort(as.numeric(bart_variables_select_obj$important_vars_global_se_names))	
 	#do var selection with a CV-min-RMSE
 	bart_cv_vars_good_prior = as.numeric(var_selection_by_permute_response_cv(bart_machine)$important_vars_cv)
@@ -133,7 +133,7 @@ for (nr in 26 : 29){
 	#do var selection with bart WITH PRIOR
 	bart_variables_select_obj = var_selection_by_permute_response_three_methods(bart_machine, plot = FALSE)
 	bart_ptwise_vars_bad_prior = sort(as.numeric(bart_variables_select_obj$important_vars_local_names))
-	bart_simul_max_vars_bad_prior = sort(as.numeric(bart_variables_select_obj$important_global_max_names))
+	bart_simul_max_vars_bad_prior = sort(as.numeric(bart_variables_select_obj$important_vars_global_max_names))
 	bart_simul_se_vars_bad_prior = sort(as.numeric(bart_variables_select_obj$important_vars_global_se_names))	
 	#do var selection with a CV-min-RMSE
 	bart_cv_vars_bad_prior = as.numeric(var_selection_by_permute_response_cv(bart_machine)$important_vars_cv)
