@@ -105,8 +105,8 @@ save(new_all_num_var_results_no_na_wanted, file = "new_all_num_var_results_no_na
 # load("C:/Users/Justin/Dropbox/BART_gene/all_rmse_results.RData")
 # load("C:/Users/Justin/Dropbox/BART_gene/all_num_var_results.RData")
 
-load("C:/Users/jbleich/Dropbox/BART_gene/new_all_rmse_results_wanted.Rdata")
-load("C:/Users/jbleich/Dropbox/BART_gene/new_all_num_var_results_no_na_wanted.Rdata")
+load("C:/Users/kapelner/Dropbox/BART_gene/new_all_rmse_results_wanted.Rdata")
+load("C:/Users/kapelner/Dropbox/BART_gene/new_all_num_var_results_no_na_wanted.Rdata")
 
 
 ##Change some colnames
@@ -134,8 +134,8 @@ all_rmse_results_wanted = new_all_rmse_results_wanted[-rm,]
 ##rm OLS BART BEST
 all_rmse_results_wanted = all_rmse_results_wanted[, c("Null", "OLS", "Stepwise", "Lasso", "RF", "BART-Best", "BART-G.Max", "BART-Full", "DT", "spike-slab")]
 
-par(mgp=c(1.8,.5,0),mar=c(3,3,2,1))
-boxplot(all_rmse_results_wanted, ylim = c(0, 1.1), ylab = "out-of-sample RMSE", outline = F)
+par(mgp=c(1.8,.5,0), mar=c(4,2.7,0.1,0.1))
+boxplot(all_rmse_results_wanted, ylim = c(0, 1.1), ylab = "out-of-sample RMSE", outline = F, las = 2, names = c("Null", "OLS", "Stepwise", "Lasso", "RF", "BART-\nBest", "BART-\nG.Max", "BART-\nFull", "DT", "spike-\nslab"))
 points(apply(all_rmse_results_wanted, 2, mean, na.rm = T), pch = "-", col = "blue", cex = 5)
 #abline(a = mean(all_rmse_results_wanted[, 1], na.rm = TRUE), b = 0, col = "red")
 
@@ -149,10 +149,11 @@ points(apply(all_rmse_results_wanted, 2, mean, na.rm = T), pch = "-", col = "blu
 
 ##rm ols bart best
 all_num_var_results_no_na_wanted = all_num_var_results_no_na_wanted[, c("Null", "OLS", "Stepwise", "Lasso", "RF", "BART-Best", "BART-G.Max", "BART-Full", "DT", "spike-slab")]
+all_num_var_results_no_na_wanted_fig = all_num_var_results_no_na_wanted[, c("Stepwise", "Lasso", "RF", "BART-Best", "BART-G.Max", "DT", "spike-slab")]
 
-par(mgp=c(1.8,.5,0),mar=c(3,3,2,1))
-boxplot(all_num_var_results_no_na_wanted, ylab = "Number of TF's Selected", outline = F)
-points(apply(all_num_var_results_no_na_wanted, 2, mean), pch = "-", col = "blue", cex = 5)
+par(mgp=c(1.8,.5,0), mar=c(4,2.7,0.1,0.1))
+boxplot(all_num_var_results_no_na_wanted_fig, ylab = "Number of TF's Selected", outline = F, las = 2, names = c("Stepwise", "Lasso", "RF", "BART-\nBest", "BART-\nG.Max", "DT", "spike-\nslab"))
+points(apply(all_num_var_results_no_na_wanted_fig, 2, mean), pch = "-", col = "blue", cex = 5)
 
 
 ##Reduction per var 
@@ -165,10 +166,11 @@ for (i in 1 : nrow(all_rmse_results_wanted)){
 
 all_rmse_minus_null_per_num_var_wanted = all_rmse_minus_null_per_num_var[, c("OLS", "Stepwise", "Lasso", "RF", "BART-Best", "BART-G.Max", "BART-Full", "DT", "spike-slab")]
 
-par(mgp=c(1.8,.5,0),mar=c(3,3,2,1))
+par(mgp=c(1.8,.5,0), mar=c(4,4,0.1,0.1))
 boxplot(all_rmse_minus_null_per_num_var_wanted, 
-		ylab = "RMSE Reduction per TF", 
-		ylim = c(-.05, 0.2), outline = F)
+		ylab = "RMSE Reduction per TF\n", 
+		ylim = c(-.05, 0.2), outline = F, las = 2,
+		names = c("OLS", "Stepwise", "Lasso", "RF", "BART-\nBest", "BART-\nG.Max", "BART-\nFull", "DT", "spike-\nslab"))
 points(apply(all_rmse_minus_null_per_num_var_wanted, 2, mean, na.rm = TRUE), pch = "-", col = "blue", cex = 5)
 abline(a = 0, b = 0, col = "red")
 
