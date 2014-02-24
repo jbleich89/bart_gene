@@ -89,7 +89,7 @@ rep_results = array(NA, c(NUM_ALGOS, 2, num_replicates))
 
 
 ######replicate a few times
-for (nr in 1 : num_replicates){
+for (nr in num_replicates : 1){
 	cat("replicate #", nr, "\n")
 	
 	#generate linear model data
