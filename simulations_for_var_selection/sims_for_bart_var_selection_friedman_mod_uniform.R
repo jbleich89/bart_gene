@@ -85,7 +85,7 @@ sigsq = param_mat[iter_num, 2]
 rep_results = array(NA, c(NUM_ALGOS, 2, num_replicates))
 
 ######replicate a few times
-for (nr in 30 : num_replicates){
+for (nr in 1 : 30){
   cat("replicate #", nr, "\n")
   #generate friedman model data
   X = matrix(runif(n * p), ncol = p)
@@ -271,7 +271,7 @@ F1s = 2 * results[, 1] * results[, 2] / (results[, 1] + results[, 2])
 results = cbind(results, F1s)
 
 #save results
-write.csv(results, file = paste("complete_var_sel_sim_friedman_uniform_p", p, "_sigsq_", sigsq, "_revised.csv", sep = ""))	
+# write.csv(results, file = paste("complete_var_sel_sim_friedman_uniform_p", p, "_sigsq_", sigsq, "_revised.csv", sep = ""))	
 
 
 ##load results and print them to xtable
