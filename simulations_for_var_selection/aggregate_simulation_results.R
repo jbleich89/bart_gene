@@ -10,6 +10,9 @@ dimnames(results_p200_p20_sigsq5) = list(c("BART_CV", "BART_pointwise", "BART_si
                                            "lasso", "RF_CV", "RF_point", "RF_simul", "dynaTree","spikeSlab") , NULL, c("Precision", "Recall", "F1"))
 for(nr in 1:50){
   temp = read.csv(paste("partial_var_sel_sim_linear_p200_p0_20_sigsq_5_nr_", nr, "_revised.csv", sep = ""))
+  temp2 = read.csv(paste("partial_var_sel_sim_linear_p200_p0_20_sigsq_5_nr_", nr, "_bart_gmax.csv", sep = ""))
+  temp[c(3,7, 11),2:3] = temp2[c(3,7, 11),2:3]
+  
   f1s = 2 * temp[,2] * temp[,3]/(temp[,2] + temp[, 3])
   f1s = ifelse(is.nan(f1s), 0, f1s)
   results_p200_p20_sigsq5[,nr,] = cbind(temp[,2], temp[,3], f1s)
@@ -26,6 +29,8 @@ dimnames(results_p200_p20_sigsq20) = list(c("BART_CV", "BART_pointwise", "BART_s
                                            "lasso", "RF_CV", "RF_point", "RF_simul", "dynaTree","spikeSlab") , NULL, c("Precision", "Recall", "F1"))
 for(nr in 1:50){
   temp = read.csv(paste("partial_var_sel_sim_linear_p200_p0_20_sigsq_20_nr_", nr, "_revised.csv", sep = ""))
+  temp2 = read.csv(paste("partial_var_sel_sim_linear_p200_p0_20_sigsq_20_nr_", nr, "_bart_gmax.csv", sep = ""))
+  temp[c(3,7, 11),2:3] = temp2[c(3,7, 11),2:3]
   f1s = 2 * temp[,2] * temp[,3]/(temp[,2] + temp[, 3])
   f1s = ifelse(is.nan(f1s), 0, f1s)
   results_p200_p20_sigsq20[,nr,] = cbind(temp[,2], temp[,3], f1s)
@@ -41,6 +46,8 @@ dimnames(results_p200_p2_sigsq5) = list(c("BART_CV", "BART_pointwise", "BART_sim
                                            "lasso", "RF_CV", "RF_point", "RF_simul", "dynaTree","spikeSlab") , NULL, c("Precision", "Recall", "F1"))
 for(nr in 1:50){
   temp = read.csv(paste("partial_var_sel_sim_linear_p200_p0_2_sigsq_5_nr_", nr, "_revised.csv", sep = ""))
+  temp2 = read.csv(paste("partial_var_sel_sim_linear_p200_p0_2_sigsq_5_nr_", nr, "_bart_gmax.csv", sep = ""))
+  temp[c(3,7, 11),2:3] = temp2[c(3,7, 11),2:3]
   f1s = 2 * temp[,2] * temp[,3]/(temp[,2] + temp[, 3])
   f1s = ifelse(is.nan(f1s), 0, f1s)
   results_p200_p2_sigsq5[,nr,] = cbind(temp[,2], temp[,3], f1s)
@@ -57,6 +64,8 @@ dimnames(results_p200_p2_sigsq20) = list(c("BART_CV", "BART_pointwise", "BART_si
                                            "lasso", "RF_CV", "RF_point", "RF_simul", "dynaTree","spikeSlab") , NULL, c("Precision", "Recall", "F1"))
 for(nr in 1:50){
   temp = read.csv(paste("partial_var_sel_sim_linear_p200_p0_2_sigsq_20_nr_", nr, "_revised.csv", sep = ""))
+  temp2 = read.csv(paste("partial_var_sel_sim_linear_p200_p0_2_sigsq_20_nr_", nr, "_bart_gmax.csv", sep = ""))
+  temp[c(3,7, 11),2:3] = temp2[c(3,7, 11),2:3]
   f1s = 2 * temp[,2] * temp[,3]/(temp[,2] + temp[, 3])
   f1s = ifelse(is.nan(f1s), 0, f1s)
   results_p200_p2_sigsq20[,nr,] = cbind(temp[,2], temp[,3], f1s)
@@ -73,6 +82,8 @@ dimnames(results_p500_p25_sigsq1) = list(c("BART_CV", "BART_pointwise", "BART_si
                                            "lasso", "RF_CV", "RF_point", "RF_simul", "dynaTree","spikeSlab") , NULL, c("Precision", "Recall", "F1"))
 for(nr in 1:50){
   temp = read.csv(paste("partial_var_sel_sim_linear_p500_p0_25_sigsq_1_nr_", nr, "_revised.csv", sep = ""))
+  temp2 = read.csv(paste("partial_var_sel_sim_linear_p500_p0_25_sigsq_1_nr_", nr, "_bart_gmax.csv", sep = ""))
+  temp[c(3,7, 11),2:3] = temp2[c(3,7, 11),2:3]
   f1s = 2 * temp[,2] * temp[,3]/(temp[,2] + temp[, 3])
   f1s = ifelse(is.nan(f1s), 0, f1s)
   results_p500_p25_sigsq1[,nr,] = cbind(temp[,2], temp[,3], f1s)
@@ -89,6 +100,8 @@ dimnames(results_p500_p25_sigsq5) = list(c("BART_CV", "BART_pointwise", "BART_si
                                            "lasso", "RF_CV", "RF_point", "RF_simul", "dynaTree","spikeSlab") , NULL, c("Precision", "Recall", "F1"))
 for(nr in 1:50){
   temp = read.csv(paste("partial_var_sel_sim_linear_p500_p0_25_sigsq_5_nr_", nr, "_revised.csv", sep = ""))
+  temp2 = read.csv(paste("partial_var_sel_sim_linear_p500_p0_25_sigsq_5_nr_", nr, "_bart_gmax.csv", sep = ""))
+  temp[c(3,7, 11),2:3] = temp2[c(3,7, 11),2:3]
   f1s = 2 * temp[,2] * temp[,3]/(temp[,2] + temp[, 3])
   f1s = ifelse(is.nan(f1s), 0, f1s)
   results_p500_p25_sigsq5[,nr,] = cbind(temp[,2], temp[,3], f1s)
@@ -104,6 +117,8 @@ dimnames(results_p500_p50_sigsq1) = list(c("BART_CV", "BART_pointwise", "BART_si
                                            "lasso", "RF_CV", "RF_point", "RF_simul", "dynaTree","spikeSlab") , NULL, c("Precision", "Recall", "F1"))
 for(nr in 1:50){
   temp = read.csv(paste("partial_var_sel_sim_linear_p500_p0_50_sigsq_1_nr_", nr, "_revised.csv", sep = ""))
+  temp2 = read.csv(paste("partial_var_sel_sim_linear_p500_p0_50_sigsq_1_nr_", nr, "_bart_gmax.csv", sep = ""))
+  temp[c(3,7, 11),2:3] = temp2[c(3,7, 11),2:3]
   f1s = 2 * temp[,2] * temp[,3]/(temp[,2] + temp[, 3])
   f1s = ifelse(is.nan(f1s), 0, f1s)
   results_p500_p50_sigsq1[,nr,] = cbind(temp[,2], temp[,3], f1s)
@@ -120,6 +135,8 @@ dimnames(results_p500_p50_sigsq5) = list(c("BART_CV", "BART_pointwise", "BART_si
                                            "lasso", "RF_CV", "RF_point", "RF_simul", "dynaTree","spikeSlab") , NULL, c("Precision", "Recall", "F1"))
 for(nr in 1:50){
   temp = read.csv(paste("partial_var_sel_sim_linear_p500_p0_50_sigsq_5_nr_", nr, "_revised.csv", sep = ""))
+  temp2 = read.csv(paste("partial_var_sel_sim_linear_p500_p0_50_sigsq_5_nr_", nr, "_bart_gmax.csv", sep = ""))
+  temp[c(3,7, 11),2:3] = temp2[c(3,7, 11),2:3]
   f1s = 2 * temp[,2] * temp[,3]/(temp[,2] + temp[, 3])
   f1s = ifelse(is.nan(f1s), 0, f1s)
   results_p500_p50_sigsq5[,nr,] = cbind(temp[,2], temp[,3], f1s)
@@ -145,6 +162,8 @@ dimnames(results_fried_unif_p500_sigsq1) = list(c("BART_CV", "BART_pointwise", "
                                            "lasso", "RF_CV", "RF_point", "RF_simul", "dynaTree","spikeSlab") , NULL, c("Precision", "Recall", "F1"))
 for(nr in 1:50){
   temp = read.csv(paste("partial_var_sel_sim_friedman_uniform_p500_sigsq_1_nr_", nr, "_revised.csv", sep = ""))
+  temp2 = read.csv(paste("partial_var_sel_sim_friedman_uniform_p500_sigsq_1_nr_", nr, "_bart_gmax.csv", sep = ""))
+  temp[c(3,7, 11),2:3] = temp2[c(3,7, 11),2:3]
   f1s = 2 * temp[,2] * temp[,3]/(temp[,2] + temp[, 3])
   f1s = ifelse(is.nan(f1s), 0, f1s)
   results_fried_unif_p500_sigsq1[,nr,] = cbind(temp[,2], temp[,3], f1s)
@@ -159,6 +178,8 @@ dimnames(results_fried_unif_p500_sigsq25) = list(c("BART_CV", "BART_pointwise", 
                                                   "lasso", "RF_CV", "RF_point", "RF_simul", "dynaTree","spikeSlab") , NULL, c("Precision", "Recall", "F1"))
 for(nr in 1:50){
   temp = read.csv(paste("partial_var_sel_sim_friedman_uniform_p500_sigsq_25_nr_", nr, "_revised.csv", sep = ""))
+  temp2 = read.csv(paste("partial_var_sel_sim_friedman_uniform_p500_sigsq_25_nr_", nr, "_bart_gmax.csv", sep = ""))
+  temp[c(3,7, 11),2:3] = temp2[c(3,7, 11),2:3]
   f1s = 2 * temp[,2] * temp[,3]/(temp[,2] + temp[, 3])
   f1s = ifelse(is.nan(f1s), 0, f1s)
   results_fried_unif_p500_sigsq25[,nr,] = cbind(temp[,2], temp[,3], f1s)
@@ -175,6 +196,8 @@ dimnames(results_fried_unif_p500_sigsq100) = list(c("BART_CV", "BART_pointwise",
                                                   "lasso", "RF_CV", "RF_point", "RF_simul", "dynaTree","spikeSlab") , NULL, c("Precision", "Recall", "F1"))
 for(nr in 1:50){
   temp = read.csv(paste("partial_var_sel_sim_friedman_uniform_p500_sigsq_100_nr_", nr, "_revised.csv", sep = ""))
+  temp2 = read.csv(paste("partial_var_sel_sim_friedman_uniform_p500_sigsq_100_nr_", nr, "_bart_gmax.csv", sep = ""))
+  temp[c(3,7, 11),2:3] = temp2[c(3,7, 11),2:3]
   f1s = 2 * temp[,2] * temp[,3]/(temp[,2] + temp[, 3])
   f1s = ifelse(is.nan(f1s), 0, f1s)
   results_fried_unif_p500_sigsq100[,nr,] = cbind(temp[,2], temp[,3], f1s)
@@ -192,6 +215,8 @@ dimnames(results_fried_unif_p1000_sigsq1) = list(c("BART_CV", "BART_pointwise", 
                                                   "lasso", "RF_CV", "RF_point", "RF_simul", "dynaTree","spikeSlab") , NULL, c("Precision", "Recall", "F1"))
 for(nr in 1:50){
   temp = read.csv(paste("partial_var_sel_sim_friedman_uniform_p1000_sigsq_1_nr_", nr, "_revised.csv", sep = ""))
+  temp2 = read.csv(paste("partial_var_sel_sim_friedman_uniform_p1000_sigsq_1_nr_", nr, "_bart_gmax.csv", sep = ""))
+  temp[c(3,7, 11),2:3] = temp2[c(3,7, 11),2:3]
   f1s = 2 * temp[,2] * temp[,3]/(temp[,2] + temp[, 3])
   f1s = ifelse(is.nan(f1s), 0, f1s)
   results_fried_unif_p1000_sigsq1[,nr,] = cbind(temp[,2], temp[,3], f1s)
@@ -206,6 +231,8 @@ dimnames(results_fried_unif_p1000_sigsq25) = list(c("BART_CV", "BART_pointwise",
                                                    "lasso", "RF_CV", "RF_point", "RF_simul", "dynaTree","spikeSlab") , NULL, c("Precision", "Recall", "F1"))
 for(nr in 1:50){
   temp = read.csv(paste("partial_var_sel_sim_friedman_uniform_p1000_sigsq_25_nr_", nr, "_revised.csv", sep = ""))
+  temp2 = read.csv(paste("partial_var_sel_sim_friedman_uniform_p1000_sigsq_25_nr_", nr, "_bart_gmax.csv", sep = ""))
+  temp[c(3,7, 11),2:3] = temp2[c(3,7, 11),2:3]
   f1s = 2 * temp[,2] * temp[,3]/(temp[,2] + temp[, 3])
   f1s = ifelse(is.nan(f1s), 0, f1s)
   results_fried_unif_p1000_sigsq25[,nr,] = cbind(temp[,2], temp[,3], f1s)
@@ -222,6 +249,8 @@ dimnames(results_fried_unif_p1000_sigsq100) = list(c("BART_CV", "BART_pointwise"
                                                     "lasso", "RF_CV", "RF_point", "RF_simul", "dynaTree","spikeSlab") , NULL, c("Precision", "Recall", "F1"))
 for(nr in 1:50){
   temp = read.csv(paste("partial_var_sel_sim_friedman_uniform_p1000_sigsq_100_nr_", nr, "_revised.csv", sep = ""))
+  temp2 = read.csv(paste("partial_var_sel_sim_friedman_uniform_p1000_sigsq_100_nr_", nr, "_bart_gmax.csv", sep = ""))
+  temp[c(3,7, 11),2:3] = temp2[c(3,7, 11),2:3]
   f1s = 2 * temp[,2] * temp[,3]/(temp[,2] + temp[, 3])
   f1s = ifelse(is.nan(f1s), 0, f1s)
   results_fried_unif_p1000_sigsq100[,nr,] = cbind(temp[,2], temp[,3], f1s)

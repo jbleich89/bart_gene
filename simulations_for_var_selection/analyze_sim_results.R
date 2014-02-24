@@ -110,21 +110,25 @@ make_nonlin_plot(500, 625)
 make_nonlin_plot(1000, 100)
 make_nonlin_plot(1000, 625)
 
+
+setwd("C:/Users/jbleich/Dropbox/BART_gene/sim_results_new/linear/") ##for justin
+
 make_lin_prior_plot = function(p, p0, sigsq){
 	par(mar = c(6.5,5.5,2,0))
 	par(mgp=c(4,5,0))	
 	
-	X = read.csv(paste("complete_var_sel_sim_linear_p", p, "_p0_", p0, "_sigsq_", sigsq, ".csv", sep = ""))
-	F1s = X[c(1, 5, 9), 4]
+	load(file = paste("results_p", p, "_p", p0, "_sigsq", sigsq, ".Rdata", sep = ""))
+	obj = eval(as.name(paste("results_p", p, "_p", p0, "_sigsq", sigsq, sep = "")))
+	F1s = apply(obj[,,3], 1, mean)[c(1,5,9)]
 	barplot(F1s, 
 #		xlab = "method", 
 #			ylab = "F-Score", 
 			yaxt="n",
 			ylim = c(0, 1),
 			names = c("Uniform\nPrior", "Correct\nPrior", "Incorrect\nPrior"),
-			cex.names = CEX_SIZE,
+			cex.names = CEX_SIZE)
 #		main = paste("Linear F scores by sigsq and method, p =", p, "and p0 =", p0),
-			col = model_colors[c(1, 5, 9)])
+		#	col = model_colors[c(1, 5, 9)])
 
 	title(ylab="F-Score",mgp=c(3.5,1,0), cex.lab = CEX_SIZE)
      	axis(2, at= c(0,.2,.4,.6,.8,1), labels=c("0.0","0.2","0.4","0.6","0.8","1.0"),mgp=c(3,1,0),cex.axis=CEX_SIZE_2)

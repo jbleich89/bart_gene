@@ -176,7 +176,7 @@ for (nr in num_replicates : 1){
 #   
 #   
 #   ##do var selection with dynaTree
-#   dynatree_vars = as.numeric(var_sel_dynaTree(as.matrix(X), y, n_particles = 2500))
+#   dynatree_vars = as.numeric(var_sel_dynaTree(as.matrix(X), y, n_particles = 5000))
 #   
 #   ##do var selection with spikeslab
 # 	spikeslab_mod = spikeslab(x = as.matrix(X), y = y, verbose = F, 
