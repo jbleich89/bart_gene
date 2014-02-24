@@ -98,7 +98,7 @@ for (nr in 30 : num_replicates){
   #do var selection with bart WITHOUT PRIOR
   bart_machine = build_bart_machine(X, y, num_trees = 1, num_burn_in = 2000, run_in_sample = FALSE, verbose = FALSE)	
   #now build bart machine WITHOUT PRIOR
-#   bart_variables_select_obj = var_selection_by_permute_response_three_methods(bart_machine, plot = FALSE)
+   bart_variables_select_obj = var_selection_by_permute_response_three_methods(bart_machine, plot = FALSE)
 #   bart_ptwise_vars = sort(as.numeric(bart_variables_select_obj$important_vars_local_names))
   bart_simul_max_vars = sort(as.numeric(bart_variables_select_obj$important_vars_global_max_names))
 #   bart_simul_se_vars = sort(as.numeric(bart_variables_select_obj$important_vars_global_se_names))	
