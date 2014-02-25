@@ -1,21 +1,8 @@
-if (.Platform$OS.type == "windows"){
-  directory_where_code_is = "C:\\Users\\jbleich\\workspace\\CGMBART_GPL/bartMachine/R/"
-}
-setwd(directory_where_code_is)
-source("bart_package_builders.R")
-source("bart_package_variable_selection.R")
-source("bart_package_data_preprocessing.R")
-source("bart_package_inits.R")
-source("bart_package_summaries.R")
-
+library(bartMachine)
 
 setwd("C:/Users/jbleich/workspace/bart_gene/analysis_with_tuning/")
 
-
 source("simulation_params_JB.R")
-
-setwd("C:\\Users\\jbleich\\workspace\\CGMBART_GPL/")
-
 
 ##For sample figure
 
@@ -113,9 +100,9 @@ save(corrs_mat, file = "null_corrs_matrix.Rdata")
 #load items
 load("C:/Users/Justin/Dropbox/BART_gene/null_corrs_matrix.Rdata")
 load("C:/Users/Justin/Dropbox/BART_gene/null_probs_matrix.Rdata")
-load("C:/Users/jbleich/Desktop/Dropbox/BART_gene/null_corrs_matrix.Rdata")
-load("C:/Users/jbleich/Desktop/Dropbox/BART_gene/null_probs_matrix.Rdata")
-setwd("C:/Users/jbleich/Desktop/Dropbox/BART_gene/null_distribution/")
+load("C:/Users/jbleich/Dropbox/BART_gene/null_corrs_matrix.Rdata")
+load("C:/Users/jbleich/Dropbox/BART_gene/null_probs_matrix.Rdata")
+setwd("C:/Users/jbleich/Dropbox/BART_gene/null_distribution/")
 par(mgp=c(1.8,.5,0), mar=c(3.5,3.5,2,1)) 
 ##across data set variation
 

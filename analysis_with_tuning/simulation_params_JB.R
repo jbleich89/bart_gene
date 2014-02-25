@@ -1,5 +1,7 @@
 #simulation params
 
+setwd("C:\\Users\\jbleich\\Documents\\Bleich_Files\\Research_Genomics")
+
 cs = c(
 	0, #no prior
 	0.5, #weak prior
@@ -24,7 +26,7 @@ METHODS = c("important_tfs_at_alpha_pointwise", "important_tfs_at_alpha_simul_ma
 NUM_TREES_FOR_EVAL = 200
 GENE_NUM = 1 #this will be set by passing an arg into R below:
 
-source("~/Research_Genomics/bart_gene/helper_functions.R")
+source("bart_gene/helper_functions.R")
 
 # if (.Platform$OS.type == "windows"){
 # 	setwd("C:/Users/Kapelner/Desktop/Dropbox/BART_gene")
@@ -32,7 +34,7 @@ source("~/Research_Genomics/bart_gene/helper_functions.R")
 # 	setwd("../shane_data")
 # }
 
-setwd("~/Research_Genomics/")
+
 priors = read.table("CHIP.priorprobs.39.txt", header = TRUE)
 gene.exp = read.table("expression.genes.txt", header = TRUE)
 tf.exp = read.table("expression.tfs.39.txt", header = TRUE)
