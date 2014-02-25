@@ -38,7 +38,7 @@ setwd("C:/Users/kapelner/Desktop/Dropbox/BART_gene/sim_results_new/linear/") ##f
 
 CEX_SIZE=2.75
 CEX_SIZE_2 = 2
-METHOD_NAMES = c("BART-Best", "BART-Local", "BART-G.Max","BART-G.SE", "Stepwise", "Lasso", "RF-CV", "DT", "spike-slab")
+METHOD_NAMES = c("BART-Best", "BART-Local", "BART-G.Max", "BART-G.SE", "Stepwise", "Lasso", "RF-CV", "DT", "Spike-slab")
 
 make_lin_plot = function(p, p0, sigsq){
 #	par(mar = c(6.5,5.5,2,0))
@@ -84,9 +84,9 @@ make_lin_plot(500, 50, 5)
 setwd("C:/Users/jbleich/Dropbox/BART_gene/sim_results_new/friedman_uniform/") ##for justin
 setwd("C:/Users/kapelner/Dropbox/BART_gene/sim_results_new/friedman_uniform/") ##for justin
 
-CEX_SIZE=1
-CEX_SIZE_2 = 2
-METHOD_NAMES = c("BART-\nBest", "BART-\nLocal", "BART-\nG.Max","BART-\nG.SE", "Step-\nwise", "Lasso\n", "RF-\nCV", "DT\n", "spike-\nslab")
+#CEX_SIZE=1
+#CEX_SIZE_2 = 2
+#METHOD_NAMES = c("BART-\nBest", "BART-\nLocal", "BART-\nG.Max","BART-\nG.SE", "Step-\nwise", "Lasso\n", "RF-\nCV", "DT\n", "spike-\nslab")
 
 make_nonlin_plot = function(p, sigsq){
 	par(mar = c(6.5,5.5,2,0))
@@ -98,22 +98,14 @@ make_nonlin_plot = function(p, sigsq){
 	F1_sd = apply(obj[,,3], 1, sd)[c(1,2,3,4, 13,15,16, 19, 20)]
 	num_sims = dim(obj)[2]
 	
-	par(mgp=c(1.8,.5,0), mar=c(4,2.7,0.3,0.1))
-	bars = barplot(F1s, 
-#		xlab = "Method", 
-#		ylab = "F-Score", 
+	par(mgp=c(1.8,.5,0), mar=c(4.3,2.7,0.3,0.1))
+	bars = barplot(F1s,
 			ylim = c(0, 1),
-#     		cex.names = CEX_SIZE,
-			names = METHOD_NAMES,
-#		yaxt="n",
+			xaxt = "n",
 			las = 2,
-			ylab="F-Score")
-#		main = paste("Linear F scores by sigsq and method, p =", p, "and p0 =", p0),
-	#col = model_colors[c(1,2,3,4, 13,15,16)])
+			ylab = "F-Score")
 	
-#	axis(1, at = 1:6, labels = METHOD_NAMES, cex.axis = CEX_SIZE)
-#	title(ylab="F-Score",mgp=c(3.5,1,0), cex.lab = CEX_SIZE)
-#     axis(2, at= c(0,.2,.4,.6,.8,1), labels=c("0.0","0.2","0.4","0.6","0.8","1.0"),mgp=c(3,1,0),cex.axis=CEX_SIZE_2)
+	text(bars, labels = METHOD_NAMES, par("usr")[3] - 0.05, srt = 45, adj = 1, xpd = TRUE, font = 1)
 	
 	conf_upper = F1s + 1.645 * F1_sd / sqrt(num_sims)
 	conf_lower = F1s - 1.645 * F1_sd / sqrt(num_sims)
@@ -137,21 +129,24 @@ make_lin_prior_plot = function(p, p0, sigsq){
 	par(mar = c(6.5,5.5,2,0))
 	par(mgp=c(4,5,0))	
 	
-	load(file = paste("results_p", p, "_p", p0, "_sigsq", sigsq, ".Rdata", sep = ""))
+#	load(file = paste("results_p", p, "_p", p0, "_sigsq", sigsq, ".Rdata", sep = ""))
 	obj = eval(as.name(paste("results_p", p, "_p", p0, "_sigsq", sigsq, sep = "")))
 	F1s = apply(obj[,,3], 1, mean)[c(1,5,9)]
-	barplot(F1s, 
-#		xlab = "method", 
-#			ylab = "F-Score", 
-			yaxt="n",
+	F1_sd = apply(obj[,,3], 1, sd)[c(1,5,9)]
+	num_sims = dim(obj)[2]
+	
+	par(mgp=c(1.8,.5,0), mar=c(3.5,2.7,0.7,0.1))
+	bars = barplot(F1s,
+			xaxt = "n",
 			ylim = c(0, 1),
-			names = c("Uniform\nPrior", "Correct\nPrior", "Incorrect\nPrior"),
-			cex.names = CEX_SIZE)
-#		main = paste("Linear F scores by sigsq and method, p =", p, "and p0 =", p0),
-		#	col = model_colors[c(1, 5, 9)])
+			ylab = "F-Score")
 
-	title(ylab="F-Score",mgp=c(3.5,1,0), cex.lab = CEX_SIZE)
-     	axis(2, at= c(0,.2,.4,.6,.8,1), labels=c("0.0","0.2","0.4","0.6","0.8","1.0"),mgp=c(3,1,0),cex.axis=CEX_SIZE_2)
+	text(bars, labels = c("Uniform\nPrior", "Correct\nPrior", "Incorrect\nPrior"), par("usr")[3] - 0.06, srt = 45, adj = 1, xpd = TRUE, font = 1)
+	
+	conf_upper = F1s + 1.645 * F1_sd / sqrt(num_sims)
+	conf_lower = F1s - 1.645 * F1_sd / sqrt(num_sims)
+	segments(bars, F1s, bars, conf_upper, col = rgb(0.3,0.3,0.3), lwd = 3) # Draw error bars
+	segments(bars, F1s, bars, conf_lower, col = rgb(0.3,0.3,0.3), lwd = 3)
 }
 
 make_lin_prior_plot(200, 2, 5)

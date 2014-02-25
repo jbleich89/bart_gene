@@ -134,9 +134,13 @@ all_rmse_results_wanted = new_all_rmse_results_wanted[-rm,]
 ##rm OLS BART BEST
 all_rmse_results_wanted = all_rmse_results_wanted[, c("Null", "OLS", "Stepwise", "Lasso", "RF", "BART-Best", "BART-G.Max", "BART-Full", "DT", "spike-slab")]
 
-par(mgp=c(1.8,.5,0), mar=c(4,2.7,0.1,0.1))
-boxplot(all_rmse_results_wanted, ylim = c(0, 1.1), ylab = "out-of-sample RMSE", outline = F, las = 2, names = c("Null", "OLS", "Stepwise", "Lasso", "RF", "BART-\nBest", "BART-\nG.Max", "BART-\nFull", "DT", "spike-\nslab"))
-points(apply(all_rmse_results_wanted, 2, mean, na.rm = T), pch = "-", col = "blue", cex = 5)
+par(mgp=c(1.8,.5,0), mar=c(4.4,2.7,0.1,0.1))
+bars = boxplot(all_rmse_results_wanted, ylim = c(0, 1.1), ylab = "out-of-sample RMSE", outline = F, names = NA)
+y_coords = apply(all_rmse_results_wanted, 2, mean, na.rm = TRUE)
+for (x in 1 : 10){
+	segments(x - 0.2, y_coords[x], x + 0.2, y_coords[x], col = "blue", lwd = 4)
+}
+text(1 : 10, labels = c("Null", "OLS", "Stepwise", "Lasso", "RF-CV", "BART-Best", "BART-G.Max", "BART-Full", "DT", "Spike-slab"), par("usr")[3] - 0.045, srt = 45, adj = 1, xpd = TRUE, font = 1)
 #abline(a = mean(all_rmse_results_wanted[, 1], na.rm = TRUE), b = 0, col = "red")
 
 
@@ -151,10 +155,14 @@ points(apply(all_rmse_results_wanted, 2, mean, na.rm = T), pch = "-", col = "blu
 all_num_var_results_no_na_wanted = all_num_var_results_no_na_wanted[, c("Null", "OLS", "Stepwise", "Lasso", "RF", "BART-Best", "BART-G.Max", "BART-Full", "DT", "spike-slab")]
 all_num_var_results_no_na_wanted_fig = all_num_var_results_no_na_wanted[, c("Stepwise", "Lasso", "RF", "BART-Best", "BART-G.Max", "DT", "spike-slab")]
 
-par(mgp=c(1.8,.5,0), mar=c(4,2.7,0.1,0.1))
-boxplot(all_num_var_results_no_na_wanted_fig, ylab = "Number of TF's Selected", outline = F, las = 2, names = c("Stepwise", "Lasso", "RF", "BART-\nBest", "BART-\nG.Max", "DT", "spike-\nslab"))
-points(apply(all_num_var_results_no_na_wanted_fig, 2, mean), pch = "-", col = "blue", cex = 5)
-
+windows()
+par(mgp=c(1.8,.5,0), mar=c(4.6,2.7,0.3,0.1))
+boxplot(all_num_var_results_no_na_wanted_fig, ylab = "Number of TF's Selected", outline = F, names = NA)
+y_coords = apply(all_num_var_results_no_na_wanted_fig, 2, mean, na.rm = TRUE)
+for (x in 1 : 7){
+	segments(x - 0.2, y_coords[x], x + 0.2, y_coords[x], col = "blue", lwd = 4)
+}
+text(1 : 7, labels = c("Stepwise", "Lasso", "RF-CV", "BART-Best", "BART-G.Max", "DT", "Spike-slab"), par("usr")[3] - 1.75, srt = 45, adj = 1, xpd = TRUE, font = 1)
 
 ##Reduction per var 
 all_rmse_minus_null_per_num_var = (matrix(rep(all_rmse_results_wanted[, 1], ncol(all_rmse_results_wanted)), ncol = ncol(all_rmse_results_wanted)) - all_rmse_results_wanted) / all_num_var_results_no_na_wanted
@@ -166,13 +174,19 @@ for (i in 1 : nrow(all_rmse_results_wanted)){
 
 all_rmse_minus_null_per_num_var_wanted = all_rmse_minus_null_per_num_var[, c("OLS", "Stepwise", "Lasso", "RF", "BART-Best", "BART-G.Max", "BART-Full", "DT", "spike-slab")]
 
-par(mgp=c(1.8,.5,0), mar=c(4,4,0.1,0.1))
+par(mgp=c(1.8,.5,0), mar=c(4.5,2.7,0.175,0.1))
 boxplot(all_rmse_minus_null_per_num_var_wanted, 
 		ylab = "RMSE Reduction per TF\n", 
-		ylim = c(-.05, 0.2), outline = F, las = 2,
-		names = c("OLS", "Stepwise", "Lasso", "RF", "BART-\nBest", "BART-\nG.Max", "BART-\nFull", "DT", "spike-\nslab"))
-points(apply(all_rmse_minus_null_per_num_var_wanted, 2, mean, na.rm = TRUE), pch = "-", col = "blue", cex = 5)
+		ylim = c(-.05, 0.2), outline = F,
+		names = NA)
+y_coords = apply(all_rmse_minus_null_per_num_var_wanted, 2, mean, na.rm = TRUE)
+for (x in 1 : 9){
+	segments(x - 0.2, y_coords[x], x + 0.2, y_coords[x], col = "blue", lwd = 4)
+}
+
 abline(a = 0, b = 0, col = "red")
+text(1 : 9, labels = c("OLS", "Stepwise", "Lasso", "RF-CV", "BART-Best", "BART-G.Max", "BART-Full", "DT", "Spike-slab"), par("usr")[3] - .012, srt = 45, adj = 1, xpd = TRUE, font = 1)
+
 
 counts = apply(all_num_var_results_no_na_wanted, 2, function(s) sum(s>0))
 counts
