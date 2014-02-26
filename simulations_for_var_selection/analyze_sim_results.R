@@ -64,7 +64,7 @@ make_lin_plot = function(p, p0, sigsq){
 #	axis(1, at = 1:6, labels = METHOD_NAMES, cex.axis = CEX_SIZE)
 #	title(ylab="F-Score",mgp=c(3.5,1,0), cex.lab = CEX_SIZE)
 #     axis(2, at= c(0,.2,.4,.6,.8,1), labels=c("0.0","0.2","0.4","0.6","0.8","1.0"),mgp=c(3,1,0),cex.axis=CEX_SIZE_2)
-	text(bars, labels = METHOD_NAMES, par("usr")[3] - 0.05, srt = 45, adj = 1, xpd = TRUE, font = 1)
+	text(bars, labels = METHOD_NAMES, par("usr")[3] - 0.06, srt = 45, adj = 1, xpd = TRUE, font = 1)
 	conf_upper = F1s + 1.645 * F1_sd / sqrt(num_sims)
 	conf_lower = F1s - 1.645 * F1_sd / sqrt(num_sims)
 	segments(bars, F1s, bars, conf_upper, col = rgb(0.3,0.3,0.3), lwd = 3) # Draw error bars

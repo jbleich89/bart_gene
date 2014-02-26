@@ -2,7 +2,7 @@ library(bartMachine)
 
 setwd("C:/Users/jbleich/workspace/bart_gene/analysis_with_tuning/")
 
-source("simulation_params_JB.R")
+source("simulation_params.R")
 
 ##For sample figure
 
@@ -21,8 +21,8 @@ sel = var_selection_by_permute_response_three_methods(bart_machine, num_reps_for
 ##NOISE PLOT
 ##
 out = list()
-par(mgp = c(1.8,.5,0),mar = c(3,3,2,1))
-par(mfrow = c(1,2))
+#par(mgp = c(1.8,.5,0),mar = c(3,3,2,1))
+#par(mfrow = c(1,2))
 nsim = 50
 ymin = 0
 N = 250
@@ -47,13 +47,15 @@ ymax = max(cum_props[2000:n_iter,])
 ymax
 rain = rainbow(p)
 
+par(mgp=c(1.8,.5,0), mar=c(3,2.7,0.3,0.4))
 plot(1:n_iter,cum_props[,1],type="l",col=rain[1],ylim=c(ymin,ymax),
      xlab="Gibbs Sample",ylab="Variable Inclusion Proportion")
-sapply(2:p, function(s) points(1:n_iter,cum_props[,s],type="l",col=rain[s]))
+sapply(2:p, function(s) points(1:n_iter,cum_props[,s],type="l",col=rain[s], lwd = 1))
 abline(h = .025, col = "black", lwd = 3, lty = 2)
 ##follow max
 maxs=apply(cum_props,1,max)
 mins=apply(cum_props,1,min)
+par(mgp=c(1.8,.5,0), mar=c(3,2.7,0.3,0.4))
 plot(1:n_iter,maxs,ylim=c(ymin,ymax),type="l",col="red",lwd=3,ylab="Variable Inclusion Proportion",xlab="Gibbs Sample")
 points(1:n_iter,mins,type="l",col="blue",lwd=3)
 abline(h = .025, col = "black", lwd = 3, lty = 2)
@@ -284,12 +286,12 @@ var
      
 
 
-par(mgp=c(3.5,.5,0), mar=c(5,5,2,1)) 
-boxplot(sqrt(var_i_dot_k), ylim = c(0,.017), ylab = "Standard Deviation", xlab = "Predictor", las = 1, outline = F)
-points(sqrt(var_k), pch = 16, col = "blue", cex = 2.5)
+par(mgp=c(2,.5,0), mar=c(3,4,0.2,0.2)) 
+boxplot(sqrt(var_i_dot_k), ylim = c(0,.017), ylab = "Standard Deviation\n", xlab = "Predictor", las = 1, outline = F)
+points(sqrt(var_k), pch = 16, col = "blue", cex = 1)
 abline(h = sqrt(var), col = "red", lty = 2, lwd = 3)
-dev.copy2pdf(file="anova_plot.pdf", out.type = "pdf")
-dev.off()
+#dev.copy2pdf(file="anova_plot.pdf", out.type = "pdf")
+#dev.off()
 
 ##scratch
 samp = probs_mat[1:50,3:42]

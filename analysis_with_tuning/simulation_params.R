@@ -1,5 +1,5 @@
 #simulation params
-LAST_NAME = "jbleich"
+LAST_NAME = "kapelner"
 NOT_ON_GRID = length(grep("wharton.upenn.edu", Sys.getenv(c("HOSTNAME")))) == 0
 
 
@@ -46,7 +46,7 @@ METHODS = c("important_tfs_at_alpha_pointwise", "important_tfs_at_alpha_simul_ma
 NUM_TREES_FOR_EVAL = 200
 GENE_NUM = 1 #this will be set by passing an arg into R below:
 
-source("helper_functions.R")
+#source("helper_functions.R")
 
 if (NOT_ON_GRID){
 	setwd(paste("C:/Users/", LAST_NAME, "/Desktop/Dropbox/BART_gene", sep = ""))
